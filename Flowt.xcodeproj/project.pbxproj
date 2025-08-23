@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1C3BAAC02E57205B004D83AC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAABF2E57205B004D83AC /* FirebaseAuth */; };
+		1C3BAAC22E57205B004D83AC /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAAC12E57205B004D83AC /* FirebaseFirestore */; };
+		1C3BAAC42E5720BD004D83AC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAAC32E5720BD004D83AC /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		1C370B3A2E565C2800A13271 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +58,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C3BAAC02E57205B004D83AC /* FirebaseAuth in Frameworks */,
+				1C3BAAC22E57205B004D83AC /* FirebaseFirestore in Frameworks */,
+				1C3BAAC42E5720BD004D83AC /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +87,7 @@
 				1C370B2E2E565C2600A13271 /* Flowt */,
 				1C370B3C2E565C2800A13271 /* FlowtTests */,
 				1C370B462E565C2800A13271 /* FlowtUITests */,
+				1C5D5A902E58C78E00DF0335 /* Frameworks */,
 				1C370B2D2E565C2600A13271 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +100,13 @@
 				1C370B432E565C2800A13271 /* FlowtUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1C5D5A902E58C78E00DF0335 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +129,9 @@
 			);
 			name = Flowt;
 			packageProductDependencies = (
+				1C3BAABF2E57205B004D83AC /* FirebaseAuth */,
+				1C3BAAC12E57205B004D83AC /* FirebaseFirestore */,
+				1C3BAAC32E5720BD004D83AC /* FirebaseAnalytics */,
 			);
 			productName = Flowt;
 			productReference = 1C370B2C2E565C2600A13271 /* Flowt.app */;
@@ -195,6 +215,9 @@
 			);
 			mainGroup = 1C370B232E565C2600A13271;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1C370B2D2E565C2600A13271 /* Products */;
 			projectDirPath = "";
@@ -395,6 +418,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Flowt/Flowt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KV29DSPCB2;
@@ -410,7 +434,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = drab.Flowt;
+				PRODUCT_BUNDLE_IDENTIFIER = com.drab.Flowt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -423,6 +447,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Flowt/Flowt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KV29DSPCB2;
@@ -438,7 +463,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = drab.Flowt;
+				PRODUCT_BUNDLE_IDENTIFIER = com.drab.Flowt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -558,6 +583,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1C3BAABF2E57205B004D83AC /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		1C3BAAC12E57205B004D83AC /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		1C3BAAC32E5720BD004D83AC /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1C370B242E565C2600A13271 /* Project object */;
 }
