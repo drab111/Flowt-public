@@ -10,7 +10,10 @@ import SwiftUI
 
 @MainActor
 final class AuthViewModel: ObservableObject {
-    @Published var currentUser: AuthUser?
+    @Published var email: String = ""
+    @Published var password: String = ""
+    @Published var isRegistering: Bool = false
+    @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
     private var appState: AppState
@@ -19,24 +22,33 @@ final class AuthViewModel: ObservableObject {
     init(appState: AppState) { self.appState = appState }
     
     // MARK: - Sign in with Email & Password
-    func signUp(email: String, password: String) async {
+    func submit() async {
+        isLoading = true
+        defer { isLoading = false }
+        if isRegistering {
+            await signUp(email: email, password: password)
+        } else {
+            await signIn(email: email, password: password)
+        }
+    }
+    private func signUp(email: String, password: String) async {
         do {
-            currentUser = try await auth.signUp(email: email, password: password)
-            appState.currentUser = currentUser
-            refreshSession()
+            let user = try await auth.signUp(email: email, password: password)
+            appState.currentUser = user
             try await auth.sendVerificationEmail()
+            appState.checkUserSession()
         } catch { errorMessage = error.localizedDescription }
     }
     
-    func signIn(email: String, password: String) async {
+    private func signIn(email: String, password: String) async {
         do {
-            currentUser = try await auth.signIn(email: email, password: password)
-            appState.currentUser = currentUser
+            let user = try await auth.signIn(email: email, password: password)
+            appState.currentUser = user
             if let user = auth.getCurrentUser(), !user.isEmailVerified {
                 appState.currentScreen = .verifyEmail
                 return
             }
-            appState.currentScreen = .mainMenu
+            appState.currentScreen = .mainMenu(.account)
         } catch { errorMessage = error.localizedDescription }
     }
     
@@ -52,9 +64,9 @@ final class AuthViewModel: ObservableObject {
             if let credential = authResults.credential as? ASAuthorizationAppleIDCredential {
                 Task {
                     do {
-                        currentUser = try await auth.handleAppleAuth(credential: credential)
-                        appState.currentUser = currentUser
-                        appState.currentScreen = .mainMenu
+                        let user = try await auth.handleAppleAuth(credential: credential)
+                        appState.currentUser = user
+                        appState.currentScreen = .mainMenu(.account)
                     } catch { errorMessage = error.localizedDescription }
                 }
             }
@@ -63,15 +75,45 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Helpers
-    func resendVerificationEmail() async {
+    // MARK: Deleting Account
+    func deleteUserAccount() async {
+        guard (appState.currentUser?.uid) != nil else { return }
         do {
-            try await auth.sendVerificationEmail()
-            errorMessage = "A verification email has been sent."
+            try await auth.deleteAccount()
+            appState.currentUser = nil
+            appState.currentScreen = .signIn
         } catch { errorMessage = error.localizedDescription }
     }
     
-    func refreshSession() { appState.checkUserSession() }
+    // MARK: - Helpers
+    var isEmailValid: Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
+    }
+
+    var isPasswordValid: Bool { return password.count >= 8 }
+
+    var canSubmit: Bool {
+        if isRegistering {
+            return isEmailValid && isPasswordValid
+        } else {
+            return !email.isEmpty && !password.isEmpty
+        }
+    }
     
-    func signOut() { appState.signOut() }
+    func signOut() {
+        do {
+            try auth.signOut()
+            appState.currentUser = nil
+            appState.currentUserProfile = nil
+            appState.currentScreen = .signIn
+        } catch { errorMessage = error.localizedDescription }
+    }
+    
+    func toggleMode() {
+        withAnimation(.spring()) {
+            isRegistering.toggle()
+            errorMessage = nil
+        }
+    }
 }

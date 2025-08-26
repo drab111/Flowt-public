@@ -23,14 +23,14 @@ struct RootView: View {
     
     var body: some View {
         switch appState.currentScreen {
+        case .loading:
+            LoadingView()
         case .signIn:
             SignInView(viewModel: AuthViewModel(appState: appState)) // appState to klasa więc przekazujemy oryginał
         case .verifyEmail:
-            VerifyEmailView(viewModel: AuthViewModel(appState: appState))
-        case .mainMenu:
-            MainMenuView(viewModel: MainMenuViewModel(appState: appState))
-        case .account:
-            AccountView(viewModel: UserProfileViewModel(appState: appState))
+            VerifyEmailView(viewModel: VerifyEmailViewModel(appState: appState))
+        case .mainMenu(let selectedTab):
+            MainMenuView(authVM: AuthViewModel(appState: appState), mainMenuVM: MainMenuViewModel(appState: appState), selectedTab: selectedTab)
         }
     }
 }

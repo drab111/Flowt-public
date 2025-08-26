@@ -8,13 +8,17 @@
 import SwiftUI
 import FirebaseAuth
 
+enum Screen {
+    case loading, signIn, verifyEmail, mainMenu(MainMenuTab)
+}
+
+enum MainMenuTab {
+    case account, tutorial, game, ranking, settings
+}
+
 @MainActor
 class AppState: ObservableObject {
-    enum Screen {
-        case signIn, verifyEmail, mainMenu, account
-    }
-    
-    @Published var currentScreen: Screen = .signIn
+    @Published var currentScreen: Screen = .loading
     @Published var currentUser: AuthUser? = nil
     @Published var currentUserProfile: UserProfile? = nil
     
@@ -27,7 +31,7 @@ class AppState: ObservableObject {
                     try await user.reload()
                     currentUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
                     if user.isEmailVerified {
-                        currentScreen = .mainMenu
+                        currentScreen = .mainMenu(.account)
                     } else {
                         currentScreen = .verifyEmail
                     }
@@ -35,17 +39,6 @@ class AppState: ObservableObject {
             } else {
                 currentScreen = .signIn
             }
-        }
-    }
-    
-    func signOut() {
-        do {
-            try Auth.auth().signOut()
-            currentUser = nil
-            currentUserProfile = nil
-            currentScreen = .signIn
-        } catch {
-            print("Error signing out: \(error.localizedDescription)")
         }
     }
 }

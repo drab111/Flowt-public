@@ -48,7 +48,12 @@ final class AuthService {
         return AuthUser(uid: result.user.uid, displayName: result.user.displayName ?? credential.fullName?.givenName, email: result.user.email)
     }
     
-    // MARK: - Helpers
+    // MARK: - Other Methods
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else { return }
+        try await user.delete()
+    }
+    
     func getCurrentUser() -> User? { return Auth.auth().currentUser }
     
     func signOut() throws { try Auth.auth().signOut() }

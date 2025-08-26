@@ -9,15 +9,16 @@ import SwiftUI
 import PhotosUI
 
 struct AccountView: View {
-    @StateObject var viewModel: UserProfileViewModel
+    @StateObject var authVM: AuthViewModel
+    @StateObject var userProfileVM: UserProfileViewModel
     @State private var pickerItem: PhotosPickerItem? = nil // wybrany element z selektora zdjęć
     
     var body: some View {
         VStack(spacing: 20) {
-            if viewModel.isLoading {
+            if userProfileVM.isLoading {
                 ProgressView()
                     .frame(width: 120, height: 120)
-            } else if let data = viewModel.avatarData, let image = UIImage(data: data) {
+            } else if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -35,35 +36,53 @@ struct AccountView: View {
                 .onChange(of: pickerItem) { _, newItem in // newItem to obiekt typu PhotosPickerItem
                     Task {
                         if let data = try? await newItem?.loadTransferable(type: Data.self) { // surowe dane binarne
-                            viewModel.avatarData = data
+                            userProfileVM.avatarData = data
                         }
                     }
                 }
             
-            Label("Nickname: \(viewModel.currentNickname)", systemImage: "person.crop.circle")
+            Label("Nickname: \(userProfileVM.currentNickname)", systemImage: "person.crop.circle")
                 .font(.headline)
                 .padding()
             
-            TextField("Change nickname", text: $viewModel.currentNickname)
+            TextField("Change nickname", text: $userProfileVM.currentNickname)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
             Button("Save Profile") {
-                Task { await viewModel.updateProfile(nickname: viewModel.currentNickname, imageData: viewModel.avatarData) }
+                Task { await userProfileVM.updateProfile(nickname: userProfileVM.currentNickname, imageData: userProfileVM.avatarData) }
             }
             .buttonStyle(.borderedProminent)
             
             Spacer()
+            
+            Button(role: .destructive) {
+                authVM.signOut()
+            } label: {
+                Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+            }
+            
+            Button(role: .destructive) {
+                Task {
+                    await userProfileVM.deleteProfile()
+                    await authVM.deleteUserAccount()
+                }
+            } label: {
+                Text("Delete Account")
+            }
+            .padding()
         }
         .padding()
-        .task { await viewModel.loadUserProfile() }
+        .task { await userProfileVM.loadUserProfile() }
     }
 }
 
 
 #Preview {
     let appState = AppState()
-    let viewModel = UserProfileViewModel(appState: appState)
-    AccountView(viewModel: viewModel)
+    let userProfileVM = UserProfileViewModel(appState: appState)
+    let authVM = AuthViewModel(appState: appState)
+    
+    AccountView(authVM: authVM, userProfileVM: userProfileVM)
         .environmentObject(appState)
 }

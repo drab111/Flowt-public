@@ -13,7 +13,7 @@ final class MainMenuViewModel: ObservableObject {
     
     init(appState: AppState) { self.appState = appState }
     
-    func goToAccount() { appState.currentScreen = .account }
+    func changeTab(_ tab: MainMenuTab) { appState.currentScreen = .mainMenu(tab) }
     
-    func signOut() { appState.signOut() }
+    func getAppState() -> AppState { return appState }
 }

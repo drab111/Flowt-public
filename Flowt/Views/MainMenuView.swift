@@ -8,38 +8,56 @@
 import SwiftUI
 
 struct MainMenuView: View {
-    @StateObject var viewModel: MainMenuViewModel
+    @StateObject var authVM: AuthViewModel
+    @StateObject var mainMenuVM: MainMenuViewModel
+    var selectedTab: MainMenuTab
     
     var body: some View {
-        VStack(spacing: 30) {
-            Text("Main Menu")
-                .font(.largeTitle)
-                .bold()
+        TabView(selection: Binding( // musimy zrobic sami Binding bo selectedTab pochodzace z nadwidoku nie jest typu @State
+            get: { selectedTab },
+            set: { newTab in mainMenuVM.changeTab(newTab) }
+        )) {
             
-            Button {
-                viewModel.goToAccount()
-            } label: {
-                Label("My Account", systemImage: "person.circle")
+            AccountView( authVM: AuthViewModel(appState: mainMenuVM.getAppState()), userProfileVM: UserProfileViewModel(appState: mainMenuVM.getAppState()))
+            .tabItem {
+                Label("Account", systemImage: "person.crop.circle")
             }
-            .buttonStyle(.borderedProminent)
+            .tag(MainMenuTab.account)
             
-            Spacer()
+            TutorialView()
+                .tabItem {
+                    Label("Tutorial", systemImage: "book.closed")
+                }
+                .tag(MainMenuTab.tutorial)
             
-            Button(role: .destructive) {
-                viewModel.signOut()
-            } label: {
-                Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-            }
+            GameView()
+                .tabItem {
+                    Label("Game", systemImage: "gamecontroller")
+                }
+                .tag(MainMenuTab.game)
+            
+            RankingView()
+                .tabItem {
+                    Label("Ranking", systemImage: "trophy")
+                }
+                .tag(MainMenuTab.ranking)
+            
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape")
+                }
+                .tag(MainMenuTab.settings)
         }
-        .padding()
+        .accentColor(.blue) // kolor ikonek aktywnej zakładki
+        .animation(.easeInOut, value: selectedTab) // płynne przejście
     }
 }
 
-
-
 #Preview {
     let appState = AppState()
-    let viewModel = MainMenuViewModel(appState: appState)
-    MainMenuView(viewModel: viewModel)
+    let mainMenuVM = MainMenuViewModel(appState: appState)
+    let authVM = AuthViewModel(appState: appState)
+    
+    MainMenuView(authVM: authVM, mainMenuVM: mainMenuVM, selectedTab: .account)
         .environmentObject(appState)
 }

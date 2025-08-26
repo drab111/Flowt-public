@@ -22,20 +22,17 @@ final class UserProfileViewModel: ObservableObject {
     func loadUserProfile() async {
         isLoading = true
         defer { isLoading = false }
-        
         guard let uid = appState.currentUser?.uid else { return }
         do {
             if let profile = try await profileService.fetchProfile(uid: uid) {
                 appState.currentUserProfile = profile
                 currentNickname = profile.nickname
-                if currentNickname == "" { currentNickname = "Player \(uid)" }
                 avatarData = profile.avatarBase64.flatMap { Data(base64Encoded: $0) }
             } else {
+                currentNickname = "Player \(String(uid.prefix(5)))"
                 errorMessage = "Profile not found"
             }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        } catch { errorMessage = error.localizedDescription }
     }
     
     func updateProfile(nickname: String, imageData: Data?) async {
@@ -52,8 +49,14 @@ final class UserProfileViewModel: ObservableObject {
             appState.currentUserProfile = profile
             currentNickname = profile.nickname
             avatarData = profile.avatarBase64.flatMap { Data(base64Encoded: $0) }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        } catch { errorMessage = error.localizedDescription }
+    }
+    
+    func deleteProfile() async {
+        guard let uid = appState.currentUser?.uid else { return }
+        do {
+            try await profileService.deleteProfile(uid: uid)
+            appState.currentUserProfile = nil
+        } catch { errorMessage = error.localizedDescription }
     }
 }

@@ -27,4 +27,8 @@ final class UserProfileService {
     func saveProfile(_ profile: UserProfile) async throws {
         try await db.collection("users").document(profile.id).setData(["nickname": profile.nickname, "avatarBase64": profile.avatarBase64 as Any])
     }
+    
+    func deleteProfile(uid: String) async throws {
+        try await db.collection("users").document(uid).delete()
+    }
 }
