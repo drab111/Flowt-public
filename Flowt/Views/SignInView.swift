@@ -9,13 +9,13 @@ import SwiftUI
 import AuthenticationServices
 
 struct SignInView: View {
-    @StateObject var viewModel: AuthViewModel
-    @Environment(\.colorScheme) var colorScheme
-    @FocusState private var focusedField: Field? // info w jakim polu tekstowym user ma klawiature (email czy password)
-    
     enum Field {
         case email, password
     }
+    
+    @StateObject var viewModel: AuthViewModel
+    @Environment(\.colorScheme) var colorScheme
+    @FocusState private var focusedField: Field? // info w jakim polu tekstowym user ma klawiature (email czy password)
     
     var body: some View {
         ZStack {
