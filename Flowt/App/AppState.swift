@@ -12,8 +12,28 @@ enum Screen {
     case loading, signIn, verifyEmail, mainMenu(MainMenuTab)
 }
 
-enum MainMenuTab {
+enum MainMenuTab: CaseIterable {
     case account, tutorial, game, ranking, settings
+    
+    var title: String {
+        switch self {
+        case .account: return "Account"
+        case .tutorial: return "Tutorial"
+        case .game: return "Game"
+        case .ranking: return "Ranking"
+        case .settings: return "Settings"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .account: return "person.circle"
+        case .tutorial: return "book.fill"
+        case .game: return "gamecontroller"
+        case .ranking: return "list.bullet"
+        case .settings: return "gearshape"
+        }
+    }
 }
 
 @MainActor

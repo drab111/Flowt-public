@@ -9,10 +9,13 @@ import SwiftUI
 
 struct LoadingView: View {
     var body: some View {
-        Image("FlowtLogo")
-            .resizable()
-            .scaledToFit()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ZStack {
+            BackgroundView(withLogo: false, hasBottomBar: false)
+            Image("FlowtLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
     }
 }
 

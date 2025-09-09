@@ -19,11 +19,7 @@ struct SignInView: View {
     
     var body: some View {
         ZStack {
-            LinearGradient(colors: [
-                Color(red: 0.05, green: 0.1, blue: 0.25),
-                Color(red: 0.1, green: 0.3, blue: 0.6)
-            ], startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
+            BackgroundView(withLogo: false, hasBottomBar: false)
                 .onTapGesture { focusedField = nil } // jak klikamy gdzies poza TextField to ustawia sie na nil
             
             VStack(spacing: 30) {

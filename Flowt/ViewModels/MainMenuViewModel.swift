@@ -9,11 +9,15 @@ import SwiftUI
 
 @MainActor
 final class MainMenuViewModel: ObservableObject {
+    @Published var authVM: AuthViewModel
+    @Published var userProfileVM: UserProfileViewModel
     private var appState: AppState
     
-    init(appState: AppState) { self.appState = appState }
-    
-    func changeTab(_ tab: MainMenuTab) { appState.currentScreen = .mainMenu(tab) }
+    init(appState: AppState) {
+        self.appState = appState
+        self.authVM = AuthViewModel(appState: appState)
+        self.userProfileVM = UserProfileViewModel(appState: appState)
+    }
     
     func getAppState() -> AppState { return appState }
 }

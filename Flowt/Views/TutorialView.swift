@@ -9,7 +9,11 @@ import SwiftUI
 
 struct TutorialView: View {
     var body: some View {
-        Text("TutorialView")
+        ZStack {
+            BackgroundView()
+            
+            Text("TutorialView")
+        }
     }
 }
 

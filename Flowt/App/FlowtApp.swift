@@ -19,7 +19,15 @@ struct FlowtApp: App {
 }
 
 struct RootView: View {
-    @StateObject private var appState = AppState()
+    @StateObject private var appState: AppState
+    @StateObject private var mainMenuVM: MainMenuViewModel
+    
+    init() {
+        let appState = AppState()
+        // pzypisujemy obiekty do samego wrappera a nie zmiennej
+        _appState = StateObject(wrappedValue: appState)
+        _mainMenuVM = StateObject(wrappedValue: MainMenuViewModel(appState: appState))
+    }
     
     var body: some View {
         switch appState.currentScreen {
@@ -30,7 +38,14 @@ struct RootView: View {
         case .verifyEmail:
             VerifyEmailView(viewModel: VerifyEmailViewModel(appState: appState))
         case .mainMenu(let selectedTab):
-            MainMenuView(authVM: AuthViewModel(appState: appState), mainMenuVM: MainMenuViewModel(appState: appState), selectedTab: selectedTab)
+            MainMenuView(
+                mainMenuVM: mainMenuVM,
+                selectedTab: selectedTab,
+                onTabChange: { newTab in
+                    appState.currentScreen = .mainMenu(newTab)
+                }
+            )
+            .id(appState.currentUser?.uid) // jak zmieni się user (czyli jego uid) to tworzymy nową instancję aby nie pamiętała wcześniejszych danych
         }
     }
 }

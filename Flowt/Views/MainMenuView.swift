@@ -8,56 +8,111 @@
 import SwiftUI
 
 struct MainMenuView: View {
-    @StateObject var authVM: AuthViewModel
     @StateObject var mainMenuVM: MainMenuViewModel
-    var selectedTab: MainMenuTab
+    
+    let selectedTab: MainMenuTab
+    let onTabChange: (MainMenuTab) -> Void
+    
+    @Namespace private var animation
     
     var body: some View {
-        TabView(selection: Binding( // musimy zrobic sami Binding bo selectedTab pochodzace z nadwidoku nie jest typu @State
-            get: { selectedTab },
-            set: { newTab in mainMenuVM.changeTab(newTab) }
-        )) {
+        ZStack {
+            BackgroundView()
             
-            AccountView( authVM: AuthViewModel(appState: mainMenuVM.getAppState()), userProfileVM: UserProfileViewModel(appState: mainMenuVM.getAppState()))
-            .tabItem {
-                Label("Account", systemImage: "person.crop.circle")
+            VStack(spacing: 0) {
+                // Główna treść
+                ZStack {
+                    switch selectedTab {
+                    case .account: AccountView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.userProfileVM)
+                    case .tutorial: TutorialView()
+                    case .game: GameView()
+                    case .ranking: RankingView()
+                    case .settings: SettingsView()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                CustomTabBar(selectedTab: selectedTab, animation: animation, onTabChange: onTabChange)
             }
-            .tag(MainMenuTab.account)
-            
-            TutorialView()
-                .tabItem {
-                    Label("Tutorial", systemImage: "book.closed")
-                }
-                .tag(MainMenuTab.tutorial)
-            
-            GameView()
-                .tabItem {
-                    Label("Game", systemImage: "gamecontroller")
-                }
-                .tag(MainMenuTab.game)
-            
-            RankingView()
-                .tabItem {
-                    Label("Ranking", systemImage: "trophy")
-                }
-                .tag(MainMenuTab.ranking)
-            
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
-                }
-                .tag(MainMenuTab.settings)
+            .ignoresSafeArea(edges: .bottom)
         }
-        .accentColor(.blue) // kolor ikonek aktywnej zakładki
-        .animation(.easeInOut, value: selectedTab) // płynne przejście
+    }
+}
+
+struct CustomTabBar: View {
+    let selectedTab: MainMenuTab
+    var animation: Namespace.ID
+    let onTabChange: (MainMenuTab) -> Void
+    
+    var body: some View {
+        HStack {
+            ForEach(MainMenuTab.allCases, id: \.self) { tab in
+                VStack(spacing: 4) {
+                    ZStack {
+                        if selectedTab == tab {
+                            LinearGradient(
+                                colors: [Color(red: 0.8, green: 0.0, blue: 0.0),
+                                         Color(red: 0.0, green: 0.2, blue: 0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            .mask(
+                                Image(systemName: tab.icon)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 26, height: 26)
+                            )
+                            .matchedGeometryEffect(id: "ICON", in: animation)
+                            .frame(width: 26, height: 26)
+                        } else {
+                            Image(systemName: tab.icon)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    }
+                    
+                    Text(tab.title)
+                        .font(.caption2)
+                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.6))
+                }
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .onTapGesture {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        onTabChange(tab) // zamiast bindingu, callback do RootView
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.bottom, 20)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.05, green: 0.1, blue: 0.25).opacity(0.95),
+                    Color(red: 0.1, green: 0.3, blue: 0.55).opacity(0.95)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: -5)
     }
 }
 
 #Preview {
     let appState = AppState()
     let mainMenuVM = MainMenuViewModel(appState: appState)
-    let authVM = AuthViewModel(appState: appState)
     
-    MainMenuView(authVM: authVM, mainMenuVM: mainMenuVM, selectedTab: .account)
-        .environmentObject(appState)
+    MainMenuView(
+        mainMenuVM: mainMenuVM,
+        selectedTab: .settings,
+        onTabChange: { newTab in
+            appState.currentScreen = .mainMenu(newTab)
+        }
+    )
+    .environmentObject(appState)
 }

@@ -9,7 +9,11 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        Text("SettingsView")
+        ZStack {
+            BackgroundView()
+            
+            Text("SettingsView")
+        }
     }
 }
 

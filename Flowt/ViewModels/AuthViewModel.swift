@@ -31,6 +31,7 @@ final class AuthViewModel: ObservableObject {
             await signIn(email: email, password: password)
         }
     }
+    
     private func signUp(email: String, password: String) async {
         do {
             let user = try await auth.signUp(email: email, password: password)
@@ -93,13 +94,7 @@ final class AuthViewModel: ObservableObject {
 
     var isPasswordValid: Bool { return password.count >= 8 }
 
-    var canSubmit: Bool {
-        if isRegistering {
-            return isEmailValid && isPasswordValid
-        } else {
-            return !email.isEmpty && !password.isEmpty
-        }
-    }
+    var canSubmit: Bool { return isEmailValid && isPasswordValid }
     
     func signOut() {
         do {
