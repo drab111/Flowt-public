@@ -9,9 +9,7 @@ import SwiftUI
 import AuthenticationServices
 
 struct SignInView: View {
-    enum Field {
-        case email, password
-    }
+    enum Field { case email, password }
     
     @StateObject var viewModel: AuthViewModel
     @Environment(\.colorScheme) var colorScheme

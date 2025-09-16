@@ -9,10 +9,14 @@ import SwiftUI
 
 @MainActor
 final class UserProfileViewModel: ObservableObject {
+    enum SaveState { case idle, saving, saved }
+    
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var currentNickname: String = ""
+    @Published var newNickname: String = ""
     @Published var avatarData: Data?
+    @Published var saveState: SaveState = .idle
     
     private var appState: AppState
     private let profileService = UserProfileService()
@@ -29,27 +33,45 @@ final class UserProfileViewModel: ObservableObject {
                 currentNickname = profile.nickname
                 avatarData = profile.avatarBase64.flatMap { Data(base64Encoded: $0) }
             } else {
+                errorMessage = "New profile"
                 currentNickname = "Player \(String(uid.prefix(5)))"
-                errorMessage = "Profile not found"
+                avatarData = nil
+                let profile = UserProfile(id: uid, nickname: currentNickname, avatarBase64: nil)
+                try await profileService.saveProfile(profile)
             }
         } catch { errorMessage = error.localizedDescription }
     }
     
     func updateProfile(nickname: String, imageData: Data?) async {
+        saveState = .saving
+        defer { saveState = .idle }
         guard let uid = appState.currentUser?.uid else { return }
         do {
+            let finalNickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? currentNickname : nickname
+            
             var avatarBase64: String? = appState.currentUserProfile?.avatarBase64
             if let imageData = imageData, let image = UIImage(data: imageData) {
                 // zmniejszamy i kompresujemy
                 let resized = image.resized(to: 200)
                 avatarBase64 = resized.toBase64(maxSizeKB: 500)
             }
-            let profile = UserProfile(id: uid, nickname: nickname, avatarBase64: avatarBase64)
+            
+            let profile = UserProfile(id: uid, nickname: finalNickname, avatarBase64: avatarBase64)
             try await profileService.saveProfile(profile)
             appState.currentUserProfile = profile
             currentNickname = profile.nickname
             avatarData = profile.avatarBase64.flatMap { Data(base64Encoded: $0) }
-        } catch { errorMessage = error.localizedDescription }
+            newNickname = ""
+            
+            // sukces
+            saveState = .saved
+            // automatyczny powrót do "idle" po 1.5 sekundy
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            if !Task.isCancelled { saveState = .idle }
+        } catch {
+            errorMessage = error.localizedDescription
+            saveState = .idle
+        }
     }
     
     func deleteProfile() async {

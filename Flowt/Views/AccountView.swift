@@ -9,71 +9,218 @@ import SwiftUI
 import PhotosUI
 
 struct AccountView: View {
+    enum ActiveAlert: Identifiable {
+        case signOut, deleteAccount
+        
+        var id: Int {
+            switch self {
+            case .signOut: return 1
+            case .deleteAccount: return 2
+            }
+        }
+    }
+    
     @StateObject var authVM: AuthViewModel
     @StateObject var userProfileVM: UserProfileViewModel
-    @State private var pickerItem: PhotosPickerItem? = nil // wybrany element z selektora zdjęć
+    @State private var pickerItem: PhotosPickerItem? = nil // wybrany element w selektorze zdjęć
+    @State private var activeAlert: ActiveAlert? = nil
+    @FocusState private var focusedField: Bool
     
     var body: some View {
-        VStack(spacing: 20) {
+        ZStack {
             if userProfileVM.isLoading {
                 ProgressView()
-                    .frame(width: 120, height: 120)
-            } else if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 120, height: 120)
-                    .clipShape(Circle())
-                    .clipped()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.2))
             } else {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 120, height: 120)
-                    .overlay(Text("Avatar"))
+                ScrollView {
+                    VStack(spacing: 24) {
+                        Group {
+                            // MARK: - Profil użytkownika
+                            profilePanel
+                            
+                            // MARK: - Ranking
+                            scorePanel
+                            
+                            // MARK: - Akcje konta
+                            actionsPanel
+                        }
+                        .padding()
+                        .background(Color.white.opacity(0.03))
+                        .cornerRadius(8)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.15), lineWidth: 1))
+                    }
+                    .padding()
+                }
             }
+        }
+        .task { await userProfileVM.loadUserProfile() }
+        .onTapGesture { focusedField = false }
+        .alert(item: $activeAlert) { alertType in
+            switch alertType {
+            case .signOut:
+                return Alert(
+                    title: Text("Confirm Sign Out"),
+                    message: Text("You are about to sign out of your account. You can sign back in at any time."),
+                    primaryButton: .destructive(Text("Sign Out")) { authVM.signOut() },
+                    secondaryButton: .cancel(Text("Stay Logged In"))
+                )
+            case .deleteAccount:
+                return Alert(
+                    title: Text("Delete Account"),
+                    message: Text("This will permanently remove your account and all associated data. This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete Account")) {
+                        Task {
+                            await userProfileVM.deleteProfile()
+                            await authVM.deleteUserAccount()
+                        }
+                    },
+                    secondaryButton: .cancel(Text("Cancel"))
+                )
+            }
+        }
+
+    }
+    
+    // MARK: - Panel profilu
+    private var profilePanel: some View {
+        VStack(spacing: 16) {
+            Group {
+                if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 2))
+                } else {
+                    Image("FlowtLogo")
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 2))
+                }
+            }
+            .frame(width: 140, height: 140)
+            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
             
-            PhotosPicker("Select Avatar", selection: $pickerItem, matching: .images)
-                .onChange(of: pickerItem) { _, newItem in // newItem to obiekt typu PhotosPickerItem
+            Text(userProfileVM.currentNickname)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+            
+            PhotosPicker("Change Avatar", selection: $pickerItem, matching: .images)
+                .onChange(of: pickerItem) { _, newItem in
                     Task {
-                        if let data = try? await newItem?.loadTransferable(type: Data.self) { // surowe dane binarne
+                        if let data = try? await newItem?.loadTransferable(type: Data.self) {
                             userProfileVM.avatarData = data
                         }
                     }
                 }
+                .buttonStyle(.bordered)
+                .tint(.blue.opacity(0.6))
             
-            Label("Nickname: \(userProfileVM.currentNickname)", systemImage: "person.crop.circle")
-                .font(.headline)
-                .padding()
+            TextField("Enter new nickname", text: $userProfileVM.newNickname)
+                .focused($focusedField)
+                .padding(10)
+                .background(Color.white.opacity(0.1))
+                .cornerRadius(6)
+                .foregroundColor(.white)
             
-            TextField("Change nickname", text: $userProfileVM.currentNickname)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Button("Save Profile") {
-                Task { await userProfileVM.updateProfile(nickname: userProfileVM.currentNickname, imageData: userProfileVM.avatarData) }
+            switch userProfileVM.saveState {
+            case .idle:
+                Button {
+                    Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
+                    focusedField = false
+                } label: {
+                    Label("Save Changes", systemImage: "square.and.arrow.down")
+                        .font(.body.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.vertical, 8)
+                .background(Color.blue.opacity(0.7))
+                .foregroundColor(.white)
+                .cornerRadius(6)
+
+            case .saving:
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.blue.opacity(0.5))
+                    .cornerRadius(6)
+
+            case .saved:
+                Label("Saved!", systemImage: "checkmark.circle.fill")
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.green.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
             }
-            .buttonStyle(.borderedProminent)
+        }
+    }
+    
+    // MARK: - Panel wyniku
+    private var scorePanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Performance")
+                .font(.headline)
+                .foregroundColor(.white.opacity(0.8))
             
-            Spacer()
-            
-            Button(role: .destructive) {
-                authVM.signOut()
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Highest Score")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.6))
+                    Text("123") // TODO: fetch from Firestore
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Global Rank")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.6))
+                    Text("#42") // TODO: mock / Firestore ranking
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.yellow)
+                }
+            }
+        }
+
+    }
+    
+    // MARK: - Panel akcji
+    private var actionsPanel: some View {
+        VStack(spacing: 12) {
+            Button {
+                activeAlert = .signOut
             } label: {
                 Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-            }
-            
-            Button(role: .destructive) {
-                Task {
-                    await userProfileVM.deleteProfile()
-                    await authVM.deleteUserAccount()
-                }
-            } label: {
-                Text("Delete Account")
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
             }
             .padding()
+            .background(Color.red.opacity(0.7))
+            .foregroundColor(.white)
+            .cornerRadius(6)
+            
+            Button {
+                activeAlert = .deleteAccount
+            } label: {
+                Label("Delete Account", systemImage: "trash")
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .padding()
+            .background(Color.red)
+            .foregroundColor(.white)
+            .cornerRadius(6)
         }
-        .padding()
-        .task { await userProfileVM.loadUserProfile() }
     }
 }
 

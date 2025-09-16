@@ -25,7 +25,7 @@ struct BackgroundView: View {
             .ignoresSafeArea()
             
             // Warstwy fal
-            GeometryReader { geo in
+            GeometryReader { geo in // specjalny kontener SwiftUI który daje dostęp do rozmiaru i położenia przestrzeni w której dany widok się znajduje
                 ZStack {
                     WaveShape(amplitude: 40, frequency: 1.5)
                         .fill(Color.white.opacity(0.06))
@@ -44,7 +44,7 @@ struct BackgroundView: View {
                 }
             }
             
-            // Delikatna siatka morska
+            // Delikatne kafelki
             GeometryReader { geo in
                 Path { path in
                     let spacing: CGFloat = 120
@@ -73,24 +73,25 @@ struct BackgroundView: View {
 }
 
 struct WaveShape: Shape {
-    var amplitude: CGFloat
-    var frequency: CGFloat
+    var amplitude: CGFloat // wysokość fal
+    var frequency: CGFloat // ile fal zmieści się w szerokości prostokąta
     
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let midHeight = rect.height / 2
+        let midHeight = rect.height / 2 // linia środkowa (fala oscyluje wokół niej)
         
         path.move(to: CGPoint(x: 0, y: midHeight))
         
-        for x in stride(from: 0, through: rect.width, by: 1) {
-            let relativeX = x / rect.width
+        for x in stride(from: 0, through: rect.width, by: 1) { // iterujemy po każdym pikselu w poziomie
+            let relativeX = x / rect.width // normalizujemy pozycję X do przedziału 0…1 (żeby fala była niezależna od rozdzielczości)
             let y = midHeight + sin(relativeX * .pi * frequency) * amplitude
+            // y przesuwa się w górę i w dół tworząc fale
             path.addLine(to: CGPoint(x: x, y: y))
         }
         
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
-        path.addLine(to: CGPoint(x: 0, y: rect.height))
-        path.closeSubpath()
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height)) // schodzimy w dół na prawym brzegu
+        path.addLine(to: CGPoint(x: 0, y: rect.height)) // wracamy do lewego dołu
+        path.closeSubpath() // zamykamy kształt
         
         return path
     }
