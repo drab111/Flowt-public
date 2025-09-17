@@ -11,13 +11,13 @@ import SwiftUI
 final class MainMenuViewModel: ObservableObject {
     @Published var authVM: AuthViewModel
     @Published var userProfileVM: UserProfileViewModel
+    @Published var gameVM: GameViewModel
     private var appState: AppState
     
     init(appState: AppState) {
         self.appState = appState
         self.authVM = AuthViewModel(appState: appState)
         self.userProfileVM = UserProfileViewModel(appState: appState)
+        self.gameVM = GameViewModel(appState: appState)
     }
-    
-    func getAppState() -> AppState { return appState }
 }

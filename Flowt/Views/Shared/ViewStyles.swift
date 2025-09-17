@@ -1,5 +1,5 @@
 //
-//  BackgroundView.swift
+//  ViewStyles.swift
 //  Flowt
 //
 //  Created by Wiktor Drab on 09/09/2025.
@@ -94,5 +94,18 @@ struct WaveShape: Shape {
         path.closeSubpath() // zamykamy kształt
         
         return path
+    }
+}
+
+struct GradientBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)).opacity(0.7)
+    }
+}
+
+extension View {
+    public func gradientBackground() -> some View {
+        modifier(GradientBackground())
     }
 }

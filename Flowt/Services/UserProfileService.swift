@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import Foundation
+import NSFWDetector
 
 struct UserProfile: Identifiable, Codable {
     var id: String // = uid z FirebaseAuth
@@ -16,7 +17,9 @@ struct UserProfile: Identifiable, Codable {
 
 final class UserProfileService {
     private let db = Firestore.firestore()
+    private let detector = NSFWDetector.shared
     
+    // MARK: - Firestore
     func fetchProfile(uid: String) async throws -> UserProfile? {
         // doc to pojedyńczy dokument pobrany z Firestore
         let doc = try await db.collection("users").document(uid).getDocument()
@@ -30,5 +33,25 @@ final class UserProfileService {
     
     func deleteProfile(uid: String) async throws {
         try await db.collection("users").document(uid).delete()
+    }
+    
+    // MARK: - helper do modelu ML (opakowujemy stare, callback-owe API w mechanizm async/await - wymuszając zaczekanie na wynik klasyfikatora)
+    func validateAvatar(image: UIImage, threshold: Float = 0.5) async throws -> Bool {
+        try await withCheckedThrowingContinuation { continuation in // to wykryje brak wywołania resume lub podwójne resume i zgłosi problem — pomaga debugować
+            detector.check(image: image) { result in
+                switch result {
+                case let .success(nsfwConfidence: confidence):
+                    if confidence > threshold {
+                        // zdjęcie nieodpowiednie
+                        continuation.resume(returning: false)
+                    } else {
+                        // zdjęcie ok
+                        continuation.resume(returning: true)
+                    }
+                case let .error(error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 }

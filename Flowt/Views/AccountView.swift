@@ -20,8 +20,8 @@ struct AccountView: View {
         }
     }
     
-    @StateObject var authVM: AuthViewModel
-    @StateObject var userProfileVM: UserProfileViewModel
+    @ObservedObject var authVM: AuthViewModel
+    @ObservedObject var userProfileVM: UserProfileViewModel
     @State private var pickerItem: PhotosPickerItem? = nil // wybrany element w selektorze zdjęć
     @State private var activeAlert: ActiveAlert? = nil
     @FocusState private var focusedField: Bool
@@ -119,7 +119,7 @@ struct AccountView: View {
                     }
                 }
                 .buttonStyle(.bordered)
-                .tint(.blue.opacity(0.6))
+                .tint(.blue.opacity(0.65))
             
             TextField("Enter new nickname", text: $userProfileVM.newNickname)
                 .focused($focusedField)
@@ -134,12 +134,12 @@ struct AccountView: View {
                     Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
                     focusedField = false
                 } label: {
-                    Label("Save Changes", systemImage: "square.and.arrow.down")
+                    Text("Save Changes")
                         .font(.body.weight(.semibold))
                         .frame(maxWidth: .infinity)
                 }
                 .padding(.vertical, 8)
-                .background(Color.blue.opacity(0.7))
+                .gradientBackground()
                 .foregroundColor(.white)
                 .cornerRadius(6)
 
@@ -147,7 +147,7 @@ struct AccountView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
-                    .background(Color.blue.opacity(0.5))
+                    .gradientBackground()
                     .cornerRadius(6)
 
             case .saved:
@@ -156,6 +156,15 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
                     .background(Color.green.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                
+            case .rejected:
+                Label("Inappropriate avatar!", systemImage: "xmark.octagon.fill")
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.red.opacity(0.9))
                     .foregroundColor(.white)
                     .cornerRadius(6)
             }
@@ -205,7 +214,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity)
             }
             .padding()
-            .background(Color.red.opacity(0.7))
+            .gradientBackground()
             .foregroundColor(.white)
             .cornerRadius(6)
             
@@ -217,7 +226,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity)
             }
             .padding()
-            .background(Color.red)
+            .background(Color.red).opacity(0.75)
             .foregroundColor(.white)
             .cornerRadius(6)
         }

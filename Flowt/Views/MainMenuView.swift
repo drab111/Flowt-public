@@ -25,7 +25,7 @@ struct MainMenuView: View {
                     switch selectedTab {
                     case .account: AccountView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.userProfileVM)
                     case .tutorial: TutorialView()
-                    case .game: GameView()
+                    case .game: GameView(gameVM: mainMenuVM.gameVM)
                     case .ranking: RankingView()
                     case .settings: SettingsView()
                     }

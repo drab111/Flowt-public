@@ -9,7 +9,7 @@ import SwiftUI
 
 @MainActor
 final class UserProfileViewModel: ObservableObject {
-    enum SaveState { case idle, saving, saved }
+    enum SaveState { case idle, saving, saved, rejected }
     
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -51,7 +51,19 @@ final class UserProfileViewModel: ObservableObject {
             
             var avatarBase64: String? = appState.currentUserProfile?.avatarBase64
             if let imageData = imageData, let image = UIImage(data: imageData) {
-                // zmniejszamy i kompresujemy
+                
+                // Sprawdzanie czy zdjęcie nie jest niestosowne używając modelu ML
+                let isSafe = try await profileService.validateAvatar(image: image)
+                
+                // Odrzucenie zapisu w przypadku niestosowności
+                if !isSafe {
+                    saveState = .rejected
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    if !Task.isCancelled { saveState = .idle }
+                    return
+                }
+                
+                // Zdjęcie jest stosowne
                 let resized = image.resized(to: 200)
                 avatarBase64 = resized.toBase64(maxSizeKB: 500)
             }
@@ -79,6 +91,7 @@ final class UserProfileViewModel: ObservableObject {
         do {
             try await profileService.deleteProfile(uid: uid)
             appState.currentUserProfile = nil
+            appState.currentScreen = .signIn
         } catch { errorMessage = error.localizedDescription }
     }
 }

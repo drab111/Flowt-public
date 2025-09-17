@@ -10,6 +10,7 @@
 		1C3BAAC02E57205B004D83AC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAABF2E57205B004D83AC /* FirebaseAuth */; };
 		1C3BAAC22E57205B004D83AC /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAAC12E57205B004D83AC /* FirebaseFirestore */; };
 		1C3BAAC42E5720BD004D83AC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAAC32E5720BD004D83AC /* FirebaseAnalytics */; };
+		1CB515D02E7AF56D0050FFA6 /* NSFWDetector in Frameworks */ = {isa = PBXBuildFile; productRef = 1CB515CF2E7AF56D0050FFA6 /* NSFWDetector */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CB515D02E7AF56D0050FFA6 /* NSFWDetector in Frameworks */,
 				1C3BAAC02E57205B004D83AC /* FirebaseAuth in Frameworks */,
 				1C3BAAC22E57205B004D83AC /* FirebaseFirestore in Frameworks */,
 				1C3BAAC42E5720BD004D83AC /* FirebaseAnalytics in Frameworks */,
@@ -132,6 +134,7 @@
 				1C3BAABF2E57205B004D83AC /* FirebaseAuth */,
 				1C3BAAC12E57205B004D83AC /* FirebaseFirestore */,
 				1C3BAAC32E5720BD004D83AC /* FirebaseAnalytics */,
+				1CB515CF2E7AF56D0050FFA6 /* NSFWDetector */,
 			);
 			productName = Flowt;
 			productReference = 1C370B2C2E565C2600A13271 /* Flowt.app */;
@@ -217,6 +220,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				1CB515CE2E7AF56D0050FFA6 /* XCRemoteSwiftPackageReference "NSFWDetector" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1C370B2D2E565C2600A13271 /* Products */;
@@ -593,6 +597,14 @@
 				minimumVersion = 12.1.0;
 			};
 		};
+		1CB515CE2E7AF56D0050FFA6 /* XCRemoteSwiftPackageReference "NSFWDetector" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lovoo/NSFWDetector.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -610,6 +622,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1C3BAABE2E57205B004D83AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		1CB515CF2E7AF56D0050FFA6 /* NSFWDetector */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1CB515CE2E7AF56D0050FFA6 /* XCRemoteSwiftPackageReference "NSFWDetector" */;
+			productName = NSFWDetector;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
