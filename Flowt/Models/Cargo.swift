@@ -8,22 +8,20 @@
 import SpriteKit
 
 class Cargo: SKSpriteNode {
-    private let cargoType: CargoType
+    let cargoType: CargoType
     
     init(cargoType: CargoType) {
         self.cargoType = cargoType
         let texture = SKTexture(imageNamed: cargoType.symbol)
         super.init(texture: texture, color: .clear, size: CGSize(width: 15, height: 15))
         
-        self.color = .black
-        self.colorBlendFactor = 0.0
-        
+        //self.color = .black
+        //self.colorBlendFactor = 0.0 // 100% tekstura, 0% kolor (brak mieszania)
+        self.zPosition = 2
         self.name = "Cargo"
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) not implemented")
-    }
+    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
 }
 
 enum CargoType: CaseIterable {
@@ -42,12 +40,11 @@ enum CargoType: CaseIterable {
 }
 
 protocol CargoFactory {
-    func createCargo(of type: CargoType, color: UIColor) -> Cargo
+    func createCargo(type: CargoType) -> Cargo
 }
 
 class SimpleCargoFactory: CargoFactory {
-    func createCargo(of type: CargoType, color: UIColor) -> Cargo {
-        let prefix = (color == .white) ? "white_" : ""
+    func createCargo(type: CargoType) -> Cargo {
         switch type {
         case .food:
             return Cargo(cargoType: .food)
@@ -58,3 +55,5 @@ class SimpleCargoFactory: CargoFactory {
         }
     }
 }
+
+// TODO: Fabryka tworząca Cargo w trybie ciemnym

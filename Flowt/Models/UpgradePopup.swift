@@ -1,0 +1,114 @@
+//
+//  UpgradePopup.swift
+//  Flowt
+//
+//  Created by Wiktor Drab on 18/09/2025.
+//
+
+import SpriteKit
+
+// Z tej klasy zdobywamy informację który przycisk wybrał użytkownik aby móc podjąć dalsze działania
+class UpgradePopup: SKNode {
+    var onOptionSelected: ((UpgradeOption) -> Void)?
+    
+    init(onOptionSelected: ((UpgradeOption) -> Void)? = nil) {
+        super.init()
+        self.onOptionSelected = onOptionSelected
+        name = "UpgradePopup"
+        
+        setupBackground()
+        setupTitle()
+        setupButtons()
+    }
+    
+    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
+    
+    private func setupBackground() {
+        let bg = SKSpriteNode(color: .black, size: CGSize(width: 2000, height: 2000))
+        bg.alpha = 0.6
+        bg.zPosition = -1
+        bg.name = "UpgradePopupBG"
+        addChild(bg)
+    }
+    
+    private func setupTitle() {
+        let title = SKLabelNode(text: "Select Upgrade:")
+        title.fontColor = .white
+        title.fontSize = 28
+        title.fontName = "HelveticaNeue-Bold"
+        title.position = CGPoint(x: 0, y: 70)
+        addChild(title)
+    }
+    
+    private func setupButtons() {
+        let options: [UpgradeOption] = [.addShip, .speedBoost, .capacityBoost]
+        let startY: CGFloat = 30
+        let spacing: CGFloat = -60
+        
+        for (index, option) in options.enumerated() {
+            let pos = CGPoint(x: 0, y: startY + spacing * CGFloat(index))
+            let button = UpgradeButton(option: option, position: pos)
+            addChild(button)
+        }
+    }
+    
+    private func makeButton(_ name: String, _ text: String, _ position: CGPoint) -> SKNode {
+        let container = SKNode()
+        container.name = name
+        container.position = position
+        
+        let shape = SKShapeNode(rectOf: CGSize(width: 200, height: 40), cornerRadius: 8)
+        shape.fillColor = UIColor(red: 0.1, green: 0.15, blue: 0.25, alpha: 1.0)
+        shape.strokeColor = .white
+        shape.lineWidth = 2
+        shape.name = "ButtonShape"
+        container.addChild(shape)
+        
+        let label = SKLabelNode(text: text)
+        label.fontColor = .white
+        label.fontSize = 23
+        label.verticalAlignmentMode = .center
+        label.fontName = "HelveticaNeue-Bold"
+        label.name = "ButtonLabel"
+        container.addChild(label)
+        
+        return container
+    }
+    
+    private func handleTouch(_ location: CGPoint) {
+        // Konwersja dotyku na lokalne współrzędne popupu (bo popup ma inne wymiary - 2000x2000)
+        let localPos = convert(location, from: parent!)
+        let nodesAtPos = nodes(at: localPos)
+        
+        if let button = nodesAtPos.compactMap({ $0 as? UpgradeButton }).first {
+            onOptionSelected?(button.option)
+            removeFromParent()
+        }
+    }
+}
+
+// Przycisk używany w popupie
+fileprivate class UpgradeButton: SKNode {
+    let option: UpgradeOption
+    
+    init(option: UpgradeOption, position: CGPoint) {
+        self.option = option
+        super.init()
+        self.position = position
+        
+        let shape = SKShapeNode(rectOf: CGSize(width: 200, height: 40), cornerRadius: 8)
+        shape.fillColor = UIColor(red: 0.1, green: 0.15, blue: 0.25, alpha: 1.0)
+        shape.strokeColor = .white
+        shape.lineWidth = 2
+        addChild(shape)
+        
+        let label = SKLabelNode(text: option.title)
+        label.fontColor = .white
+        label.fontSize = 23
+        label.fontName = "HelveticaNeue-Bold"
+        label.verticalAlignmentMode = .center
+        addChild(label)
+    }
+    
+    required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
+}
