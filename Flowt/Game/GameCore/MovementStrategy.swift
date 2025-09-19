@@ -30,7 +30,9 @@ class ShipMovementContext {
 class LoopMovementStrategy: MovementStrategy {
     func moveShip(_ context: ShipMovementContext) {
         let ship = context.getShip()
-        let pts = ship.linePermanentPoints
+        guard let line = ship.parentLine else { return }
+        
+        let pts = line.permanentPoints
         let n = pts.count
         
         let i1 = ship.currentSegmentIndex
@@ -62,7 +64,9 @@ class LoopMovementStrategy: MovementStrategy {
 class BackAndForthMovementStrategy: MovementStrategy {
     func moveShip(_ context: ShipMovementContext) {
         let ship = context.getShip()
-        let pts = ship.linePermanentPoints
+        guard let line = ship.parentLine else { return }
+        
+        let pts = line.permanentPoints
         let n = pts.count
         
         if ship.goingForward && ship.currentSegmentIndex >= n-1 {

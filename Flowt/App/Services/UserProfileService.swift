@@ -6,14 +6,7 @@
 //
 
 import FirebaseFirestore
-import Foundation
 import NSFWDetector
-
-struct UserProfile: Identifiable, Codable {
-    var id: String // = uid z FirebaseAuth
-    var nickname: String
-    var avatarBase64: String? // Base64 to metoda kodowania danych binarnych na tekst
-}
 
 final class UserProfileService {
     private let db = Firestore.firestore()

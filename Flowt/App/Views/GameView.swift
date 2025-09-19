@@ -12,7 +12,7 @@ struct GameView: View {
     @ObservedObject var gameVM: GameViewModel
     
     var scene: SKScene {
-        let scene = GameScene(gameVM: gameVM)
+        let scene = GameScene(gameVM: gameVM, cargoFactory: SimpleCargoFactory(), upgradeFactory: SimpleUpgradeFactory()) // TODO: Fabryka w trybie ciemnym
         scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         scene.scaleMode = .resizeFill
         return scene
@@ -44,6 +44,7 @@ struct GameView: View {
         .fullScreenCover(isPresented: $gameVM.gameStarted) {
             SpriteView(scene: scene)
                 .ignoresSafeArea()
+                .statusBarHidden(true)
         }
     }
 }

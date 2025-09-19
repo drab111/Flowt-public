@@ -7,12 +7,15 @@
 
 import SpriteKit
 
-class LineSelectionPopup: SKNode {
+class LineSelectionPopup: SKNode, Popup {
     var onLineSelected: ((Int) -> Void)?
     
-    init(amountOfLines: Int) {
+    init(position: CGPoint, amountOfLines: Int, onLineSelected: ((Int) -> Void)? = nil) {
         super.init()
-        name = "LineSelectionPopup"
+        self.onLineSelected = onLineSelected
+        self.position = position
+        self.zPosition = 6
+        self.name = "LineSelectionPopup"
         
         setupBackground()
         setupTitle()
@@ -63,7 +66,7 @@ class LineSelectionPopup: SKNode {
         }
     }
     
-    private func handleTouch(_ location: CGPoint) {
+    func handleTouch(_ location: CGPoint) {
         let localPos = convert(location, from: parent!)
         let nodesAtPos = nodes(at: localPos)
         
@@ -88,7 +91,7 @@ fileprivate class LineButton: SKShapeNode {
         lineWidth = 2
         self.position = position
         
-        let texture = SKTexture(imageNamed: "sign") // TODO: Zmień na customowy symbol
+        let texture = SKTexture(imageNamed: "SignTexture") // TODO: Zmień na customowy symbol
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 35, height: 35)
         imageNode.zPosition = 1

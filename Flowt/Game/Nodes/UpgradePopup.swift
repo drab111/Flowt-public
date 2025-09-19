@@ -8,13 +8,15 @@
 import SpriteKit
 
 // Z tej klasy zdobywamy informację który przycisk wybrał użytkownik aby móc podjąć dalsze działania
-class UpgradePopup: SKNode {
+class UpgradePopup: SKNode, Popup {
     var onOptionSelected: ((UpgradeOption) -> Void)?
     
-    init(onOptionSelected: ((UpgradeOption) -> Void)? = nil) {
+    init(position: CGPoint, onOptionSelected: ((UpgradeOption) -> Void)? = nil) {
         super.init()
         self.onOptionSelected = onOptionSelected
-        name = "UpgradePopup"
+        self.position = position
+        self.zPosition = 6
+        self.name = "UpgradePopup"
         
         setupBackground()
         setupTitle()
@@ -75,7 +77,7 @@ class UpgradePopup: SKNode {
         return container
     }
     
-    private func handleTouch(_ location: CGPoint) {
+    func handleTouch(_ location: CGPoint) {
         // Konwersja dotyku na lokalne współrzędne popupu (bo popup ma inne wymiary - 2000x2000)
         let localPos = convert(location, from: parent!)
         let nodesAtPos = nodes(at: localPos)
@@ -111,4 +113,8 @@ fileprivate class UpgradeButton: SKNode {
     }
     
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
+}
+
+protocol Popup {
+    func handleTouch(_ location: CGPoint)
 }

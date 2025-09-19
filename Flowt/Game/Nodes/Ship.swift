@@ -8,11 +8,11 @@
 import SpriteKit
 
 class Ship: SKSpriteNode {
+    weak var parentLine: RouteLine?
+    private lazy var loopMovementStrategy: LoopMovementStrategy = LoopMovementStrategy()
     private var movementContext: ShipMovementContext?
-    private var loopMovementStrategy: LoopMovementStrategy = LoopMovementStrategy()
-    private var lineIsLoop: Bool = false
-    private var isInStormZone: ((CGPoint) -> Bool)?
-    private var portsOnScene: [Port] = []
+    private var isInStormZone: ((CGPoint) -> Bool)
+    private var getPorts: (() -> [Port])
     
     // Potrzebne dla wzorca Strategii
     var shipSpeed: CGFloat = 30.0
@@ -21,11 +21,13 @@ class Ship: SKSpriteNode {
     var currentSegmentIndex: Int = 0
     var goingForward: Bool = true
     var cargoBuffer: [Cargo] = []
-    var linePermanentPoints: [CGPoint] = []
     
-    init(position: CGPoint, isInStormZone: ((CGPoint) -> Bool)? = nil) {
+    init(position: CGPoint, parentLine: RouteLine, isInStormZone: @escaping ((CGPoint) -> Bool), getPorts: @escaping (() -> [Port])) {
+        self.parentLine = parentLine
         self.isInStormZone = isInStormZone
-        let texture = SKTexture(imageNamed: "shipTexture")
+        self.getPorts = getPorts
+        
+        let texture = SKTexture(imageNamed: "ShipTexture")
         super.init(texture: texture, color: .clear, size: CGSize(width: 30, height: 20))
         
         self.position = position
@@ -56,9 +58,11 @@ class Ship: SKSpriteNode {
         }
     }
     
+    func setMovementContext(_ context: ShipMovementContext) { self.movementContext = context }
+    
     func startNextSegment() {
-        guard let context = movementContext, linePermanentPoints.count >= 2 else { return }
-        if lineIsLoop == true { context.setStrategy(loopMovementStrategy) }
+        guard let context = movementContext, let line = parentLine, line.permanentPoints.count >= 2 else { return }
+        if line.isLoop == true { context.setStrategy(loopMovementStrategy) }
         context.move()
         updateShipCargoDisplay()
     }
@@ -66,9 +70,7 @@ class Ship: SKSpriteNode {
     func checkStormIfNeeded() {
         shipSpeed = 30.0 * speedBoost
         // Sprawdzamy czy nasza pozycja jest w burzy
-        if let isInStormZone = isInStormZone {
-            if isInStormZone(self.position) { shipSpeed *= 0.5 }
-        }
+        if isInStormZone(self.position) { shipSpeed *= 0.5 }
     }
     
     func handlePortIfNeeded(port: Port?) {
@@ -107,13 +109,9 @@ class Ship: SKSpriteNode {
     // Sprawdzamy czy aktualny punkt na którym jest statek znajduje się w zasięgu któregoś z portów
     func findPort(point: CGPoint) -> Port? {
         let maxDistance: CGFloat = 15
-        
-        for port in portsOnScene {
+        for port in getPorts() {
             if distanceBetween(port.position, point) < maxDistance { return port }
         }
         return nil
     }
-    
-    func setMovementContext(_ context: ShipMovementContext) { self.movementContext = context }
 }
-

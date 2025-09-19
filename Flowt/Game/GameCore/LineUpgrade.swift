@@ -5,18 +5,6 @@
 //  Created by Wiktor Drab on 18/09/2025.
 //
 
-enum UpgradeOption: CaseIterable {
-    case addShip, speedBoost, capacityBoost
-    
-    var title: String {
-        switch self {
-        case .addShip: return "New Ship"
-        case .speedBoost: return "+25% Speed"
-        case .capacityBoost: return "+1 Capacity"
-        }
-    }
-}
-
 protocol LineUpgrade {
     func apply(line: RouteLine)
 }
@@ -24,7 +12,7 @@ protocol LineUpgrade {
 class AddShipUpgrade: LineUpgrade {
     func apply(line: RouteLine) {
         guard !line.permanentPoints.isEmpty else { return }
-        let newShip = Ship(position: line.permanentPoints[0]) // TODO: Dodać funkcje isInStormZone z GameScene
+        let newShip = Ship(position: line.permanentPoints[0], parentLine: line, isInStormZone: line.isInStormZone, getPorts: line.getPorts)
         line.ships.append(newShip)
         line.addChild(newShip)
         newShip.setMovementContext(ShipMovementContext(ship: newShip, strategy: BackAndForthMovementStrategy()))
@@ -44,19 +32,14 @@ class CapacityUpgrade: LineUpgrade {
     }
 }
 
-protocol UpgradeFactory {
-    func createUpgrade(option: UpgradeOption) -> LineUpgrade
-}
-
-class SimpleUpgradeFactory {
-    func createUpgrade(option: UpgradeOption) -> LineUpgrade {
-        switch option {
-        case .addShip:
-            return AddShipUpgrade()
-        case .speedBoost:
-            return SpeedUpgrade()
-        case .capacityBoost:
-            return CapacityUpgrade()
+enum UpgradeOption: CaseIterable {
+    case addShip, speedBoost, capacityBoost
+    
+    var title: String {
+        switch self {
+        case .addShip: return "New Ship"
+        case .speedBoost: return "+25% Speed"
+        case .capacityBoost: return "+1 Capacity"
         }
     }
 }

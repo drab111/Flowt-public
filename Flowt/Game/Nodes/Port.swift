@@ -5,8 +5,8 @@
 //  Created by Wiktor Drab on 17/09/2025.
 //
 
-import SpriteKit
 import AudioToolbox
+import SpriteKit
 
 class Port: SKSpriteNode {
     private var cargoFactory: CargoFactory
@@ -16,12 +16,12 @@ class Port: SKSpriteNode {
     private var isOverloaded = false
     private var remainingTime: CGFloat = 30.0
     private var overloadIndicator: SKShapeNode?
-    private var increaseScore: (() -> Void)?
-    private var gameOver: (() -> Void)?
+    private var increaseScore: (() -> Void)
+    private var gameOver: (() -> Void)
     var portType: CargoType
     var isOccupied = false
     
-    init(position: CGPoint, portType: CargoType, factory: CargoFactory, increaseScore: (() -> Void)? = nil, gameOver: (() -> Void)? = nil) {
+    init(position: CGPoint, portType: CargoType, factory: CargoFactory, increaseScore: @escaping (() -> Void), gameOver: @escaping (() -> Void)) {
         self.portType = portType
         self.cargoFactory = factory
         self.increaseScore = increaseScore
@@ -67,13 +67,12 @@ class Port: SKSpriteNode {
         }
     }
     
-    private func produceRandomCargo() -> Cargo {
+    func produceRandomCargo() {
         let possibleTypes = CargoType.allCases.filter { $0 != self.portType }
         let randomType = possibleTypes.randomElement()!
         let cargo = cargoFactory.createCargo(type: randomType)
         
         addCargo(cargo)
-        return cargo
     }
     
     private func addCargo(_ cargo: Cargo) {
@@ -113,7 +112,7 @@ class Port: SKSpriteNode {
                 cargo.removeFromParent()
                 
                 // +1 punkt
-                increaseScore?()
+                increaseScore()
             }
         }
     }
@@ -136,7 +135,7 @@ class Port: SKSpriteNode {
                         overloadTimer?.invalidate()
                         overloadTimer = nil
                         removeOverloadIndicator()
-                        self.gameOver?()
+                        self.gameOver()
                     }
                 }
             }

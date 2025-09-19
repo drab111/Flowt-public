@@ -14,4 +14,6 @@ final class GameViewModel: ObservableObject {
     init(appState: AppState) { self.appState = appState }
     
     func startGame() { gameStarted = true }
+    
+    func endGame() { gameStarted = false}
 }

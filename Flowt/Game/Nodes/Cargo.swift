@@ -30,30 +30,11 @@ enum CargoType: CaseIterable {
     var symbol: String {
         switch self {
         case .oil:
-            return "drop"
+            return "OilTexture"
         case .gas:
-            return "flame"
+            return "GasTexture"
         case .food:
-            return "leaf"
+            return "FoodTexture"
         }
     }
 }
-
-protocol CargoFactory {
-    func createCargo(type: CargoType) -> Cargo
-}
-
-class SimpleCargoFactory: CargoFactory {
-    func createCargo(type: CargoType) -> Cargo {
-        switch type {
-        case .food:
-            return Cargo(cargoType: .food)
-        case .oil:
-            return Cargo(cargoType: .oil)
-        case .gas:
-            return Cargo(cargoType: .gas)
-        }
-    }
-}
-
-// TODO: Fabryka tworząca Cargo w trybie ciemnym

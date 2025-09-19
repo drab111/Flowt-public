@@ -9,12 +9,6 @@ import FirebaseAuth
 import AuthenticationServices
 import CryptoKit
 
-struct AuthUser {
-    let uid: String
-    let displayName: String?
-    let email: String?
-}
-
 final class AuthService {
     
     // MARK: - Email & Password
