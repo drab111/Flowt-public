@@ -23,7 +23,7 @@ class Island: SKSpriteNode {
         
         // Otoczka aby było wiadomo gdzie oddziaływanie ma wyspa
         let border = SKShapeNode(circleOfRadius: radius)
-        border.strokeColor = UIColor(red: 0.0, green: 0.4, blue: 0.7, alpha: 9.0)
+        border.strokeColor = UIColor(red: 0.0, green: 0.4, blue: 0.7, alpha: 0.9)
         border.lineWidth = 0.2
         border.zPosition = 2
         addChild(border)

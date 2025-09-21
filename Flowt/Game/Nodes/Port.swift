@@ -11,10 +11,10 @@ import SpriteKit
 class Port: SKSpriteNode {
     private var cargoFactory: CargoFactory
     private var cargoBuffer: [Cargo] = []
-    private let maxBuffer = 5
+    private let maxBuffer = GameConfig.portMaxBuffer
+    private var remainingTime: CGFloat = GameConfig.overloadTime
     private var overloadTimer: Timer?
     private var isOverloaded = false
-    private var remainingTime: CGFloat = 30.0
     private var overloadIndicator: SKShapeNode?
     private var increaseScore: (() -> Void)
     private var gameOver: (() -> Void)
@@ -27,7 +27,7 @@ class Port: SKSpriteNode {
         self.increaseScore = increaseScore
         self.gameOver = gameOver
         let texture = SKTexture(imageNamed: portType.symbol)
-        super.init(texture: texture, color: .white, size: CGSize(width: 20, height: 20))
+        super.init(texture: texture, color: .white, size: GameConfig.portSize)
 
         self.position = position
         self.zPosition = 2
@@ -102,7 +102,7 @@ class Port: SKSpriteNode {
         return taken
     }
     
-    func acceptMatchingCargo(ship: Ship) {
+    func unloadCargo(ship: Ship) {
         let toUnload = ship.cargoBuffer.filter { $0.cargoType == portType }
         
         for cargo in toUnload {
@@ -124,32 +124,37 @@ class Port: SKSpriteNode {
                 isOverloaded = true
                 AudioServicesPlaySystemSound(1005) // TODO: zmienić dźwięk
                 createOverloadIndicator()
-                
-                overloadTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-                    guard let self = self else { return }  // sprawdzamy czy self już nie został zwolniony z pamięci i nie istnieje
-                    self.remainingTime -= 1.0
-                    updateOverloadIndicator()
-                    
-                    // Przekroczenie czasu i koniec gry
-                    if self.remainingTime <= 0 && self.cargoBuffer.count > self.maxBuffer {
-                        overloadTimer?.invalidate()
-                        overloadTimer = nil
-                        removeOverloadIndicator()
-                        self.gameOver()
-                    }
-                }
+                startOverloadTimer()
             }
         } else {
-            remainingTime = 30.0
             isOverloaded = false
-            overloadTimer?.invalidate()
-            overloadTimer = nil
-            removeOverloadIndicator()
+            stopOverloadTimer()
         }
     }
     
+    private func startOverloadTimer() {
+        overloadTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }  // sprawdzamy czy self już nie został zwolniony z pamięci i nie istnieje
+            remainingTime -= 1.0
+            updateOverloadIndicator()
+            
+            // Przekroczenie czasu i koniec gry
+            if remainingTime <= 0 && cargoBuffer.count > maxBuffer {
+                stopOverloadTimer()
+                gameOver()
+            }
+        }
+    }
+    
+    private func stopOverloadTimer() {
+        overloadTimer?.invalidate()
+        overloadTimer = nil
+        removeOverloadIndicator()
+        remainingTime = GameConfig.overloadTime
+    }
+    
     private func createOverloadIndicator() {
-        let radius: CGFloat = 25.0
+        let radius: CGFloat = GameConfig.indicatorRadius
         let overloadIndicator = SKShapeNode(circleOfRadius: radius)
         overloadIndicator.strokeColor = UIColor(red: 0.5, green: 0.0, blue: 0.0, alpha: 1.0)
         overloadIndicator.lineWidth = 16
@@ -165,7 +170,7 @@ class Port: SKSpriteNode {
         let progress = remainingTime / 30.0
         let endAngle = CGFloat.pi * 2 * progress - CGFloat.pi / 2
         let path = CGMutablePath()
-        path.addArc(center: .zero, radius: 25.0, startAngle: -CGFloat.pi / 2, endAngle: endAngle, clockwise: false)
+        path.addArc(center: .zero, radius: GameConfig.indicatorRadius, startAngle: -CGFloat.pi / 2, endAngle: endAngle, clockwise: false)
         overloadIndicator.path = path
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate) // TODO: Zmienić wibracje urządzenia na coś innego
     }

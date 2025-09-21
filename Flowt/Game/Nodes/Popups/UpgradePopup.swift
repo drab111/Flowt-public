@@ -11,12 +11,12 @@ import SpriteKit
 class UpgradePopup: SKNode, Popup {
     var onOptionSelected: ((UpgradeOption) -> Void)?
     
-    init(position: CGPoint, onOptionSelected: ((UpgradeOption) -> Void)? = nil) {
+    init(size: CGSize, onOptionSelected: ((UpgradeOption) -> Void)? = nil) {
         super.init()
-        self.onOptionSelected = onOptionSelected
-        self.position = position
+        self.position = CGPoint(x: size.width / 2, y: size.height / 2)
         self.zPosition = 6
         self.name = "UpgradePopup"
+        self.onOptionSelected = onOptionSelected
         
         setupBackground()
         setupTitle()
@@ -26,7 +26,7 @@ class UpgradePopup: SKNode, Popup {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
     private func setupBackground() {
-        let bg = SKSpriteNode(color: .black, size: CGSize(width: 2000, height: 2000))
+        let bg = SKSpriteNode(color: .black, size: UIScreen.main.bounds.size)
         bg.alpha = 0.6
         bg.zPosition = -1
         bg.name = "UpgradePopupBG"
@@ -79,7 +79,8 @@ class UpgradePopup: SKNode, Popup {
     
     func handleTouch(_ location: CGPoint) {
         // Konwersja dotyku na lokalne współrzędne popupu (bo popup ma inne wymiary - 2000x2000)
-        let localPos = convert(location, from: parent!)
+        guard let parent = parent else { return }
+        let localPos = convert(location, from: parent)
         let nodesAtPos = nodes(at: localPos)
         
         if let button = nodesAtPos.compactMap({ $0 as? UpgradeButton }).first {

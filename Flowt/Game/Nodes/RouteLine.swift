@@ -8,17 +8,17 @@
 import SpriteKit
 
 class RouteLine: SKShapeNode {
-    private var checkIslandCollision: ((CGPoint) -> Bool)
+    private let checkIslandCollision: ((CGPoint) -> Bool)
     
     // Dla wzorca fabryki i zarządzania przez Scene
+    let isInStormZone: ((CGPoint) -> Bool)
+    let getPorts: (() -> [Port])
     var permanentPoints: [CGPoint] = []
     var currentPoints: [CGPoint] = []
     var existingConnections: [(Port, Port)] = []
     var isLoop: Bool = false
     var ships: [Ship] = []
     var isAppendingAtFront = false
-    var isInStormZone: ((CGPoint) -> Bool)
-    var getPorts: (() -> [Port])
     
     init(lineColor: UIColor, checkIslandCollision: @escaping ((CGPoint) -> Bool), isInStormZone: @escaping ((CGPoint) -> Bool), getPorts: @escaping () -> [Port]) {
         self.checkIslandCollision = checkIslandCollision

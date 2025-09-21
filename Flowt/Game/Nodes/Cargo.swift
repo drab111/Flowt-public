@@ -13,7 +13,7 @@ class Cargo: SKSpriteNode {
     init(cargoType: CargoType) {
         self.cargoType = cargoType
         let texture = SKTexture(imageNamed: cargoType.symbol)
-        super.init(texture: texture, color: .clear, size: CGSize(width: 15, height: 15))
+        super.init(texture: texture, color: .clear, size: GameConfig.cargoSize)
         
         //self.color = .black
         //self.colorBlendFactor = 0.0 // 100% tekstura, 0% kolor (brak mieszania)

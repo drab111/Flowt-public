@@ -22,9 +22,17 @@ class Storm: SKShapeNode {
         self.fillColor = .darkGray
         self.alpha = 0.3
         self.zPosition = 0.5
+        
+        // Animacja
+        startAnimating()
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
+    
+    private func startAnimating() {
+        let pulse = SKAction.sequence([.fadeAlpha(to: 0.5, duration: 1.0), .fadeAlpha(to: 0.3, duration: 1.0)])
+        run(.repeatForever(pulse))
+    }
     
     // Sprawdza czy podany punkt jest w promieniu burzy
     func contains(point: CGPoint) -> Bool {

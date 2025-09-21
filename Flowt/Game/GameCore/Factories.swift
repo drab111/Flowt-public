@@ -29,16 +29,7 @@ protocol CargoFactory {
 }
 
 class SimpleCargoFactory: CargoFactory {
-    func createCargo(type: CargoType) -> Cargo {
-        switch type {
-        case .food:
-            return Cargo(cargoType: .food)
-        case .oil:
-            return Cargo(cargoType: .oil)
-        case .gas:
-            return Cargo(cargoType: .gas)
-        }
-    }
+    func createCargo(type: CargoType) -> Cargo { Cargo(cargoType: type) }
 }
 
 // TODO: Fabryka tworząca Cargo w trybie ciemnym

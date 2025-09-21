@@ -15,7 +15,7 @@ class Ship: SKSpriteNode {
     private var getPorts: (() -> [Port])
     
     // Potrzebne dla wzorca Strategii
-    var shipSpeed: CGFloat = 30.0
+    var shipSpeed: CGFloat = GameConfig.shipSpeed
     var speedBoost: CGFloat = 1.0
     var maxCapacity = 4
     var currentSegmentIndex: Int = 0
@@ -28,7 +28,7 @@ class Ship: SKSpriteNode {
         self.getPorts = getPorts
         
         let texture = SKTexture(imageNamed: "ShipTexture")
-        super.init(texture: texture, color: .clear, size: CGSize(width: 30, height: 20))
+        super.init(texture: texture, color: .clear, size: GameConfig.shipSize)
         
         self.position = position
         self.zPosition = 3
@@ -68,39 +68,41 @@ class Ship: SKSpriteNode {
     }
     
     func checkStormIfNeeded() {
-        shipSpeed = 30.0 * speedBoost
+        shipSpeed = GameConfig.shipSpeed * speedBoost
         // Sprawdzamy czy nasza pozycja jest w burzy
-        if isInStormZone(self.position) { shipSpeed *= 0.5 }
+        if isInStormZone(self.position) { shipSpeed *= GameConfig.stormSlowdown }
     }
     
     func handlePortIfNeeded(port: Port?) {
         if let port = port {
-            shipSpeed = 20.0 * speedBoost
+            shipSpeed = GameConfig.portSpeed * speedBoost
             
             if port.isOccupied == false {
                 port.isOccupied = true
-                port.acceptMatchingCargo(ship: self)
-                
-                // Załadowywujemy cargo w porcie (którego port "nie lubi")
-                let freeSpace = maxCapacity - cargoBuffer.count
-                if freeSpace > 0 {
-                    let taken = port.removeCargo(type: port.portType, maxCount: freeSpace)
-                    for cargo in taken {
-                        cargo.removeFromParent()
-                        cargoBuffer.append(cargo)
-                        cargo.isHidden = true
-                        cargo.position = .zero
-                        cargo.zPosition = 3
-                        addChild(cargo)
-                    }
-                }
+                port.unloadCargo(ship: self)
+                loadCargo(port: port)
                 updateShipCargoDisplay()
                 port.updatePortCargoDisplay()
                 port.isOccupied = false
             }
         } else {
-            shipSpeed = 30.0  * speedBoost
+            shipSpeed = GameConfig.shipSpeed  * speedBoost
             checkStormIfNeeded()
+        }
+    }
+    
+    private func loadCargo(port: Port) {
+        let freeSpace = maxCapacity - cargoBuffer.count
+        if freeSpace > 0 {
+            let taken = port.removeCargo(type: port.portType, maxCount: freeSpace)
+            for cargo in taken {
+                cargo.removeFromParent()
+                cargoBuffer.append(cargo)
+                cargo.isHidden = true
+                cargo.position = .zero
+                cargo.zPosition = 3
+                addChild(cargo)
+            }
         }
     }
     
@@ -108,7 +110,7 @@ class Ship: SKSpriteNode {
     
     // Sprawdzamy czy aktualny punkt na którym jest statek znajduje się w zasięgu któregoś z portów
     func findPort(point: CGPoint) -> Port? {
-        let maxDistance: CGFloat = 15
+        let maxDistance = GameConfig.portDetectionRadius
         for port in getPorts() {
             if distanceBetween(port.position, point) < maxDistance { return port }
         }

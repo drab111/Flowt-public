@@ -12,8 +12,8 @@ protocol MovementStrategy {
 }
 
 class ShipMovementContext {
-    private unowned let ship: Ship
     private var strategy: MovementStrategy
+    unowned let ship: Ship
     
     init(ship: Ship, strategy: MovementStrategy) {
         self.ship = ship
@@ -22,14 +22,12 @@ class ShipMovementContext {
     
     func setStrategy(_ strategy: MovementStrategy) { self.strategy = strategy }
     
-    func getShip() -> Ship { return self.ship }
-    
     func move() { strategy.moveShip(self) }
 }
 
 class LoopMovementStrategy: MovementStrategy {
     func moveShip(_ context: ShipMovementContext) {
-        let ship = context.getShip()
+        let ship = context.ship
         guard let line = ship.parentLine else { return }
         
         let pts = line.permanentPoints
@@ -48,7 +46,7 @@ class LoopMovementStrategy: MovementStrategy {
         let dist = ship.distanceBetween(p1, p2)
         let duration = TimeInterval(dist / ship.shipSpeed)
         
-        let angle = atan2(p2.y - p1.y, p2.x - p1.x) + CGFloat.pi/2
+        let angle = atan2(p2.y - p1.y, p2.x - p1.x) + CGFloat.pi / 2
         let rotateAction = SKAction.rotate(toAngle: angle, duration: 0, shortestUnitArc: true)
         let moveAction = SKAction.move(to: p2, duration: duration)
         
@@ -63,13 +61,13 @@ class LoopMovementStrategy: MovementStrategy {
 
 class BackAndForthMovementStrategy: MovementStrategy {
     func moveShip(_ context: ShipMovementContext) {
-        let ship = context.getShip()
+        let ship = context.ship
         guard let line = ship.parentLine else { return }
         
         let pts = line.permanentPoints
         let n = pts.count
         
-        if ship.goingForward && ship.currentSegmentIndex >= n-1 {
+        if ship.goingForward && ship.currentSegmentIndex >= n - 1 {
             ship.goingForward = false
         } else if !ship.goingForward && ship.currentSegmentIndex <= 0 {
             ship.goingForward = true
@@ -84,7 +82,7 @@ class BackAndForthMovementStrategy: MovementStrategy {
             ship.startNextSegment()
             return
         } else if i2 >= n {
-            ship.currentSegmentIndex = n-1
+            ship.currentSegmentIndex = n - 1
             ship.goingForward = false
             ship.startNextSegment()
             return
@@ -100,7 +98,7 @@ class BackAndForthMovementStrategy: MovementStrategy {
         let dist = ship.distanceBetween(p1, p2)
         let duration = TimeInterval(dist / ship.shipSpeed)
         
-        let angle = atan2(p2.y - p1.y, p2.x - p1.x) + CGFloat.pi/2
+        let angle = atan2(p2.y - p1.y, p2.x - p1.x) + CGFloat.pi / 2
         let rotateAction = SKAction.rotate(toAngle: angle, duration: 0, shortestUnitArc: true)
         let moveAction = SKAction.move(to: p2, duration: duration)
         

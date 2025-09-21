@@ -11,12 +11,12 @@ protocol LineUpgrade {
 
 class AddShipUpgrade: LineUpgrade {
     func apply(line: RouteLine) {
-        guard !line.permanentPoints.isEmpty else { return }
+        guard line.permanentPoints.count >= 2 else { return }
         let newShip = Ship(position: line.permanentPoints[0], parentLine: line, isInStormZone: line.isInStormZone, getPorts: line.getPorts)
         line.ships.append(newShip)
         line.addChild(newShip)
         newShip.setMovementContext(ShipMovementContext(ship: newShip, strategy: BackAndForthMovementStrategy()))
-        newShip.startNextSegment() // TODO: to niech będzie odpalane w init contextu
+        newShip.startNextSegment()
     }
 }
 

@@ -10,12 +10,12 @@ import SpriteKit
 class LineSelectionPopup: SKNode, Popup {
     var onLineSelected: ((Int) -> Void)?
     
-    init(position: CGPoint, amountOfLines: Int, onLineSelected: ((Int) -> Void)? = nil) {
+    init(size: CGSize, amountOfLines: Int, onLineSelected: ((Int) -> Void)? = nil) {
         super.init()
-        self.onLineSelected = onLineSelected
-        self.position = position
+        self.position = CGPoint(x: size.width / 2, y: size.height / 2)
         self.zPosition = 6
         self.name = "LineSelectionPopup"
+        self.onLineSelected = onLineSelected
         
         setupBackground()
         setupTitle()
@@ -25,7 +25,7 @@ class LineSelectionPopup: SKNode, Popup {
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
     
     private func setupBackground() {
-        let bg = SKSpriteNode(color: .black, size: CGSize(width: 2000, height: 2000))
+        let bg = SKSpriteNode(color: .black, size: UIScreen.main.bounds.size)
         bg.alpha = 0.5
         bg.zPosition = -1
         bg.name = "LineSelectionPopupBG"
@@ -67,7 +67,8 @@ class LineSelectionPopup: SKNode, Popup {
     }
     
     func handleTouch(_ location: CGPoint) {
-        let localPos = convert(location, from: parent!)
+        guard let parent = parent else { return }
+        let localPos = convert(location, from: parent)
         let nodesAtPos = nodes(at: localPos)
         
         if let button = nodesAtPos.compactMap({ $0 as? LineButton }).first {
