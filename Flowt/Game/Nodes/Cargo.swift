@@ -10,13 +10,12 @@ import SpriteKit
 class Cargo: SKSpriteNode {
     let cargoType: CargoType
     
-    init(cargoType: CargoType) {
+    init(cargoType: CargoType, useLightTexture: Bool) {
         self.cargoType = cargoType
-        let texture = SKTexture(imageNamed: cargoType.symbol)
+        let textureName = useLightTexture ? cargoType.lightSymbol : cargoType.symbol
+        let texture = SKTexture(imageNamed: textureName)
         super.init(texture: texture, color: .clear, size: GameConfig.cargoSize)
         
-        //self.color = .black
-        //self.colorBlendFactor = 0.0 // 100% tekstura, 0% kolor (brak mieszania)
         self.zPosition = 2
         self.name = "Cargo"
     }
@@ -35,6 +34,17 @@ enum CargoType: CaseIterable {
             return "GasTexture"
         case .food:
             return "FoodTexture"
+        }
+    }
+    
+    var lightSymbol: String {
+        switch self {
+        case .oil:
+            return "OilLightTexture"
+        case .gas:
+            return "GasLightTexture"
+        case .food:
+            return "FoodLightTexture"
         }
     }
 }

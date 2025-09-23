@@ -12,6 +12,7 @@ class GameScene: SKScene {
     let cargoFactory: CargoFactory
     let upgradeFactory: UpgradeFactory
     let scoreLabel = ScoreLabel(position: CGPoint(x: 22, y: UIScreen.main.bounds.height - 30))
+    let cameraNode = SKCameraNode()
     
     var ports: [Port] = []
     var routeLines: [RouteLine] = []
@@ -21,11 +22,12 @@ class GameScene: SKScene {
     var colorButtons: [SKShapeNode] = []
     var score: Int = 0 { didSet { scoreLabel.score = score } }
     var storm: Storm?
+    var ocean: Ocean?
     var islands: [Island] = []
     var activePopup: SKNode?
     var pendingUpgrade: LineUpgrade?
     var backToMenuButton: SKLabelNode?
-    var colors: [UIColor] = [UIColor.red.withAlphaComponent(0.7), UIColor.magenta.withAlphaComponent(0.7)]
+    var colors: [UIColor] = Array(GameConfig.routeColors.prefix(2))
     var cargoSpawnInterval: Double = GameConfig.spawnCargoInterval {
         didSet { resetCargoSpawnTimer() }
     }
@@ -47,9 +49,9 @@ class GameScene: SKScene {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
     override func didMove(to view: SKView) {
-        let ocean = OceanBackground(size: size)
-        addChild(ocean)
-        setupUI()
+        setupBackground()
+        setupButtons()
+        setupCamera()
         setupRouteLines()
         setupIslands()
         setupInitialPorts()

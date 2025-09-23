@@ -24,6 +24,7 @@ extension GameScene {
         scoreLabel.removeFromParent()
         backToMenuButton = nil
         storm = nil
+        ocean = nil
         activePopup = nil
         pendingUpgrade = nil
         
@@ -42,12 +43,17 @@ extension GameScene {
     }
     
     private func cargoInterval(score: Int) -> TimeInterval {
-        let maxScore: Double = 500
-        let start: Double = 2.0
-        let end: Double = 0.05
-
-        let t = min(Double(score) / maxScore, 1.0)
-        return start + (end - start) * t
+        switch score {
+        case ..<30:    return 2.5
+        case ..<60:    return 1.8
+        case ..<100:   return 1.4
+        case ..<150:   return 1.0
+        case ..<300:   return 0.7
+        case ..<500:   return 0.4
+        case ..<1000:  return 0.25
+        case ..<1500:  return 0.15
+        default:       return 0.1
+        }
     }
     
     func checkConnectionForSegment(points: [CGPoint], line: RouteLine) -> (Port, Port)? {

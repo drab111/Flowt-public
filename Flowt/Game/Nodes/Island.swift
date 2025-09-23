@@ -15,23 +15,45 @@ class Island: SKSpriteNode {
         let texture = SKTexture(imageNamed: picture)
         super.init(texture: texture, color: .clear, size: CGSize(width: radius*2, height: radius*2))
         
-        // Kolor wypełnienia
-        //self.colorBlendFactor = 1.0
         self.position = position
         self.zPosition = 1
         self.name = "Island"
         
-        // Otoczka aby było wiadomo gdzie oddziaływanie ma wyspa
-        let border = SKShapeNode(circleOfRadius: radius)
-        border.strokeColor = UIColor(red: 0.0, green: 0.4, blue: 0.7, alpha: 0.9)
-        border.lineWidth = 0.2
-        border.zPosition = 2
-        addChild(border)
+        addBlurredShadow(texture: texture, radius: radius)
+        addBorder()
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
-    // Sprawdza czy podany punkt jest w promieniu wyspy
+    // MARK: - Wygląd
+    
+    private func addBlurredShadow(texture: SKTexture, radius: CGFloat) {
+        let shadowNode = SKSpriteNode(texture: texture)
+        shadowNode.size = CGSize(width: radius*2, height: radius*2)
+        shadowNode.color = .black
+        shadowNode.colorBlendFactor = 1.0
+        shadowNode.alpha = 0.4
+        
+        let effectNode = SKEffectNode()
+        effectNode.addChild(shadowNode)
+        effectNode.filter = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius": 4])
+        effectNode.shouldRasterize = true
+        effectNode.zPosition = -1
+        effectNode.position = CGPoint(x: 2, y: -2)
+        
+        addChild(effectNode)
+    }
+    
+    private func addBorder() {
+        let border = SKShapeNode(circleOfRadius: radius)
+        border.strokeColor = UIColor.black.withAlphaComponent(0.2)
+        border.lineWidth = 1
+        border.zPosition = 1.5
+        addChild(border)
+    }
+    
+    // MARK: - Kolizja
+    
     func contains(point: CGPoint) -> Bool {
         let dist = hypot(point.x - self.position.x, point.y - self.position.y)
         return dist <= radius

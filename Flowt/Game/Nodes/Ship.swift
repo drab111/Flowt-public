@@ -7,12 +7,14 @@
 
 import SpriteKit
 
-class Ship: SKSpriteNode {
+class Ship: SKNode {
     weak var parentLine: RouteLine?
-    private lazy var loopMovementStrategy: LoopMovementStrategy = LoopMovementStrategy()
+    private let shipSprite: SKSpriteNode
+    private let cargoContainer = SKNode()
     private var movementContext: ShipMovementContext?
     private var isInStormZone: ((CGPoint) -> Bool)
     private var getPorts: (() -> [Port])
+    private lazy var loopMovementStrategy: LoopMovementStrategy = LoopMovementStrategy()
     
     // Potrzebne dla wzorca Strategii
     var shipSpeed: CGFloat = GameConfig.shipSpeed
@@ -28,35 +30,50 @@ class Ship: SKSpriteNode {
         self.getPorts = getPorts
         
         let texture = SKTexture(imageNamed: "ShipTexture")
-        super.init(texture: texture, color: .clear, size: GameConfig.shipSize)
+        shipSprite = SKSpriteNode(texture: texture, color: .clear, size: GameConfig.shipSize)
+        shipSprite.zPosition = 3
+        shipSprite.name = "Ship"
+        
+        super.init()
         
         self.position = position
         self.zPosition = 3
-        self.name = "Ship"
+        self.name = "ShipNode"
+        addChild(shipSprite) // obracamy tylko sprite'a
+        addChild(cargoContainer) // container nie obraca się
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
+    // MARK: Wygląd
+    
     private func updateShipCargoDisplay() {
-        // Usuwamy wszystkie poprzednie Node'y
-        let oldIcons = children.filter { $0.name == "MiniCargoShip" }
-        oldIcons.forEach { $0.removeFromParent() }
+        cargoContainer.removeAllChildren()
         
-        // Dodajemy obecne Node'y
         let radius: CGFloat = 15
         let angleStep = CGFloat.pi / 4
+        
         for (index, cargo) in cargoBuffer.enumerated() {
             let angle = CGFloat(index) * angleStep
             let dx = radius * cos(angle)
             let dy = radius * sin(angle)
+            
             let miniNode = SKSpriteNode(texture: cargo.texture, color: cargo.color, size: CGSize(width: 8, height: 8))
             miniNode.colorBlendFactor = cargo.colorBlendFactor
             miniNode.position = CGPoint(x: dx, y: dy)
             miniNode.zPosition = 3
             miniNode.name = "MiniCargoShip"
-            addChild(miniNode)
+            
+            cargoContainer.addChild(miniNode)
         }
     }
+    
+    func rotateShip(angle: CGFloat) {
+        let rotateAction = SKAction.rotate(toAngle: angle, duration: 0, shortestUnitArc: true)
+        shipSprite.run(rotateAction)
+    }
+    
+    // MARK: - Ruch i rozładunek
     
     func setMovementContext(_ context: ShipMovementContext) { self.movementContext = context }
     
@@ -105,6 +122,8 @@ class Ship: SKSpriteNode {
             }
         }
     }
+    
+    // MARK: - Helpers
     
     func distanceBetween(_ a: CGPoint, _ b: CGPoint) -> CGFloat { hypot(a.x - b.x, a.y - b.y) }
     

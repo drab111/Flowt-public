@@ -25,7 +25,7 @@ class RouteLine: SKShapeNode {
         self.isInStormZone = isInStormZone
         self.getPorts = getPorts
         super.init()
-        self.strokeColor = lineColor
+        self.strokeColor = lineColor.withAlphaComponent(0.4)
         self.lineWidth = 5.0
     }
     

@@ -12,7 +12,7 @@ struct GameView: View {
     @ObservedObject var gameVM: GameViewModel
     
     var scene: SKScene {
-        let scene = GameScene(gameVM: gameVM, cargoFactory: SimpleCargoFactory(), upgradeFactory: SimpleUpgradeFactory()) // TODO: Fabryka w trybie ciemnym
+        let scene = GameScene(gameVM: gameVM, cargoFactory: LightCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
         scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         scene.scaleMode = .resizeFill
         return scene

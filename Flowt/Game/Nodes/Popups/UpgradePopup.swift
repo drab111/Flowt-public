@@ -84,6 +84,7 @@ class UpgradePopup: SKNode, Popup {
         let nodesAtPos = nodes(at: localPos)
         
         if let button = nodesAtPos.compactMap({ $0 as? UpgradeButton }).first {
+            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
             onOptionSelected?(button.option)
             removeFromParent()
         }

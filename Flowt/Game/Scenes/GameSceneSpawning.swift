@@ -14,6 +14,9 @@ extension GameScene {
             },
             gameOver: { [weak self] in
                 self?.gameOver()
+            },
+            focusOnPort: { [weak self] port in
+                self?.focusOnPort(port: port)
             })
         
         addChild(port)
@@ -55,6 +58,7 @@ extension GameScene {
         let stormNode = Storm(position: position, radius: radius)
         addChild(stormNode)
         storm = stormNode
+        self.run(SKAction.playSoundFileNamed("stormSound.wav", waitForCompletion: false))
     }
     
     // MARK: - Collision helpers

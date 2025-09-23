@@ -6,6 +6,7 @@
 //
 
 // MARK: Ulepszenia
+
 protocol UpgradeFactory {
     func createUpgrade(option: UpgradeOption) -> LineUpgrade
 }
@@ -24,12 +25,15 @@ class SimpleUpgradeFactory: UpgradeFactory {
 }
 
 // MARK: Ładunki
+
 protocol CargoFactory {
     func createCargo(type: CargoType) -> Cargo
 }
 
-class SimpleCargoFactory: CargoFactory {
-    func createCargo(type: CargoType) -> Cargo { Cargo(cargoType: type) }
+class DarkCargoFactory: CargoFactory {
+    func createCargo(type: CargoType) -> Cargo { Cargo(cargoType: type, useLightTexture: false) }
 }
 
-// TODO: Fabryka tworząca Cargo w trybie ciemnym
+class LightCargoFactory: CargoFactory {
+    func createCargo(type: CargoType) -> Cargo { Cargo(cargoType: type, useLightTexture: true) }
+}

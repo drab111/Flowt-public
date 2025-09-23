@@ -42,14 +42,6 @@ class LineSelectionPopup: SKNode, Popup {
     }
     
     private func setupButtons(amount: Int) {
-        let colors: [UIColor] = [
-            .red.withAlphaComponent(0.7),
-            .magenta.withAlphaComponent(0.7),
-            .orange.withAlphaComponent(0.7),
-            .green.withAlphaComponent(0.7),
-            .blue.withAlphaComponent(0.7),
-        ]
-        
         // Wyliczamy pozycje startowe dla różnych ilości linii
         let initPos: CGFloat
         switch amount {
@@ -61,7 +53,7 @@ class LineSelectionPopup: SKNode, Popup {
         
         for i in 0..<amount {
             let dx = CGFloat(i - 1) * 50 - initPos
-            let button = LineButton(index: i, color: colors[i], position: CGPoint(x: dx, y: 0))
+            let button = LineButton(index: i, color: GameConfig.routeColors[i], position: CGPoint(x: dx, y: 0))
             addChild(button)
         }
     }
@@ -92,7 +84,7 @@ fileprivate class LineButton: SKShapeNode {
         lineWidth = 2
         self.position = position
         
-        let texture = SKTexture(imageNamed: "SignTexture") // TODO: Zmień na customowy symbol
+        let texture = SKTexture(imageNamed: "SignTexture")
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 35, height: 35)
         imageNode.zPosition = 1

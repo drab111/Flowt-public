@@ -5,6 +5,7 @@
 //  Created by Wiktor Drab on 19/09/2025.
 //
 
+import AudioToolbox
 import SpriteKit
 
 extension GameScene {
@@ -41,7 +42,7 @@ extension GameScene {
         circle.position = CGPoint(x: size.width - 40, y: size.height - CGFloat(40 + index * 50))
         circle.name = "colorButton\(index)"
         
-        let texture = SKTexture(imageNamed: "SignTexture") // TODO: wymień na własny symbol
+        let texture = SKTexture(imageNamed: "SignTexture")
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 35, height: 35)
         imageNode.zPosition = 6
@@ -51,16 +52,53 @@ extension GameScene {
     }
     
     private func highlightColorButton(_ button: SKShapeNode) {
-        let scaleUp = SKAction.scale(to: 1.2, duration: 0.5)
-        let scaleDown = SKAction.scale(to: 1.0, duration: 0.5)
-        let pulse = SKAction.sequence([scaleUp, scaleDown])
-        button.run(SKAction.repeatForever(pulse))
-
-        button.strokeColor = .yellow
-        button.lineWidth = 4
+        button.childNode(withName: "buttonHighlight")?.removeFromParent()
+        
+        let container = SKNode()
+        container.name = "buttonHighlight"
+        container.zPosition = -1
+        button.addChild(container)
+        
+        let radius: CGFloat = 24
+        
+        mainButtonCircut(container: container, radius: radius)
+        makePulse(container: container, radius: radius)
     }
     
-    func setupUI() {
+    private func mainButtonCircut(container: SKNode, radius: CGFloat = 24, arcLength: CGFloat = CGFloat.pi / 6, lineWidth: CGFloat = 3) {
+        let arcLength = CGFloat.pi / 6
+        for i in 0..<4 {
+            let startAngle = CGFloat(i) * (.pi / 2)
+            let endAngle = startAngle + arcLength
+            let path = UIBezierPath(arcCenter: .zero, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: true)
+            
+            let arc = SKShapeNode(path: path.cgPath)
+            arc.strokeColor = .cyan
+            arc.lineWidth = lineWidth
+            arc.alpha = 0.5
+            arc.lineCap = .round
+            container.addChild(arc)
+        }
+        
+        let rotate = SKAction.rotate(byAngle: .pi * 2, duration: 4.0)
+        container.run(SKAction.repeatForever(rotate))
+    }
+    
+    private func makePulse(container: SKNode, radius: CGFloat = 24) {
+        let pulse = SKShapeNode(circleOfRadius: radius)
+        pulse.strokeColor = .cyan
+        pulse.lineWidth = 2
+        pulse.alpha = 0.4
+        container.addChild(pulse)
+        
+        let scaleUp = SKAction.scale(to: 1.6, duration: 0.6)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.6)
+        let group = SKAction.group([scaleUp, fadeOut])
+        let remove = SKAction.removeFromParent()
+        pulse.run(SKAction.sequence([group, remove]))
+    }
+
+    func setupButtons() {
         addChild(scoreLabel)
         createBackToMenuButton()
         createColorButtons()
@@ -68,23 +106,39 @@ extension GameScene {
     
     func setupIslands() {
         let islandConfigs: [(CGPoint, CGFloat, String)] = [
-            (CGPoint(x: size.width*0.75, y: size.height*0.75), 40, "island_picture"),
-            (CGPoint(x: size.width*0.4,  y: size.height*0.55), 50, "island_picture2"),
-            (CGPoint(x: size.width*0.3,  y: size.height*0.25), 45, "island_picture3"),
-            (CGPoint(x: size.width*0.67, y: size.height*0.41), 50, "island_picture4")
+            (CGPoint(x: size.width * 0.25, y: size.height * 0.35), 40, "IslandTexture1"),
+            (CGPoint(x: size.width * 0.47, y: size.height * 0.2), 50, "IslandTexture2"),
+            (CGPoint(x: size.width * 0.75, y: size.height * 0.75), 45, "IslandTexture3"),
+            (CGPoint(x: size.width * 0.67, y: size.height * 0.41), 55, "IslandTexture4"),
+            (CGPoint(x: size.width * 0.4, y: size.height * 0.55), 50, "IslandTexture5")
         ]
         
         for (pos, radius, pic) in islandConfigs { addIsland(position: pos, radius: radius, picture: pic) }
     }
     
-    func addIsland(position: CGPoint, radius: CGFloat, picture: String) {
+    private func addIsland(position: CGPoint, radius: CGFloat, picture: String) {
         let island = Island(position: position, radius: radius, picture: picture)
         addChild(island)
         islands.append(island)
     }
     
+    func setupBackground() {
+        let ocean = Ocean(size: size)
+        addChild(ocean)
+        self.ocean = ocean
+    }
+    
+    func setupCamera() {
+        addChild(cameraNode)
+        self.camera = cameraNode
+        
+        cameraNode.position = CGPoint(x: frame.midX, y: frame.midY)
+        cameraNode.setScale(1.0)
+    }
+    
     func addExtraLine(lineColor: UIColor, buttonColor: UIColor) {
-        //self.run(SKAction.playSoundFileNamed("newLineSound.wav", waitForCompletion: false)) // TODO: dodaj ścieżkę dźwiękową
+        self.run(SKAction.playSoundFileNamed("successSound.wav", waitForCompletion: false))
+        
         // Tworzymy reprezentację graficzną
         let notificationCircle = makeNotificationCircle(color: buttonColor, lineColor: lineColor)
         addChild(notificationCircle)
@@ -124,12 +178,55 @@ extension GameScene {
         circle.position = CGPoint(x: size.width / 2, y: size.height / 2)
         circle.zPosition = 4
 
-        let texture = SKTexture(imageNamed: "SignTexture") // TODO: Zmień
+        let texture = SKTexture(imageNamed: "SignTexture")
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 210, height: 210)
         imageNode.zPosition = 5
         circle.addChild(imageNode)
 
         return circle
+    }
+    
+    func focusOnPort(port: Port, scale: CGFloat = 0.13, duration: TimeInterval = 2.0) {
+        guard let camera = camera else { return }
+
+        // zamrażamy wszystko poza portami i kamerą
+        for node in children {
+            if node is Port {
+                (node as! Port).stopOverloadTimer()
+            } else if !(node is SKCameraNode) {
+                node.isPaused = true
+            }
+        }
+        
+        invalidateTimers()
+        showGameOverLabel(camera: camera)
+        AudioServicesPlaySystemSound(SystemSoundID(1254))
+        
+        let move = SKAction.move(to: port.position, duration: duration)
+        let zoom = SKAction.scale(to: scale, duration: duration)
+        let group = SKAction.group([move, zoom])
+        group.timingMode = .easeInEaseOut
+
+        camera.run(group)
+    }
+    
+    private func showGameOverLabel(camera: SKCameraNode) {
+        let label = SKLabelNode(text: "GAME OVER")
+        label.fontName = "HelveticaNeue-Bold"
+        label.fontSize = 40
+        label.fontColor = .white
+        label.position = CGPoint(x: 0, y: -UIScreen.main.bounds.height / 3.5)
+        label.zPosition = 25
+        label.alpha = 0
+        camera.addChild(label)
+        
+        let fadeIn = SKAction.fadeIn(withDuration: 0.8)
+        label.run(fadeIn)
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        let dt = CGFloat(1.0 / 60.0)
+        ocean?.update(dt)
     }
 }

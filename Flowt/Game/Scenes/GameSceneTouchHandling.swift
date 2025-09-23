@@ -20,12 +20,14 @@ extension GameScene {
         
         // Sprawdzamy czy kliknięto w "MENU"
         if nodes(at: location).contains(where: { $0.name == "BackToMenuButton" }) {
-            //self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false)) // TODO: dodaj ścieżkę dźwiękową
+            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
             let popup = ConfirmExitPopup(size: self.size,
                 onConfirm: { [weak self] in
+                    self?.run(SKAction.playSoundFileNamed("failureSound.wav", waitForCompletion: false))
                     self?.gameVM.endGame()
                 },
                 onCancel: { [weak self] in
+                    self?.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
                     self?.activePopup = nil
                 })
             
@@ -36,7 +38,7 @@ extension GameScene {
         
         // Sprawdzamy czy kliknięto w przycisk linii i szukamy jej indeksu
         if let tappedButton = nodes(at: location).compactMap({ $0 as? SKShapeNode }).first, let index = colorButtons.firstIndex(of: tappedButton) {
-            //self.run(SKAction.playSoundFileNamed("lineSound.wav", waitForCompletion: false)) // TODO: dodaj ścieżkę dźwiękową
+            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
             currentLineIndex = index
             createColorButtons()
             isDrawing = false
@@ -90,11 +92,12 @@ extension GameScene {
         
         // Sprawdzenie czy nowa linia spełnia zasady gry aby móc ją zrealizować
         if let (startPort, endPort) = checkConnectionForSegment(points: pathPoints, line: currentLine) {
+            self.run(SKAction.playSoundFileNamed("successSound.wav", waitForCompletion: false))
             currentLine.finalizeCurrentLine()
             currentLine.existingConnections.append((startPort, endPort))
             checkIfLoopClosed(line: currentLine)
-            //self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false)) // TODO: dodaj ścieżkę dźwiękową
         } else {
+            self.run(SKAction.playSoundFileNamed("failureSound.wav", waitForCompletion: false))
             currentLine.currentPoints.removeAll()
             currentLine.updatePath()
         }

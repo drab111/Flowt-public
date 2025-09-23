@@ -47,15 +47,15 @@ class LoopMovementStrategy: MovementStrategy {
         let duration = TimeInterval(dist / ship.shipSpeed)
         
         let angle = atan2(p2.y - p1.y, p2.x - p1.x) + CGFloat.pi / 2
-        let rotateAction = SKAction.rotate(toAngle: angle, duration: 0, shortestUnitArc: true)
-        let moveAction = SKAction.move(to: p2, duration: duration)
+        ship.rotateShip(angle: angle)
         
+        let moveAction = SKAction.move(to: p2, duration: duration)
         let nextSegment = SKAction.run {
             ship.currentSegmentIndex = i2
             ship.startNextSegment()
         }
         
-        ship.run(SKAction.sequence([rotateAction, moveAction, nextSegment]))
+        ship.run(SKAction.sequence([moveAction, nextSegment]))
     }
 }
 
@@ -99,14 +99,14 @@ class BackAndForthMovementStrategy: MovementStrategy {
         let duration = TimeInterval(dist / ship.shipSpeed)
         
         let angle = atan2(p2.y - p1.y, p2.x - p1.x) + CGFloat.pi / 2
-        let rotateAction = SKAction.rotate(toAngle: angle, duration: 0, shortestUnitArc: true)
-        let moveAction = SKAction.move(to: p2, duration: duration)
+        ship.rotateShip(angle: angle)
         
+        let moveAction = SKAction.move(to: p2, duration: duration)
         let nextSegment = SKAction.run {
             ship.currentSegmentIndex = i2
             ship.startNextSegment()
         }
         
-        ship.run(SKAction.sequence([rotateAction, moveAction, nextSegment]))
+        ship.run(SKAction.sequence([moveAction, nextSegment]))
     }
 }

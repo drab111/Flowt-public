@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "shipTexture.png",
+      "filename" : "ShipTexture.png",
       "idiom" : "universal",
       "scale" : "1x"
     },

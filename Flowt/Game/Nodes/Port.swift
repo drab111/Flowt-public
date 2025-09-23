@@ -18,14 +18,16 @@ class Port: SKSpriteNode {
     private var overloadIndicator: SKShapeNode?
     private var increaseScore: (() -> Void)
     private var gameOver: (() -> Void)
+    private var focusOnPort: ((Port) -> Void)
     var portType: CargoType
     var isOccupied = false
     
-    init(position: CGPoint, portType: CargoType, factory: CargoFactory, increaseScore: @escaping (() -> Void), gameOver: @escaping (() -> Void)) {
+    init(position: CGPoint, portType: CargoType, factory: CargoFactory, increaseScore: @escaping (() -> Void), gameOver: @escaping (() -> Void), focusOnPort: @escaping ((Port) -> Void)) {
         self.portType = portType
         self.cargoFactory = factory
         self.increaseScore = increaseScore
         self.gameOver = gameOver
+        self.focusOnPort = focusOnPort
         let texture = SKTexture(imageNamed: portType.symbol)
         super.init(texture: texture, color: .white, size: GameConfig.portSize)
 
@@ -33,17 +35,65 @@ class Port: SKSpriteNode {
         self.zPosition = 2
         self.name = "Port"
 
-        // Otoczka portu
-        let border = SKShapeNode(circleOfRadius: 16)
-        border.strokeColor = .white
-        border.lineWidth = 2
-        border.zPosition = 2
-        addChild(border)
+        self.run(SKAction.playSoundFileNamed("portSpawnSound.wav", waitForCompletion: false))
+        makePortShape()
+        runSpawnAnimation()
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
-    // MARK: Logika generowania i wymiany ładunków pomiędzy portem a statkami
+    // MARK: - Wygląd
+    
+    private func makePortShape() {
+        let circle = SKShapeNode(circleOfRadius: 16)
+        circle.fillColor = .white
+        circle.alpha = 0.5
+        circle.strokeColor = .clear
+        circle.zPosition = -1
+        circle.name = "PortCircle"
+        addChild(circle)
+    }
+    
+    private func runSpawnAnimation() {
+        // Bounce-in (port skaluje się przy pojawieniu)
+        let scaleUp = SKAction.scale(to: 1.2, duration: 0.3)
+        scaleUp.timingMode = .easeOut
+
+        let scaleDown = SKAction.scale(to: 1.0, duration: 0.2)
+        scaleDown.timingMode = .easeIn
+
+        let appear = SKAction.sequence([
+            SKAction.scale(to: 0.0, duration: 0.0),
+            scaleUp,
+            scaleDown
+        ])
+        self.run(appear)
+        
+        // Rozbłysk kółka (sygnał nowego portu)
+        let flashCircle = SKShapeNode(circleOfRadius: 24)
+        flashCircle.fillColor = .white
+        flashCircle.alpha = 0.4
+        flashCircle.strokeColor = .clear
+        flashCircle.zPosition = -2
+        addChild(flashCircle)
+        
+        let expand = SKAction.group([
+            SKAction.fadeOut(withDuration: 0.6),
+            SKAction.scale(to: 2.0, duration: 0.6)
+        ])
+        let remove = SKAction.removeFromParent()
+        flashCircle.run(.sequence([expand, remove]))
+    }
+    
+    private func flashPortCircleSuccess() {
+        if let circle = children.first(where: { $0 is SKShapeNode && $0.name == "PortCircle" }) as? SKShapeNode {
+            let green = SKAction.run { circle.fillColor = .green }
+            let wait = SKAction.wait(forDuration: 0.3)
+            let back = SKAction.run { circle.fillColor = .white }
+            let seq = SKAction.sequence([green, wait, back])
+            circle.run(seq)
+        }
+    }
     
     // Odpowiada za ustalenie które ładunki są obecnie w porcie i je renderuje
     func updatePortCargoDisplay() {
@@ -58,7 +108,7 @@ class Port: SKSpriteNode {
             let angle = CGFloat(index) * angleStep
             let dx = radius * cos(angle)
             let dy = radius * sin(angle)
-            let miniNode = SKSpriteNode(texture: cargo.texture, color: cargo.color, size: CGSize(width: 10, height: 10))
+            let miniNode = SKSpriteNode(texture: cargo.texture, color: cargo.color, size: CGSize(width: 12, height: 12))
             miniNode.colorBlendFactor = cargo.colorBlendFactor
             miniNode.position = CGPoint(x: dx, y: dy)
             miniNode.zPosition = 3
@@ -67,13 +117,7 @@ class Port: SKSpriteNode {
         }
     }
     
-    func produceRandomCargo() {
-        let possibleTypes = CargoType.allCases.filter { $0 != self.portType }
-        let randomType = possibleTypes.randomElement()!
-        let cargo = cargoFactory.createCargo(type: randomType)
-        
-        addCargo(cargo)
-    }
+    // MARK: Logika dla ładunków
     
     private func addCargo(_ cargo: Cargo) {
         cargoBuffer.append(cargo) // ta tablica to źródło prawdy
@@ -82,6 +126,14 @@ class Port: SKSpriteNode {
         
         updatePortCargoDisplay()
         checkOverload()
+    }
+    
+    func produceRandomCargo() {
+        let possibleTypes = CargoType.allCases.filter { $0 != self.portType }
+        let randomType = possibleTypes.randomElement()!
+        let cargo = cargoFactory.createCargo(type: randomType)
+        
+        addCargo(cargo)
     }
     
     // Tą funkcją Ship zabiera tyle Cargo na ile ma miejsca
@@ -113,16 +165,20 @@ class Port: SKSpriteNode {
                 
                 // +1 punkt
                 increaseScore()
+                flashPortCircleSuccess()
             }
         }
     }
     
-    // MARK: Logika dla wskaźnika czasu
+    // MARK: Wskaźnik czasu
+    
     private func checkOverload() {
         if cargoBuffer.count > maxBuffer {
             if !isOverloaded {
                 isOverloaded = true
-                AudioServicesPlaySystemSound(1005) // TODO: zmienić dźwięk
+                
+                //self.run(SKAction.playSoundFileNamed("alarmSound.wav", waitForCompletion: false))
+                AudioServicesPlaySystemSound(SystemSoundID(1151))
                 createOverloadIndicator()
                 startOverloadTimer()
             }
@@ -139,18 +195,8 @@ class Port: SKSpriteNode {
             updateOverloadIndicator()
             
             // Przekroczenie czasu i koniec gry
-            if remainingTime <= 0 && cargoBuffer.count > maxBuffer {
-                stopOverloadTimer()
-                gameOver()
-            }
+            if remainingTime <= 0 && cargoBuffer.count > maxBuffer { endGame() }
         }
-    }
-    
-    private func stopOverloadTimer() {
-        overloadTimer?.invalidate()
-        overloadTimer = nil
-        removeOverloadIndicator()
-        remainingTime = GameConfig.overloadTime
     }
     
     private func createOverloadIndicator() {
@@ -172,11 +218,30 @@ class Port: SKSpriteNode {
         let path = CGMutablePath()
         path.addArc(center: .zero, radius: GameConfig.indicatorRadius, startAngle: -CGFloat.pi / 2, endAngle: endAngle, clockwise: false)
         overloadIndicator.path = path
-        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate) // TODO: Zmienić wibracje urządzenia na coś innego
+        AudioServicesPlaySystemSound(SystemSoundID(1151))
     }
 
     private func removeOverloadIndicator() {
         overloadIndicator?.removeFromParent()
         overloadIndicator = nil
+    }
+    
+    private func endGame() {
+        stopOverloadTimer()
+        if let circle = children.first(where: { $0 is SKShapeNode && $0.name == "PortCircle" }) as? SKShapeNode { circle.fillColor = .red }
+        focusOnPort(self)
+        
+        let wait = SKAction.wait(forDuration: 4.0)
+        let callGameOver = SKAction.run { [weak self] in
+            self?.gameOver()
+        }
+        run(.sequence([wait, callGameOver]))
+    }
+    
+    func stopOverloadTimer() {
+        overloadTimer?.invalidate()
+        overloadTimer = nil
+        removeOverloadIndicator()
+        remainingTime = GameConfig.overloadTime
     }
 }

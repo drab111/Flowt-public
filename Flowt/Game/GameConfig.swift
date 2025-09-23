@@ -11,7 +11,7 @@ enum GameConfig {
     // Interwały czasu
     static let spawnPortInterval: TimeInterval = 30.0
     static let spawnCargoInterval: TimeInterval = 2.5 // Tylko początkowo
-    static let spawnStormInterval: TimeInterval = 60.0
+    static let spawnStormInterval: TimeInterval = 40.0
     static let upgradePopupInterval: TimeInterval = 90.0
     
     // Logika rozgrywki
@@ -42,12 +42,21 @@ enum GameConfig {
     static let portSpeed: CGFloat = 20
     static let stormSlowdown: CGFloat = 0.5
     static let portDetectionRadius: CGFloat = 15
-    static let shipSize = CGSize(width: 30, height: 20)
+    static let shipSize = CGSize(width: 25, height: 25)
+    
+    // Linie
+    static let routeColors: [UIColor] = [
+        .yellow.withAlphaComponent(0.7),
+        .orange.withAlphaComponent(0.7),
+        .red.withAlphaComponent(0.7),
+        .magenta.withAlphaComponent(0.7),
+        .purple.withAlphaComponent(0.7)
+    ]
     
     // Nagrody
     static let milestoneRewards: [Int: UIColor] = [
-        20: .orange.withAlphaComponent(0.7),
-        150: .green.withAlphaComponent(0.7),
-        500: .blue.withAlphaComponent(0.7)
+        20: GameConfig.routeColors[2],
+        150: GameConfig.routeColors[3],
+        500: GameConfig.routeColors[4]
     ]
 }
