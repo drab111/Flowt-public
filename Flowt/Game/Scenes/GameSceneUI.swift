@@ -190,6 +190,11 @@ extension GameScene {
     func focusOnPort(port: Port, scale: CGFloat = 0.15, duration: TimeInterval = 2.0) {
         guard let camera = camera else { return }
 
+        if let popup = activePopup {
+            popup.removeFromParent()
+            activePopup = nil
+        }
+        
         // zamrażamy wszystko poza portami i kamerą
         for node in children {
             if node is Port {

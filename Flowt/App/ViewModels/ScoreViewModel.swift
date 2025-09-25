@@ -9,8 +9,9 @@ import SwiftUI
 
 @MainActor
 final class ScoreViewModel: ObservableObject {
+    @Published var leaderboard: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = []
     @Published var score: Int?
-    @Published var topScores: [(ScoreEntry, UserProfile?)] = []
+    @Published var latestScoreId: String?
     @Published var userRank: Int?
     @Published var errorMessage: String?
     
@@ -27,8 +28,9 @@ final class ScoreViewModel: ObservableObject {
     }
     
     func reset() {
+        leaderboard = []
         score = nil
-        topScores = []
+        latestScoreId = nil
         userRank = nil
         errorMessage = nil
         hasSaved = false
@@ -36,24 +38,43 @@ final class ScoreViewModel: ObservableObject {
     
     func setScore(_ score: Int) { self.score = score }
     
-    func saveAndLoadRanking() async {
-        guard !hasSaved, let user = appState.currentUser, let score = score else { return }
+    func saveAndLoadLeaderboard(limit: Int) async {
+        guard !hasSaved, let userId = appState.currentUser?.uid, let score = score else { return }
         hasSaved = true
         
-        let entry = ScoreEntry(id: nil, userId: user.uid, score: score)
+        let entry = ScoreEntry(id: nil, userId: userId, score: score)
         
         do {
             let documentId = try await scoreService.saveScore(entry)
-            let rawScores = try await scoreService.fetchTopScores(limit: 5)
+            latestScoreId = documentId
             
-            var results: [(ScoreEntry, UserProfile?)] = []
+            let rawScores = try await scoreService.fetchTopScores(limit: limit)
+            var results: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = []
             for score in rawScores { // wyciągamy usera do którego należy wynik
                 let profile = try await profileService.fetchProfile(uid: score.userId)
-                results.append((score, profile))
+                let isCurrent = (score.userId == userId)
+                let isLatest = (score.id == latestScoreId)
+                results.append((entry: score, profile: profile, isCurrentUser: isCurrent, isLatest: isLatest))
             }
-            topScores = results
+            leaderboard = results
             
             userRank = try await scoreService.fetchRank(documentId: documentId)
+        } catch { errorMessage = error.localizedDescription }
+    }
+    
+    func loadLeaderboard(limit: Int) async {
+        reset()
+        guard let userId = appState.currentUser?.uid else { return }
+        
+        do {
+            let rawScores = try await scoreService.fetchTopScores(limit: limit)
+            var results: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = []
+            for score in rawScores {
+                let profile = try await profileService.fetchProfile(uid: score.userId)
+                let isCurrent = (score.userId == userId)
+                results.append((entry: score, profile: profile, isCurrentUser: isCurrent, isLatest: false))
+            }
+            leaderboard = results
         } catch { errorMessage = error.localizedDescription }
     }
 }

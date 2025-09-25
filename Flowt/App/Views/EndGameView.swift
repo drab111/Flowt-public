@@ -30,7 +30,7 @@ struct EndGameView: View {
                         .foregroundColor(.white)
                     
                     if let rank = scoreVM.userRank {
-                        Text("Your Rank: #\(rank)")
+                        Text("Score Rank: #\(rank)")
                             .font(.title3)
                             .foregroundColor(.yellow)
                             .padding(.top, 4)
@@ -49,15 +49,15 @@ struct EndGameView: View {
                         .padding(.horizontal)
                 }
                 
-                // Ranking
+                // Leaderboard
                 List {
                     Section(header: Text("Top 5").foregroundColor(.white)) {
-                        ForEach(Array(scoreVM.topScores.enumerated()), id: \.element.0.id) { index, item in
-                            let entry = item.0
-                            let profile = item.1
+                        ForEach(Array(scoreVM.leaderboard.enumerated()), id: \.element.entry.id) { index, item in
+                            let entry = item.entry
+                            let profile = item.profile
                             
                             HStack(spacing: 12) {
-                                Text("#\(index+1)")
+                                Text("#\(index + 1)")
                                     .frame(width: 32, alignment: .leading)
                                     .foregroundColor(.yellow)
                                 
@@ -85,7 +85,12 @@ struct EndGameView: View {
                                     .font(.headline)
                                     .foregroundColor(.white)
                             }
-                            .padding(.vertical, 4)
+                            .padding(.vertical, 6)
+                            .listRowBackground(
+                                item.isLatest ? Color.yellow.opacity(0.4) :
+                                item.isCurrentUser ? Color.blue.opacity(0.25) :
+                                Color.clear
+                            )
                         }
                     }
                 }
@@ -110,7 +115,7 @@ struct EndGameView: View {
                 
                 Spacer(minLength: 20)
             }
-            .task { await scoreVM.saveAndLoadRanking() }
+            .task { await scoreVM.saveAndLoadLeaderboard(limit: 5) }
         }
     }
 }

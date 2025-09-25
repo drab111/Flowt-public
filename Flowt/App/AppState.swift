@@ -13,14 +13,14 @@ enum Screen {
 }
 
 enum MainMenuTab: CaseIterable {
-    case account, tutorial, game, ranking, settings
+    case account, tutorial, game, leaderboard, settings
     
     var title: String {
         switch self {
         case .account: return "Account"
         case .tutorial: return "Tutorial"
         case .game: return "Game"
-        case .ranking: return "Ranking"
+        case .leaderboard: return "Leaderboard"
         case .settings: return "Settings"
         }
     }
@@ -30,7 +30,7 @@ enum MainMenuTab: CaseIterable {
         case .account: return "person.circle"
         case .tutorial: return "book.fill"
         case .game: return "gamecontroller"
-        case .ranking: return "list.bullet"
+        case .leaderboard: return "list.bullet"
         case .settings: return "gearshape"
         }
     }

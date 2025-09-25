@@ -23,10 +23,10 @@ struct MainMenuView: View {
                 // Główna treść
                 ZStack {
                     switch selectedTab {
-                    case .account: AccountView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.userProfileVM)
+                    case .account: AccountView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.userProfileVM, accountScoreVM: mainMenuVM.accountScoreVM)
                     case .tutorial: TutorialView()
                     case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM)
-                    case .ranking: RankingView()
+                    case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
                     case .settings: SettingsView()
                     }
                 }

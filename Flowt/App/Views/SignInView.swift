@@ -12,7 +12,6 @@ struct SignInView: View {
     enum Field { case email, password }
     
     @StateObject var viewModel: AuthViewModel
-    @Environment(\.colorScheme) var colorScheme
     @FocusState private var focusedField: Field? // info w jakim polu tekstowym user ma klawiature (email czy password)
     
     var body: some View {
@@ -99,7 +98,7 @@ struct SignInView: View {
             }
         }
         .padding()
-        .background(colorScheme == .dark ? Color(red: 0.2, green: 0.2, blue: 0.25).opacity(0.75) : .white)
+        .background(Color(red: 0.2, green: 0.2, blue: 0.25).opacity(0.75))
         .cornerRadius(12)
     }
 }

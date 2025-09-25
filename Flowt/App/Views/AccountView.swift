@@ -22,13 +22,14 @@ struct AccountView: View {
     
     @ObservedObject var authVM: AuthViewModel
     @ObservedObject var userProfileVM: UserProfileViewModel
+    @ObservedObject var accountScoreVM: AccountScoreViewModel
     @State private var pickerItem: PhotosPickerItem? = nil // wybrany element w selektorze zdjęć
     @State private var activeAlert: ActiveAlert? = nil
     @FocusState private var focusedField: Bool
     
     var body: some View {
         ZStack {
-            if userProfileVM.isLoading {
+            if userProfileVM.isLoading || accountScoreVM.isLoading {
                 ProgressView()
                     .scaleEffect(1.5)
                     .tint(.white)
@@ -41,7 +42,7 @@ struct AccountView: View {
                             // MARK: - Profil użytkownika
                             profilePanel
                             
-                            // MARK: - Ranking
+                            // MARK: - Pozycja w rankingu
                             scorePanel
                             
                             // MARK: - Akcje konta
@@ -56,7 +57,10 @@ struct AccountView: View {
                 }
             }
         }
-        .task { await userProfileVM.loadUserProfile() }
+        .task {
+            await userProfileVM.loadUserProfile()
+            await accountScoreVM.loadUserStats()
+        }
         .onTapGesture { focusedField = false }
         .alert(item: $activeAlert) { alertType in
             switch alertType {
@@ -75,6 +79,7 @@ struct AccountView: View {
                         Task {
                             await userProfileVM.deleteProfile()
                             await authVM.deleteUserAccount()
+                            await accountScoreVM.deleteUserScores()
                         }
                     },
                     secondaryButton: .cancel(Text("Cancel"))
@@ -124,6 +129,9 @@ struct AccountView: View {
                 .background(Color.white.opacity(0.1))
                 .cornerRadius(6)
                 .foregroundColor(.white)
+                .onChange(of: userProfileVM.newNickname) { _, newValue in
+                    if newValue.count > 15 { userProfileVM.newNickname = String(newValue.prefix(15)) }
+                }
             
             switch userProfileVM.saveState {
             case .idle:
@@ -175,29 +183,39 @@ struct AccountView: View {
                 .font(.headline)
                 .foregroundColor(.white.opacity(0.8))
             
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Highest Score")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.6))
-                    Text("123") // TODO: fetch from Firestore
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("Global Rank")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.6))
-                    Text("#42") // TODO: mock / Firestore ranking
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.yellow)
+            if let error = accountScoreVM.errorMessage {
+                Text(error)
+                    .foregroundColor(.yellow)
+            } else {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Highest Score")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.6))
+                        Text("\(accountScoreVM.bestScore ?? 0)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("Rank")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.6))
+                        if let rank = accountScoreVM.globalRank {
+                            Text("#\(rank)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.yellow)
+                        } else {
+                            Text("-")
+                                .font(.title2)
+                                .foregroundColor(.gray)
+                        }
+                    }
                 }
             }
         }
-
     }
     
     // MARK: - Panel akcji
@@ -235,7 +253,8 @@ struct AccountView: View {
     let appState = AppState()
     let userProfileVM = UserProfileViewModel(appState: appState, profileService: UserProfileService())
     let authVM = AuthViewModel(appState: appState, authService: AuthService())
+    let accountScoreVM = AccountScoreViewModel(appState: appState, scoreService: ScoreService())
     
-    AccountView(authVM: authVM, userProfileVM: userProfileVM)
+    AccountView(authVM: authVM, userProfileVM: userProfileVM, accountScoreVM: accountScoreVM)
         .environmentObject(appState)
 }

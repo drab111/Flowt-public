@@ -13,6 +13,7 @@ final class MainMenuViewModel: ObservableObject {
     @Published var userProfileVM: UserProfileViewModel
     @Published var gameVM: GameViewModel
     @Published var scoreVM: ScoreViewModel
+    @Published var accountScoreVM: AccountScoreViewModel
     private var appState: AppState
     
     init(appState: AppState) {
@@ -21,5 +22,6 @@ final class MainMenuViewModel: ObservableObject {
         self.userProfileVM = UserProfileViewModel(appState: appState, profileService: UserProfileService())
         self.gameVM = GameViewModel(appState: appState)
         self.scoreVM = ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService())
+        self.accountScoreVM = AccountScoreViewModel(appState: appState, scoreService: ScoreService())
     }
 }
