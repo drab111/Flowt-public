@@ -9,6 +9,7 @@ import SpriteKit
 
 class GameScene: SKScene {
     let gameVM: GameViewModel
+    let scoreVM: ScoreViewModel
     let cargoFactory: CargoFactory
     let upgradeFactory: UpgradeFactory
     let scoreLabel = ScoreLabel(position: CGPoint(x: 22, y: UIScreen.main.bounds.height - 30))
@@ -38,8 +39,9 @@ class GameScene: SKScene {
     var spawnStormTimer: Timer?
     var upgradeTimer: Timer?
     
-    init(gameVM: GameViewModel, cargoFactory: CargoFactory, upgradeFactory: UpgradeFactory) {
+    init(gameVM: GameViewModel, scoreVM: ScoreViewModel, cargoFactory: CargoFactory, upgradeFactory: UpgradeFactory) {
         self.gameVM = gameVM
+        self.scoreVM = scoreVM
         self.cargoFactory = cargoFactory
         self.upgradeFactory = upgradeFactory
         
@@ -49,6 +51,7 @@ class GameScene: SKScene {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
     override func didMove(to view: SKView) {
+        scoreVM.reset()
         setupBackground()
         setupButtons()
         setupCamera()

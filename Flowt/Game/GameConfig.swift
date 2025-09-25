@@ -11,8 +11,8 @@ enum GameConfig {
     // Interwały czasu
     static let spawnPortInterval: TimeInterval = 30.0
     static let spawnCargoInterval: TimeInterval = 2.5 // Tylko początkowo
-    static let spawnStormInterval: TimeInterval = 40.0
-    static let upgradePopupInterval: TimeInterval = 90.0
+    static let spawnStormInterval: TimeInterval = 38.7
+    static let upgradePopupInterval: TimeInterval = 100.0
     
     // Logika rozgrywki
     static let portConnectionTolerance: CGFloat = 30

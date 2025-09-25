@@ -137,7 +137,7 @@ extension GameScene {
     }
     
     func addExtraLine(lineColor: UIColor, buttonColor: UIColor) {
-        self.run(SKAction.playSoundFileNamed("successSound.wav", waitForCompletion: false))
+        self.run(SKAction.playSoundFileNamed("milestoneSound.wav", waitForCompletion: false))
         
         // Tworzymy reprezentację graficzną
         let notificationCircle = makeNotificationCircle(color: buttonColor, lineColor: lineColor)
@@ -187,7 +187,7 @@ extension GameScene {
         return circle
     }
     
-    func focusOnPort(port: Port, scale: CGFloat = 0.13, duration: TimeInterval = 2.0) {
+    func focusOnPort(port: Port, scale: CGFloat = 0.15, duration: TimeInterval = 2.0) {
         guard let camera = camera else { return }
 
         // zamrażamy wszystko poza portami i kamerą

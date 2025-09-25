@@ -12,12 +12,14 @@ final class MainMenuViewModel: ObservableObject {
     @Published var authVM: AuthViewModel
     @Published var userProfileVM: UserProfileViewModel
     @Published var gameVM: GameViewModel
+    @Published var scoreVM: ScoreViewModel
     private var appState: AppState
     
     init(appState: AppState) {
         self.appState = appState
-        self.authVM = AuthViewModel(appState: appState)
-        self.userProfileVM = UserProfileViewModel(appState: appState)
+        self.authVM = AuthViewModel(appState: appState, authService: AuthService())
+        self.userProfileVM = UserProfileViewModel(appState: appState, profileService: UserProfileService())
         self.gameVM = GameViewModel(appState: appState)
+        self.scoreVM = ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService())
     }
 }

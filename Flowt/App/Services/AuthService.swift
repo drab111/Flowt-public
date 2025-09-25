@@ -9,7 +9,18 @@ import FirebaseAuth
 import AuthenticationServices
 import CryptoKit
 
-final class AuthService {
+protocol AuthServiceProtocol {
+    func signUp(email: String, password: String) async throws -> AuthUser
+    func signIn(email: String, password: String) async throws -> AuthUser
+    func prepareAppleRequest(_ request: ASAuthorizationAppleIDRequest)
+    func handleAppleAuth(credential: ASAuthorizationAppleIDCredential) async throws -> AuthUser
+    func deleteAccount() async throws
+    func getCurrentUser() -> User?
+    func signOut() throws
+    func sendVerificationEmail() async throws
+}
+
+final class AuthService: AuthServiceProtocol {
     
     // MARK: - Email & Password
     func signUp(email: String, password: String) async throws -> AuthUser {

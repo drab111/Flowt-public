@@ -9,6 +9,9 @@ import AudioToolbox
 import SpriteKit
 
 class Port: SKSpriteNode {
+    static var overloadCount = 0  // ilu portów jest przeciążonych
+    static var alarmTimer: Timer? // timer do grania dźwięku co sekundę
+    
     private var cargoFactory: CargoFactory
     private var cargoBuffer: [Cargo] = []
     private let maxBuffer = GameConfig.portMaxBuffer
@@ -176,14 +179,18 @@ class Port: SKSpriteNode {
         if cargoBuffer.count > maxBuffer {
             if !isOverloaded {
                 isOverloaded = true
+                Port.overloadCount += 1
+                if Port.overloadCount == 1 { startGlobalAlarm() }
                 
-                //self.run(SKAction.playSoundFileNamed("alarmSound.wav", waitForCompletion: false))
-                AudioServicesPlaySystemSound(SystemSoundID(1151))
                 createOverloadIndicator()
                 startOverloadTimer()
             }
         } else {
-            isOverloaded = false
+            if isOverloaded {
+                isOverloaded = false
+                Port.overloadCount -= 1
+                if Port.overloadCount == 0 { stopGlobalAlarm() }
+            }
             stopOverloadTimer()
         }
     }
@@ -218,7 +225,6 @@ class Port: SKSpriteNode {
         let path = CGMutablePath()
         path.addArc(center: .zero, radius: GameConfig.indicatorRadius, startAngle: -CGFloat.pi / 2, endAngle: endAngle, clockwise: false)
         overloadIndicator.path = path
-        AudioServicesPlaySystemSound(SystemSoundID(1151))
     }
 
     private func removeOverloadIndicator() {
@@ -243,5 +249,18 @@ class Port: SKSpriteNode {
         overloadTimer = nil
         removeOverloadIndicator()
         remainingTime = GameConfig.overloadTime
+    }
+    
+    // MARK: - Alarm
+    
+    private func startGlobalAlarm() {
+        Port.alarmTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            AudioServicesPlaySystemSound(SystemSoundID(1151))
+        }
+    }
+    
+    private func stopGlobalAlarm() {
+        Port.alarmTimer?.invalidate()
+        Port.alarmTimer = nil
     }
 }

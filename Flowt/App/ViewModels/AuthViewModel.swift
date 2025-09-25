@@ -17,9 +17,12 @@ final class AuthViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     private var appState: AppState
-    private let auth = AuthService()
+    private let authService: AuthServiceProtocol
     
-    init(appState: AppState) { self.appState = appState }
+    init(appState: AppState, authService: AuthServiceProtocol) {
+        self.appState = appState
+        self.authService = authService
+    }
     
     // MARK: - Sign in with Email & Password
     func submit() async {
@@ -34,18 +37,18 @@ final class AuthViewModel: ObservableObject {
     
     private func signUp(email: String, password: String) async {
         do {
-            let user = try await auth.signUp(email: email, password: password)
+            let user = try await authService.signUp(email: email, password: password)
             appState.currentUser = user
-            try await auth.sendVerificationEmail()
+            try await authService.sendVerificationEmail()
             appState.checkUserSession()
         } catch { errorMessage = error.localizedDescription }
     }
     
     private func signIn(email: String, password: String) async {
         do {
-            let user = try await auth.signIn(email: email, password: password)
+            let user = try await authService.signIn(email: email, password: password)
             appState.currentUser = user
-            if let user = auth.getCurrentUser(), !user.isEmailVerified {
+            if let user = authService.getCurrentUser(), !user.isEmailVerified {
                 appState.currentScreen = .verifyEmail
                 return
             }
@@ -55,7 +58,7 @@ final class AuthViewModel: ObservableObject {
     
     // MARK: - Sign in with Apple
     func handleAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
-        auth.prepareAppleRequest(request)
+        authService.prepareAppleRequest(request)
     }
     
     func handleAppleCompletion(_ result: Result<ASAuthorization, Error>) {
@@ -65,7 +68,7 @@ final class AuthViewModel: ObservableObject {
             if let credential = authResults.credential as? ASAuthorizationAppleIDCredential {
                 Task {
                     do {
-                        let user = try await auth.handleAppleAuth(credential: credential)
+                        let user = try await authService.handleAppleAuth(credential: credential)
                         appState.currentUser = user
                         appState.currentScreen = .mainMenu(.account)
                     } catch { errorMessage = error.localizedDescription }
@@ -80,7 +83,7 @@ final class AuthViewModel: ObservableObject {
     func deleteUserAccount() async {
         guard (appState.currentUser?.uid) != nil else { return }
         do {
-            try await auth.deleteAccount()
+            try await authService.deleteAccount()
             appState.currentUser = nil
             appState.currentScreen = .signIn
         } catch { errorMessage = error.localizedDescription }
@@ -98,7 +101,7 @@ final class AuthViewModel: ObservableObject {
     
     func signOut() {
         do {
-            try auth.signOut()
+            try authService.signOut()
             appState.currentUser = nil
             appState.currentUserProfile = nil
             appState.currentScreen = .signIn

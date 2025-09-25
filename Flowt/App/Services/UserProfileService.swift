@@ -8,7 +8,14 @@
 import FirebaseFirestore
 import NSFWDetector
 
-final class UserProfileService {
+protocol UserProfileServiceProtocol {
+    func fetchProfile(uid: String) async throws -> UserProfile?
+    func saveProfile(_ profile: UserProfile) async throws
+    func deleteProfile(uid: String) async throws
+    func validateAvatar(image: UIImage, threshold: Float) async throws -> Bool
+}
+
+final class UserProfileService: UserProfileServiceProtocol {
     private let db = Firestore.firestore()
     private let detector = NSFWDetector.shared
     
@@ -29,7 +36,7 @@ final class UserProfileService {
     }
     
     // MARK: - helper do modelu ML (opakowujemy stare, callback-owe API w mechanizm async/await - wymuszając zaczekanie na wynik klasyfikatora)
-    func validateAvatar(image: UIImage, threshold: Float = 0.5) async throws -> Bool {
+    func validateAvatar(image: UIImage, threshold: Float) async throws -> Bool {
         try await withCheckedThrowingContinuation { continuation in // to wykryje brak wywołania resume lub podwójne resume i zgłosi problem — pomaga debugować
             detector.check(image: image) { result in
                 switch result {

@@ -19,9 +19,12 @@ final class UserProfileViewModel: ObservableObject {
     @Published var saveState: SaveState = .idle
     
     private var appState: AppState
-    private let profileService = UserProfileService()
+    private let profileService: UserProfileServiceProtocol
     
-    init(appState: AppState) { self.appState = appState }
+    init(appState: AppState, profileService: UserProfileServiceProtocol) {
+        self.appState = appState
+        self.profileService = profileService
+    }
     
     func loadUserProfile() async {
         isLoading = true
@@ -38,6 +41,7 @@ final class UserProfileViewModel: ObservableObject {
                 avatarData = nil
                 let profile = UserProfile(id: uid, nickname: currentNickname, avatarBase64: nil)
                 try await profileService.saveProfile(profile)
+                appState.currentUserProfile = profile
             }
         } catch { errorMessage = error.localizedDescription }
     }
@@ -53,7 +57,7 @@ final class UserProfileViewModel: ObservableObject {
             if let imageData = imageData, let image = UIImage(data: imageData) {
                 
                 // Sprawdzanie czy zdjęcie nie jest niestosowne używając modelu ML
-                let isSafe = try await profileService.validateAvatar(image: image)
+                let isSafe = try await profileService.validateAvatar(image: image, threshold: 0.5)
                 
                 // Odrzucenie zapisu w przypadku niestosowności
                 if !isSafe {

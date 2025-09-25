@@ -28,6 +28,7 @@ extension GameScene {
         activePopup = nil
         pendingUpgrade = nil
         
+        scoreVM.setScore(score)
         gameVM.endGame()
     }
     
@@ -45,6 +46,7 @@ extension GameScene {
     private func cargoInterval(score: Int) -> TimeInterval {
         switch score {
         case ..<30:    return 2.5
+        case ..<45:    return 2.2
         case ..<60:    return 1.8
         case ..<100:   return 1.4
         case ..<150:   return 1.0
@@ -136,10 +138,12 @@ extension GameScene {
     }
     
     func invalidateTimers() {
-        [spawnPortTimer, spawnCargoTimer, spawnStormTimer, upgradeTimer].forEach { $0?.invalidate() }
+        [spawnPortTimer, spawnCargoTimer, spawnStormTimer, upgradeTimer, Port.alarmTimer].forEach { $0?.invalidate() }
         spawnPortTimer = nil
         spawnCargoTimer = nil
         spawnStormTimer = nil
         upgradeTimer = nil
+        Port.alarmTimer = nil
+        Port.overloadCount = 0
     }
 }

@@ -50,7 +50,7 @@ struct VerifyEmailView: View {
                 if let error = viewModel.errorMessage {
                     Text(error)
                         .foregroundColor(.yellow)
-                        .font(.footnote)
+                        .font(.callout)
                         .padding(.top, 5)
                 }
                 
@@ -65,7 +65,7 @@ struct VerifyEmailView: View {
 
 #Preview {
     let appState = AppState()
-    let viewModel = VerifyEmailViewModel(appState: appState)
+    let viewModel = VerifyEmailViewModel(appState: appState, authService: AuthService())
     VerifyEmailView(viewModel: viewModel)
         .environmentObject(appState)
 }

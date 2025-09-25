@@ -12,11 +12,12 @@ final class VerifyEmailViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     private var appState: AppState
+    private let authService: AuthServiceProtocol
     private var timer: Timer?
-    private let auth = AuthService()
     
-    init(appState: AppState) {
+    init(appState: AppState, authService: AuthServiceProtocol) {
         self.appState = appState
+        self.authService = authService
         startAutoCheck()
     }
     
@@ -24,7 +25,7 @@ final class VerifyEmailViewModel: ObservableObject {
     
     func resendVerificationEmail() async {
         do {
-            try await auth.sendVerificationEmail()
+            try await authService.sendVerificationEmail()
             errorMessage = "A verification email has been sent."
         } catch { errorMessage = error.localizedDescription }
     }
@@ -33,7 +34,7 @@ final class VerifyEmailViewModel: ObservableObject {
     
     func signOut() {
         do {
-            try auth.signOut()
+            try authService.signOut()
             appState.currentUser = nil
             appState.currentUserProfile = nil
             appState.currentScreen = .signIn

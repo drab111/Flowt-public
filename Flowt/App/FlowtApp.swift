@@ -34,9 +34,9 @@ struct RootView: View {
         case .loading:
             LoadingView()
         case .signIn:
-            SignInView(viewModel: AuthViewModel(appState: appState)) // appState to klasa więc przekazujemy oryginał
+            SignInView(viewModel: AuthViewModel(appState: appState, authService: AuthService())) // appState to klasa więc przekazujemy oryginał
         case .verifyEmail:
-            VerifyEmailView(viewModel: VerifyEmailViewModel(appState: appState))
+            VerifyEmailView(viewModel: VerifyEmailViewModel(appState: appState, authService: AuthService()))
         case .mainMenu(let selectedTab):
             MainMenuView(
                 mainMenuVM: mainMenuVM,

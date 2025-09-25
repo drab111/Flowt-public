@@ -91,17 +91,14 @@ struct AccountView: View {
                 if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
                     Image(uiImage: image)
                         .resizable()
-                        .scaledToFill()
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 2))
                 } else {
                     Image("FlowtLogo")
                         .resizable()
-                        .scaledToFill()
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 2))
                 }
             }
+            .scaledToFill()
+            .clipShape(Circle())
+            .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 2))
             .frame(width: 140, height: 140)
             .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
             
@@ -236,8 +233,8 @@ struct AccountView: View {
 
 #Preview {
     let appState = AppState()
-    let userProfileVM = UserProfileViewModel(appState: appState)
-    let authVM = AuthViewModel(appState: appState)
+    let userProfileVM = UserProfileViewModel(appState: appState, profileService: UserProfileService())
+    let authVM = AuthViewModel(appState: appState, authService: AuthService())
     
     AccountView(authVM: authVM, userProfileVM: userProfileVM)
         .environmentObject(appState)

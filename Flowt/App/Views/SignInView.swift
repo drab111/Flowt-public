@@ -63,7 +63,7 @@ struct SignInView: View {
                 if let error = viewModel.errorMessage {
                     Text(error)
                         .foregroundColor(.yellow)
-                        .font(.footnote)
+                        .font(.callout)
                         .padding(.top, 5)
                 }
                 
@@ -106,7 +106,7 @@ struct SignInView: View {
 
 #Preview {
     let appState = AppState()
-    let viewModel = AuthViewModel(appState: appState)
+    let viewModel = AuthViewModel(appState: appState, authService: AuthService())
     SignInView(viewModel: viewModel)
         .environmentObject(appState)
 }

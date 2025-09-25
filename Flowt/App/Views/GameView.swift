@@ -10,13 +10,7 @@ import SpriteKit
 
 struct GameView: View {
     @ObservedObject var gameVM: GameViewModel
-    
-    var scene: SKScene {
-        let scene = GameScene(gameVM: gameVM, cargoFactory: LightCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
-        scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        scene.scaleMode = .resizeFill
-        return scene
-    }
+    @ObservedObject var scoreVM: ScoreViewModel
     
     var body: some View {
         ZStack {
@@ -41,16 +35,34 @@ struct GameView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $gameVM.gameStarted) {
-            SpriteView(scene: scene)
-                .ignoresSafeArea()
-                .statusBarHidden(true)
+        .fullScreenCover(item: $gameVM.activePhase) { phase in
+            switch phase {
+            case .gameScene:
+                SpriteView(scene: makeGameScene())
+                    .ignoresSafeArea()
+                    .statusBarHidden(true)
+            case .endView:
+                EndGameView(gameVM: gameVM, scoreVM: scoreVM)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .ignoresSafeArea()
+                    .statusBarHidden(true)
+            }
         }
+    }
+    
+    private func makeGameScene() -> SKScene {
+        let scene = GameScene(gameVM: gameVM, scoreVM: scoreVM, cargoFactory: LightCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
+        scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        scene.scaleMode = .resizeFill
+        return scene
     }
 }
 
 #Preview {
     let appState = AppState()
-    GameView(gameVM: GameViewModel(appState: appState))
-        .environmentObject(appState)
+    GameView(
+        gameVM: GameViewModel(appState: appState),
+        scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService())
+    )
+    .environmentObject(appState)
 }

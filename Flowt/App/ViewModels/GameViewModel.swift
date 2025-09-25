@@ -7,13 +7,28 @@
 
 import SwiftUI
 
+@MainActor
 final class GameViewModel: ObservableObject {
-    @Published var gameStarted: Bool = false
+    enum GamePhase: Identifiable {
+        case gameScene
+        case endView
+        
+        var id: Int {
+            switch self {
+            case .gameScene: return 1
+            case .endView: return 2
+            }
+        }
+    }
+    
+    @Published var activePhase: GamePhase?
     private var appState: AppState
     
     init(appState: AppState) { self.appState = appState }
     
-    func startGame() { gameStarted = true }
+    func startGame() { activePhase = .gameScene }
     
-    func endGame() { gameStarted = false}
+    func endGame() { activePhase = .endView }
+    
+    func backToMenu() { activePhase = nil }
 }

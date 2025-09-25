@@ -24,7 +24,8 @@ extension GameScene {
             let popup = ConfirmExitPopup(size: self.size,
                 onConfirm: { [weak self] in
                     self?.run(SKAction.playSoundFileNamed("failureSound.wav", waitForCompletion: false))
-                    self?.gameVM.endGame()
+                    self?.invalidateTimers()
+                    self?.gameVM.backToMenu()
                 },
                 onCancel: { [weak self] in
                     self?.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
