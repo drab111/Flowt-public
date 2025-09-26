@@ -49,54 +49,61 @@ struct EndGameView: View {
                         .padding(.horizontal)
                 }
                 
-                // Leaderboard
-                List {
-                    Section(header: Text("Top 5").foregroundColor(.white)) {
-                        ForEach(Array(scoreVM.leaderboard.enumerated()), id: \.element.entry.id) { index, item in
-                            let entry = item.entry
-                            let profile = item.profile
-                            
-                            HStack(spacing: 12) {
-                                Text("#\(index + 1)")
-                                    .frame(width: 32, alignment: .leading)
-                                    .foregroundColor(.yellow)
+                if scoreVM.isLoading == true {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.white)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                else { // Leaderboard
+                    List {
+                        Section(header: Text("Top 5").foregroundColor(.white)) {
+                            ForEach(Array(scoreVM.leaderboard.enumerated()), id: \.element.entry.id) { index, item in
+                                let entry = item.entry
+                                let profile = item.profile
                                 
-                                Group {
-                                    if let base64 = profile?.avatarBase64, let data = Data(base64Encoded: base64), let uiImage = UIImage(data: data) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                    } else {
-                                        Image("FlowtLogo")
-                                            .resizable()
+                                HStack(spacing: 12) {
+                                    Text("#\(index + 1)")
+                                        .frame(width: 32, alignment: .leading)
+                                        .foregroundColor(.yellow)
+                                    
+                                    Group {
+                                        if let base64 = profile?.avatarBase64, let data = Data(base64Encoded: base64), let uiImage = UIImage(data: data) {
+                                            Image(uiImage: uiImage)
+                                                .resizable()
+                                        } else {
+                                            Image("FlowtLogo")
+                                                .resizable()
+                                        }
                                     }
+                                    .scaledToFill()
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                                    
+                                    Text(profile?.nickname ?? "Unknown")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    Text("\(entry.score)")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
                                 }
-                                .scaledToFill()
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
-                                
-                                Text(profile?.nickname ?? "Unknown")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Text("\(entry.score)")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
+                                .padding(.vertical, 6)
+                                .listRowBackground(
+                                    item.isLatest ? Color.yellow.opacity(0.4) :
+                                        item.isCurrentUser ? Color.blue.opacity(0.25) :
+                                        Color.clear
+                                )
                             }
-                            .padding(.vertical, 6)
-                            .listRowBackground(
-                                item.isLatest ? Color.yellow.opacity(0.4) :
-                                item.isCurrentUser ? Color.blue.opacity(0.25) :
-                                Color.clear
-                            )
                         }
                     }
+                    .scrollContentBackground(.hidden) // usuwa domyślne tło listy
+                    .background(Color.clear) // pozwala pokazać BackgroundView
+                    .frame(maxHeight: 400) // żeby lista nie zajmowała całego ekranu
                 }
-                .scrollContentBackground(.hidden) // usuwa domyślne tło listy
-                .background(Color.clear) // pozwala pokazać BackgroundView
-                .frame(maxHeight: 400) // żeby lista nie zajmowała całego ekranu
                 
                 Spacer()
                 
@@ -108,7 +115,7 @@ struct EndGameView: View {
                         .frame(maxWidth: .infinity)
                         .gradientBackground()
                         .foregroundColor(.white)
-                        .cornerRadius(14)
+                        .cornerRadius(20)
                         .shadow(radius: 5)
                 }
                 .padding(.horizontal)

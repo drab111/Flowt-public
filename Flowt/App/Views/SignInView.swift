@@ -12,6 +12,7 @@ struct SignInView: View {
     enum Field { case email, password }
     
     @StateObject var viewModel: AuthViewModel
+    @EnvironmentObject var audioVM: AudioViewModel
     @FocusState private var focusedField: Field? // info w jakim polu tekstowym user ma klawiature (email czy password)
     
     var body: some View {
@@ -40,14 +41,14 @@ struct SignInView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                         .background(viewModel.canSubmit ? Color.black.opacity(0.85) : Color.gray.opacity(0.5))
-                        .cornerRadius(12)
+                        .cornerRadius(20)
                 }
                 .disabled(!viewModel.canSubmit)
                 
                 SignInWithAppleButton(onRequest: viewModel.handleAppleRequest, onCompletion: viewModel.handleAppleCompletion)
                 .signInWithAppleButtonStyle(.black)
                 .frame(height: 50)
-                .cornerRadius(12)
+                .cornerRadius(20)
                 .padding(.top, 10)
                 
                 HStack {
@@ -76,9 +77,10 @@ struct SignInView: View {
                 ProgressView("Signing in...")
                     .padding()
                     .background(.ultraThinMaterial)
-                    .cornerRadius(12)
+                    .cornerRadius(20)
             }
         }
+        .onAppear { audioVM.stop() }
     }
     
     @ViewBuilder
@@ -99,7 +101,7 @@ struct SignInView: View {
         }
         .padding()
         .background(Color(red: 0.2, green: 0.2, blue: 0.25).opacity(0.75))
-        .cornerRadius(12)
+        .cornerRadius(20)
     }
 }
 

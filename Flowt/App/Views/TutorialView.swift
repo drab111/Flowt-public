@@ -67,7 +67,7 @@ struct TutorialView: View {
                         .frame(maxWidth: .infinity)
                         .gradientBackground()
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(20)
                         .shadow(radius: 5)
                 }
                 .padding(.horizontal)
@@ -101,7 +101,7 @@ struct TutorialCard: View {
                 .padding(.horizontal, 24)
         }
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
         .shadow(radius: 8)
         .padding(.horizontal, 24)
     }

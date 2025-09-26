@@ -24,49 +24,57 @@ struct LeaderboardView: View {
                     .padding(.horizontal)
             }
             
-            List {
-                Section(header: Text("Top 100").foregroundColor(.white)) {
-                    ForEach(Array(scoreVM.leaderboard.enumerated()), id: \.element.entry.id) { index, item in
-                        let entry = item.entry
-                        let profile = item.profile
-                        
-                        HStack(spacing: 12) {
-                            Text("#\(index + 1)")
-                                .font(.headline)
-                                .foregroundColor(colorForRank(index + 1))
-                                .frame(width: 40, alignment: .leading)
+            if scoreVM.isLoading == true {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            else {
+                List {
+                    Section(header: Text("Top 100").foregroundColor(.white)) {
+                        ForEach(Array(scoreVM.leaderboard.enumerated()), id: \.element.entry.id) { index, item in
+                            let entry = item.entry
+                            let profile = item.profile
                             
-                            Group {
-                                if let base64 = profile?.avatarBase64, let data = Data(base64Encoded: base64), let uiImage = UIImage(data: data) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                } else {
-                                    Image("FlowtLogo")
-                                        .resizable()
+                            HStack(spacing: 12) {
+                                Text("#\(index + 1)")
+                                    .font(.headline)
+                                    .foregroundColor(colorForRank(index + 1))
+                                    .frame(width: 40, alignment: .leading)
+                                
+                                Group {
+                                    if let base64 = profile?.avatarBase64, let data = Data(base64Encoded: base64), let uiImage = UIImage(data: data) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                    } else {
+                                        Image("FlowtLogo")
+                                            .resizable()
+                                    }
                                 }
+                                .scaledToFill()
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
+                                .frame(width: 40, height: 40)
+                                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                                
+                                Text(profile?.nickname ?? "Unknown")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Text("\(entry.score)")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
                             }
-                            .scaledToFill()
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
-                            .frame(width: 40, height: 40)
-                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
-                            
-                            Text(profile?.nickname ?? "Unknown")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                            Text("\(entry.score)")
-                                .font(.headline)
-                                .foregroundColor(.white)
+                            .padding(.vertical, 6)
+                            .listRowBackground(item.isCurrentUser ? Color.blue.opacity(0.25) : Color.clear)
                         }
-                        .padding(.vertical, 6)
-                        .listRowBackground(item.isCurrentUser ? Color.blue.opacity(0.25) : Color.clear)
                     }
                 }
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
         }
         .background(Color.clear)
         .task { await scoreVM.loadLeaderboard(limit: 100) }

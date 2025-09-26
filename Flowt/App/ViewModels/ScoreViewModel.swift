@@ -5,15 +5,19 @@
 //  Created by Wiktor Drab on 24/09/2025.
 //
 
+import AudioToolbox
 import SwiftUI
 
 @MainActor
 final class ScoreViewModel: ObservableObject {
-    @Published var leaderboard: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = []
     @Published var score: Int?
     @Published var latestScoreId: String?
     @Published var userRank: Int?
+    @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var leaderboard: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = [] {
+        didSet { if leaderboard.contains(where: { $0.isLatest }) { playSuccessSound() } }
+    }
     
     
     private let appState: AppState
@@ -39,6 +43,9 @@ final class ScoreViewModel: ObservableObject {
     func setScore(_ score: Int) { self.score = score }
     
     func saveAndLoadLeaderboard(limit: Int) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         guard !hasSaved, let userId = appState.currentUser?.uid, let score = score else { return }
         hasSaved = true
         
@@ -63,6 +70,9 @@ final class ScoreViewModel: ObservableObject {
     }
     
     func loadLeaderboard(limit: Int) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         reset()
         guard let userId = appState.currentUser?.uid else { return }
         
@@ -77,4 +87,6 @@ final class ScoreViewModel: ObservableObject {
             leaderboard = results
         } catch { errorMessage = error.localizedDescription }
     }
+    
+    private func playSuccessSound() { AudioServicesPlaySystemSound(1022) }
 }

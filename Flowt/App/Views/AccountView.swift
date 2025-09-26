@@ -127,7 +127,7 @@ struct AccountView: View {
                 .focused($focusedField)
                 .padding(10)
                 .background(Color.white.opacity(0.1))
-                .cornerRadius(6)
+                .cornerRadius(20)
                 .foregroundColor(.white)
                 .onChange(of: userProfileVM.newNickname) { _, newValue in
                     if newValue.count > 15 { userProfileVM.newNickname = String(newValue.prefix(15)) }
@@ -146,14 +146,14 @@ struct AccountView: View {
                 .padding(.vertical, 8)
                 .gradientBackground()
                 .foregroundColor(.white)
-                .cornerRadius(6)
+                .cornerRadius(20)
 
             case .saving:
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
                     .gradientBackground()
-                    .cornerRadius(6)
+                    .cornerRadius(20)
 
             case .saved:
                 Label("Saved!", systemImage: "checkmark.circle.fill")
@@ -162,7 +162,7 @@ struct AccountView: View {
                     .padding(.vertical, 8)
                     .background(Color.green.opacity(0.8))
                     .foregroundColor(.white)
-                    .cornerRadius(6)
+                    .cornerRadius(20)
                 
             case .rejected:
                 Label("Inappropriate avatar!", systemImage: "xmark.octagon.fill")
@@ -171,7 +171,7 @@ struct AccountView: View {
                     .padding(.vertical, 8)
                     .background(Color.red.opacity(0.9))
                     .foregroundColor(.white)
-                    .cornerRadius(6)
+                    .cornerRadius(20)
             }
         }
     }
@@ -231,7 +231,7 @@ struct AccountView: View {
             .padding()
             .gradientBackground()
             .foregroundColor(.white)
-            .cornerRadius(6)
+            .cornerRadius(20)
             
             Button {
                 activeAlert = .deleteAccount
@@ -243,7 +243,7 @@ struct AccountView: View {
             .padding()
             .background(Color.red).opacity(0.75)
             .foregroundColor(.white)
-            .cornerRadius(6)
+            .cornerRadius(20)
         }
     }
 }

@@ -187,7 +187,7 @@ extension GameScene {
         return circle
     }
     
-    func focusOnPort(port: Port, scale: CGFloat = 0.15, duration: TimeInterval = 2.0) {
+    func focusOnPort(port: Port, scale: CGFloat = 0.14, duration: TimeInterval = 2.0) {
         guard let camera = camera else { return }
 
         if let popup = activePopup {

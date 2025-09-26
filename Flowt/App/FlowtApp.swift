@@ -10,11 +10,26 @@ import FirebaseCore
 
 @main
 struct FlowtApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var audioVM = AudioViewModel(service: AudioService.shared)
+    
     init() { FirebaseApp.configure() }
+    
     var body: some Scene {
         WindowGroup {
             RootView()
                 .preferredColorScheme(.dark)
+                .environmentObject(audioVM)
+                .onChange(of: scenePhase) { oldPhase, newPhase in
+                    switch newPhase {
+                    case .active:
+                        audioVM.resume()
+                    case .inactive, .background:
+                        audioVM.pause()
+                    default:
+                        break
+                    }
+                }
         }
     }
 }
