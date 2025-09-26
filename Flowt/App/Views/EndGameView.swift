@@ -106,7 +106,7 @@ struct EndGameView: View {
                         .font(.headline)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background( LinearGradient(colors: [.blue, .cyan], startPoint: .leading, endPoint: .trailing) )
+                        .gradientBackground()
                         .foregroundColor(.white)
                         .cornerRadius(14)
                         .shadow(radius: 5)
@@ -122,6 +122,6 @@ struct EndGameView: View {
 
 #Preview {
     let appState = AppState()
-    EndGameView(gameVM: GameViewModel(appState: appState), scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService()))
+    EndGameView(gameVM: GameViewModel(), scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService()))
         .environmentObject(appState)
 }

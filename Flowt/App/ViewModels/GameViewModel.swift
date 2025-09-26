@@ -22,9 +22,6 @@ final class GameViewModel: ObservableObject {
     }
     
     @Published var activePhase: GamePhase?
-    private var appState: AppState
-    
-    init(appState: AppState) { self.appState = appState }
     
     func startGame() { activePhase = .gameScene }
     

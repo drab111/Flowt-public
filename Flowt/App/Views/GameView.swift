@@ -13,26 +13,22 @@ struct GameView: View {
     @ObservedObject var scoreVM: ScoreViewModel
     
     var body: some View {
-        ZStack {
-            BackgroundView()
+        VStack(spacing: 20) {
+            Text("Flowt")
+                .font(.largeTitle)
+                .foregroundColor(.white)
             
-            VStack(spacing: 20) {
-                Text("Flowt")
-                    .font(.largeTitle)
+            Button(action: {
+                withAnimation { gameVM.startGame() }
+            }) {
+                Text("Play")
+                    .font(.title2)
                     .foregroundColor(.white)
-                
-                Button(action: {
-                    withAnimation { gameVM.startGame() }
-                }) {
-                    Text("Play")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding()
-                        .padding(.horizontal, 20)
-                        .gradientBackground()
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(radius: 5)
-                }
+                    .padding()
+                    .padding(.horizontal, 20)
+                    .gradientBackground()
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(radius: 5)
             }
         }
         .fullScreenCover(item: $gameVM.activePhase) { phase in
@@ -61,7 +57,7 @@ struct GameView: View {
 #Preview {
     let appState = AppState()
     GameView(
-        gameVM: GameViewModel(appState: appState),
+        gameVM: GameViewModel(),
         scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService())
     )
     .environmentObject(appState)

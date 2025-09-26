@@ -18,13 +18,14 @@ struct MainMenuView: View {
     var body: some View {
         ZStack {
             BackgroundView()
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Główna treść
                 ZStack {
                     switch selectedTab {
                     case .account: AccountView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.userProfileVM, accountScoreVM: mainMenuVM.accountScoreVM)
-                    case .tutorial: TutorialView()
+                    case .tutorial: TutorialView(tutorialVM: mainMenuVM.tutorialVM, onTabChange: onTabChange)
                     case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM)
                     case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
                     case .settings: SettingsView()

@@ -11,6 +11,7 @@ struct LoadingView: View {
     var body: some View {
         ZStack {
             BackgroundView(withLogo: false, hasBottomBar: false)
+                .ignoresSafeArea()
             Image("FlowtLogo")
                 .resizable()
                 .scaledToFit()

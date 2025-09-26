@@ -100,7 +100,7 @@ struct WaveShape: Shape {
 struct GradientBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)).opacity(0.7)
+            .background(LinearGradient(colors: [.blue, .cyan], startPoint: .leading, endPoint: .trailing))
     }
 }
 
