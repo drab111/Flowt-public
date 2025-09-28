@@ -69,7 +69,7 @@ final class UserProfileViewModel: ObservableObject {
                 
                 // Zdjęcie jest stosowne
                 let resized = image.resized(to: 200)
-                avatarBase64 = resized.toBase64(maxSizeKB: 500)
+                avatarBase64 = resized.toBase64(maxSizeKB: 100)
             }
             
             let profile = UserProfile(id: uid, nickname: finalNickname, avatarBase64: avatarBase64)

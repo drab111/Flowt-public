@@ -112,38 +112,74 @@ extension GameScene {
     }
     
     func setupTimers() {
-        spawnPortTimer = Timer.scheduledTimer(withTimeInterval: GameConfig.spawnPortInterval, repeats: true) { [weak self] _ in
-            self?.spawnRandomPort(portType: CargoType.allCases.randomElement()!)
-        }
+        // Spawn Portów
+        let spawnPortAction = SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: GameConfig.spawnPortInterval),
+                SKAction.run { [weak self] in
+                    self?.spawnRandomPort(portType: CargoType.allCases.randomElement()!)
+                }
+            ])
+        )
+        run(spawnPortAction, withKey: TimerKeys.spawnPort)
         
-        spawnCargoTimer = Timer.scheduledTimer(withTimeInterval: cargoSpawnInterval, repeats: true) { [weak self] _ in
-            self?.spawnRandomCargo()
-        }
+        // Spawn Cargo
+        let spawnCargoAction = SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: cargoSpawnInterval),
+                SKAction.run { [weak self] in
+                    self?.spawnRandomCargo()
+                }
+            ])
+        )
+        run(spawnCargoAction, withKey: TimerKeys.spawnCargo)
         
-        spawnStormTimer = Timer.scheduledTimer(withTimeInterval: GameConfig.spawnStormInterval, repeats: true) { [weak self] _ in
-            self?.spawnStorm()
-        }
+        // Spawn Burzy
+        let spawnStormAction = SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: GameConfig.spawnStormInterval),
+                SKAction.run { [weak self] in
+                    self?.spawnStorm()
+                }
+            ])
+        )
+        run(spawnStormAction, withKey: TimerKeys.spawnStorm)
         
-        upgradeTimer = Timer.scheduledTimer(withTimeInterval: GameConfig.upgradePopupInterval, repeats: true) { [weak self] _ in
-            self?.showUpgradePopup()
-        }
+        // Upgrade popup
+        let upgradeAction = SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: GameConfig.upgradePopupInterval),
+                SKAction.run { [weak self] in
+                    self?.showUpgradePopup()
+                }
+            ])
+        )
+        run(upgradeAction, withKey: TimerKeys.upgrade)
     }
     
     // Unieważniamy poprzedni timer i tworzymy nowy
     func resetCargoSpawnTimer() {
-        spawnCargoTimer?.invalidate()
-        spawnCargoTimer = Timer.scheduledTimer(withTimeInterval: cargoSpawnInterval, repeats: true) { [weak self] _ in
-            self?.spawnRandomCargo()
-        }
+        // Usuwamy starą akcję
+        removeAction(forKey: TimerKeys.spawnCargo)
+        
+        // Dodajemy nową z nowym interwałem
+        let spawnCargoAction = SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: cargoSpawnInterval),
+                SKAction.run { [weak self] in
+                    self?.spawnRandomCargo()
+                }
+            ])
+        )
+        run(spawnCargoAction, withKey: TimerKeys.spawnCargo)
     }
     
     func invalidateTimers() {
-        [spawnPortTimer, spawnCargoTimer, spawnStormTimer, upgradeTimer, Port.alarmTimer].forEach { $0?.invalidate() }
-        spawnPortTimer = nil
-        spawnCargoTimer = nil
-        spawnStormTimer = nil
-        upgradeTimer = nil
-        Port.alarmTimer = nil
+        removeAction(forKey: TimerKeys.spawnPort)
+        removeAction(forKey: TimerKeys.spawnCargo)
+        removeAction(forKey: TimerKeys.spawnStorm)
+        removeAction(forKey: TimerKeys.upgrade)
+        scene?.removeAction(forKey: Port.alarmActionKey)
         Port.overloadCount = 0
     }
 }

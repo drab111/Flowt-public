@@ -42,7 +42,7 @@ extension GameScene {
         circle.position = CGPoint(x: size.width - 40, y: size.height - CGFloat(40 + index * 50))
         circle.name = "colorButton\(index)"
         
-        let texture = SKTexture(imageNamed: "SignTexture")
+        let texture = SKTexture(imageNamed: "AnchorTexture")
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 35, height: 35)
         imageNode.zPosition = 6
@@ -109,8 +109,8 @@ extension GameScene {
             (CGPoint(x: size.width * 0.25, y: size.height * 0.35), 40, "IslandTexture1"),
             (CGPoint(x: size.width * 0.47, y: size.height * 0.2), 50, "IslandTexture2"),
             (CGPoint(x: size.width * 0.75, y: size.height * 0.75), 45, "IslandTexture3"),
-            (CGPoint(x: size.width * 0.67, y: size.height * 0.41), 55, "IslandTexture4"),
-            (CGPoint(x: size.width * 0.4, y: size.height * 0.55), 50, "IslandTexture5")
+            (CGPoint(x: size.width * 0.4, y: size.height * 0.55), 55, "IslandTexture4"),
+            (CGPoint(x: size.width * 0.67, y: size.height * 0.41), 50, "IslandTexture5")
         ]
         
         for (pos, radius, pic) in islandConfigs { addIsland(position: pos, radius: radius, picture: pic) }
@@ -176,9 +176,9 @@ extension GameScene {
         circle.strokeColor = .black
         circle.lineWidth = 2
         circle.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        circle.zPosition = 4
+        circle.zPosition = 5.5
 
-        let texture = SKTexture(imageNamed: "SignTexture")
+        let texture = SKTexture(imageNamed: "AnchorTexture")
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 210, height: 210)
         imageNode.zPosition = 5

@@ -34,10 +34,12 @@ class GameScene: SKScene {
     }
     
     // Timery:
-    var spawnPortTimer: Timer?
-    var spawnCargoTimer: Timer?
-    var spawnStormTimer: Timer?
-    var upgradeTimer: Timer?
+    enum TimerKeys {
+        static let spawnPort = "SpawnPortAction"
+        static let spawnCargo = "SpawnCargoAction"
+        static let spawnStorm = "SpawnStormAction"
+        static let upgrade = "UpgradeAction"
+    }
     
     init(gameVM: GameViewModel, scoreVM: ScoreViewModel, cargoFactory: CargoFactory, upgradeFactory: UpgradeFactory) {
         self.gameVM = gameVM

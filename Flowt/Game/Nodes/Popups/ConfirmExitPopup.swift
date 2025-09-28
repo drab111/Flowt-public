@@ -14,7 +14,7 @@ class ConfirmExitPopup: SKNode, Popup {
     init(size: CGSize, onConfirm: @escaping () -> Void, onCancel: @escaping () -> Void) {
         super.init()
         self.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        self.zPosition = 1000
+        self.zPosition = 50
         self.name = "ConfirmExitPopup"
         
         self.onConfirm = onConfirm

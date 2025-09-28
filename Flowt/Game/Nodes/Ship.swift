@@ -41,6 +41,9 @@ class Ship: SKNode {
         self.name = "ShipNode"
         addChild(shipSprite) // obracamy tylko sprite'a
         addChild(cargoContainer) // container nie obraca się
+        
+        // od razu sprawdzamy czy statek stoi na porcie
+        if let startPort = findPort(point: position) { handlePortIfNeeded(port: startPort) }
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }

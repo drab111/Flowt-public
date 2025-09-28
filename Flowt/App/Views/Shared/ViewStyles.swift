@@ -10,97 +10,124 @@ import SwiftUI
 struct BackgroundView: View {
     var withLogo: Bool = true
     var hasBottomBar: Bool = true
+    @State private var wavePhase: CGFloat = 0
+    @State private var glowOpacity: Double = 0.08
+    @State private var logoOpacity: Double = 0.05
     
     var body: some View {
         ZStack {
-            // Gradient morski
+            // Gradient oceaniczny
             LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.1, blue: 0.25),
-                    Color(red: 0.12, green: 0.35, blue: 0.6)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
+                gradient: Gradient(colors: [
+                    Color(red: 0.0, green: 0.08, blue: 0.20),
+                    Color(red: 0.0, green: 0.12, blue: 0.25),
+                    Color(red: 0.0, green: 0.17, blue: 0.32),
+                    Color(red: 0.0, green: 0.08, blue: 0.20)
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
             )
             .ignoresSafeArea()
             
-            // Warstwy fal
-            GeometryReader { geo in // specjalny kontener SwiftUI który daje dostęp do rozmiaru i położenia przestrzeni w której dany widok się znajduje
+            // Smugi światła
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.white.opacity(glowOpacity),
+                    Color.clear,
+                    Color.white.opacity(glowOpacity * 0.8),
+                    Color.clear
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .blendMode(.overlay)
+            .rotationEffect(.degrees(-10))
+            .ignoresSafeArea()
+            .onAppear {
+                withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: true)) {
+                    glowOpacity = 0.15
+                }
+            }
+            
+            // Animowane fale
+            GeometryReader { geo in
                 ZStack {
-                    WaveShape(amplitude: 40, frequency: 1.5)
-                        .fill(Color.white.opacity(0.06))
-                        .frame(height: geo.size.height * 0.45)
-                        .offset(y: geo.size.height * (hasBottomBar ? 0.45 : 0.6))
+                    AnimatedWave(amplitude: 14, frequency: 2.5, phase: wavePhase)
+                        .fill(Color.white.opacity(0.05))
+                        .frame(height: geo.size.height * 0.5)
+                        .offset(y: geo.size.height * (hasBottomBar ? 0.5 : 0.55))
                     
-                    WaveShape(amplitude: 25, frequency: 2.5)
+                    AnimatedWave(amplitude: 9, frequency: 3.5, phase: wavePhase + .pi/2)
                         .fill(Color.white.opacity(0.04))
                         .frame(height: geo.size.height * 0.55)
-                        .offset(y: geo.size.height * (hasBottomBar ? 0.5 : 0.65))
-                    
-                    WaveShape(amplitude: 15, frequency: 3.0)
-                        .fill(Color.white.opacity(0.03))
-                        .frame(height: geo.size.height * 0.65)
-                        .offset(y: geo.size.height * (hasBottomBar ? 0.55 : 0.7))
+                        .offset(y: geo.size.height * (hasBottomBar ? 0.6 : 0.65))
+                }
+            }
+            .ignoresSafeArea()
+            .onAppear {
+                withAnimation(.linear(duration: 12).repeatForever(autoreverses: false)) {
+                    wavePhase = .pi * 2
                 }
             }
             
-            // Delikatne kafelki
-            GeometryReader { geo in
-                Path { path in
-                    let spacing: CGFloat = 120
-                    for x in stride(from: 0, through: geo.size.width, by: spacing) {
-                        path.move(to: CGPoint(x: x, y: 0))
-                        path.addLine(to: CGPoint(x: x, y: geo.size.height))
-                    }
-                    for y in stride(from: 0, through: geo.size.height, by: spacing) {
-                        path.move(to: CGPoint(x: 0, y: y))
-                        path.addLine(to: CGPoint(x: geo.size.width, y: y))
-                    }
-                }
-                .stroke(Color.white.opacity(0.02), lineWidth: 1)
-            }
-            
-            // Watermark
+            // Logo watermark
             if withLogo {
                 Image("FlowtLogo")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 320, height: 320)
-                    .opacity(0.07)
+                    .frame(width: 280, height: 280)
+                    .opacity(logoOpacity)
+                    .blur(radius: 1.5)
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 10).repeatForever(autoreverses: true)) {
+                            logoOpacity = 0.12
+                        }
+                    }
             }
         }
     }
 }
 
-struct WaveShape: Shape {
-    var amplitude: CGFloat // wysokość fal
-    var frequency: CGFloat // ile fal zmieści się w szerokości prostokąta
+struct AnimatedWave: Shape {
+    var amplitude: CGFloat
+    var frequency: CGFloat
+    var phase: CGFloat
+    
+    // nadpisujemy zmienną wbudowaną w Shape (mówimy co ma być zmieniane podczas animacji w onAppear)
+    var animatableData: CGFloat {
+        get { phase }
+        set { phase = newValue }
+    }
     
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let midHeight = rect.height / 2 // linia środkowa (fala oscyluje wokół niej)
-        
+        let midHeight = rect.height / 2
         path.move(to: CGPoint(x: 0, y: midHeight))
         
-        for x in stride(from: 0, through: rect.width, by: 1) { // iterujemy po każdym pikselu w poziomie
-            let relativeX = x / rect.width // normalizujemy pozycję X do przedziału 0…1 (żeby fala była niezależna od rozdzielczości)
-            let y = midHeight + sin(relativeX * .pi * frequency) * amplitude
-            // y przesuwa się w górę i w dół tworząc fale
+        for x in stride(from: 0, through: rect.width, by: 2) {
+            let relativeX = x / rect.width
+            let y = midHeight + sin(relativeX * .pi * frequency + phase) * amplitude
             path.addLine(to: CGPoint(x: x, y: y))
         }
         
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height)) // schodzimy w dół na prawym brzegu
-        path.addLine(to: CGPoint(x: 0, y: rect.height)) // wracamy do lewego dołu
-        path.closeSubpath() // zamykamy kształt
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+        path.addLine(to: CGPoint(x: 0, y: rect.height))
+        path.closeSubpath()
         
         return path
     }
 }
 
+
+
 struct GradientBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(LinearGradient(colors: [.blue, .cyan], startPoint: .leading, endPoint: .trailing))
+            .background(LinearGradient(colors: [
+                    Color(red: 0.0, green: 0.25, blue: 0.55),
+                    Color(red: 0.1, green: 0.4, blue: 0.75),
+                    Color(red: 0.3, green: 0.2, blue: 0.6)
+                ], startPoint: .topLeading, endPoint: .bottomTrailing))
     }
 }
 

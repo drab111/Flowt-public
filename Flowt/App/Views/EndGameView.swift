@@ -49,13 +49,8 @@ struct EndGameView: View {
                         .padding(.horizontal)
                 }
                 
-                if scoreVM.isLoading == true {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                        .tint(.white)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                else { // Leaderboard
+                ZStack {
+                    // Leaderboard
                     List {
                         Section(header: Text("Top 5").foregroundColor(.white)) {
                             ForEach(Array(scoreVM.leaderboard.enumerated()), id: \.element.entry.id) { index, item in
@@ -103,6 +98,15 @@ struct EndGameView: View {
                     .scrollContentBackground(.hidden) // usuwa domyślne tło listy
                     .background(Color.clear) // pozwala pokazać BackgroundView
                     .frame(maxHeight: 400) // żeby lista nie zajmowała całego ekranu
+                    .opacity(scoreVM.leaderboard.isEmpty ? 0 : 1)
+                    .animation(.easeInOut, value: scoreVM.leaderboard.isEmpty)
+                    
+                    if scoreVM.leaderboard.isEmpty {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                            .transition(.opacity.combined(with: .scale))
+                    }
                 }
                 
                 Spacer()

@@ -84,7 +84,7 @@ fileprivate class LineButton: SKShapeNode {
         lineWidth = 2
         self.position = position
         
-        let texture = SKTexture(imageNamed: "SignTexture")
+        let texture = SKTexture(imageNamed: "AnchorTexture")
         let imageNode = SKSpriteNode(texture: texture)
         imageNode.size = CGSize(width: 35, height: 35)
         imageNode.zPosition = 1

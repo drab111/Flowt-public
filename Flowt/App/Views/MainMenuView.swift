@@ -53,12 +53,11 @@ struct CustomTabBar: View {
                 VStack(spacing: 4) {
                     ZStack {
                         if selectedTab == tab {
-                            LinearGradient(
-                                colors: [Color(red: 0.8, green: 0.0, blue: 0.0),
-                                         Color(red: 0.0, green: 0.2, blue: 0.8)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                            LinearGradient(colors: [
+                                    Color(red: 0.0, green: 0.25, blue: 0.55),
+                                    Color(red: 0.1, green: 0.4, blue: 0.75),
+                                    Color(red: 0.3, green: 0.2, blue: 0.6)
+                            ], startPoint: .topLeading, endPoint: .bottomTrailing)
                             .mask(
                                 Image(systemName: tab.icon)
                                     .resizable()

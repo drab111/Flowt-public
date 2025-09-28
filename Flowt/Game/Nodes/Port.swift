@@ -10,13 +10,13 @@ import SpriteKit
 
 class Port: SKSpriteNode {
     static var overloadCount = 0  // ilu portów jest przeciążonych
-    static var alarmTimer: Timer? // timer do grania dźwięku co sekundę
+    static let alarmActionKey = "GlobalAlarmAction" // animacja do grania dźwięku co sekundę
     
+    private var overloadActionKey = "OverloadTimerAction"
     private var cargoFactory: CargoFactory
     private var cargoBuffer: [Cargo] = []
     private let maxBuffer = GameConfig.portMaxBuffer
     private var remainingTime: CGFloat = GameConfig.overloadTime
-    private var overloadTimer: Timer?
     private var isOverloaded = false
     private var overloadIndicator: SKShapeNode?
     private var increaseScore: (() -> Void)
@@ -196,14 +196,18 @@ class Port: SKSpriteNode {
     }
     
     private func startOverloadTimer() {
-        overloadTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }  // sprawdzamy czy self już nie został zwolniony z pamięci i nie istnieje
-            remainingTime -= 1.0
-            updateOverloadIndicator()
+        let wait = SKAction.wait(forDuration: 1.0)
+        let tick = SKAction.run { [weak self] in
+            guard let self = self else { return }
+            self.remainingTime -= 1.0
+            self.updateOverloadIndicator()
             
             // Przekroczenie czasu i koniec gry
-            if remainingTime <= 0 && cargoBuffer.count > maxBuffer { endGame() }
+            if self.remainingTime <= 0 && self.cargoBuffer.count > self.maxBuffer { self.endGame() }
         }
+        let sequence = SKAction.sequence([wait, tick])
+        let repeatAction = SKAction.repeatForever(sequence)
+        self.run(repeatAction, withKey: overloadActionKey)
     }
     
     private func createOverloadIndicator() {
@@ -245,8 +249,7 @@ class Port: SKSpriteNode {
     }
     
     func stopOverloadTimer() {
-        overloadTimer?.invalidate()
-        overloadTimer = nil
+        self.removeAction(forKey: overloadActionKey)
         removeOverloadIndicator()
         remainingTime = GameConfig.overloadTime
     }
@@ -254,13 +257,12 @@ class Port: SKSpriteNode {
     // MARK: - Alarm
     
     private func startGlobalAlarm() {
-        Port.alarmTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            AudioServicesPlaySystemSound(SystemSoundID(1151))
-        }
+        let wait = SKAction.wait(forDuration: 1.0)
+        let playSound = SKAction.run { AudioServicesPlaySystemSound(SystemSoundID(1151)) }
+        let sequence = SKAction.sequence([wait, playSound])
+        let repeatAction = SKAction.repeatForever(sequence)
+        scene?.run(repeatAction, withKey: Port.alarmActionKey)
     }
     
-    private func stopGlobalAlarm() {
-        Port.alarmTimer?.invalidate()
-        Port.alarmTimer = nil
-    }
+    private func stopGlobalAlarm() { scene?.removeAction(forKey: Port.alarmActionKey) }
 }

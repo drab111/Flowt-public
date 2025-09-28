@@ -38,7 +38,12 @@ final class UserProfileService: UserProfileServiceProtocol {
     // MARK: - helper do modelu ML (opakowujemy stare, callback-owe API w mechanizm async/await - wymuszając zaczekanie na wynik klasyfikatora)
     func validateAvatar(image: UIImage, threshold: Float) async throws -> Bool {
         try await withCheckedThrowingContinuation { continuation in // to wykryje brak wywołania resume lub podwójne resume i zgłosi problem — pomaga debugować
+            var didResume = false // flaga aby wiele razy nie dokonywać predykcji
+            
             detector.check(image: image) { result in
+                guard !didResume else { return }
+                didResume = true
+                
                 switch result {
                 case let .success(nsfwConfidence: confidence):
                     if confidence > threshold {
