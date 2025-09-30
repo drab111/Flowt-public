@@ -133,6 +133,6 @@ struct EndGameView: View {
 
 #Preview {
     let appState = AppState()
-    EndGameView(gameVM: GameViewModel(), scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService()))
+    EndGameView(gameVM: GameViewModel(), scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: ProfileService()))
         .environmentObject(appState)
 }

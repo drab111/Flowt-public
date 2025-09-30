@@ -1,5 +1,5 @@
 //
-//  UserProfileService.swift
+//  ProfileService.swift
 //  Flowt
 //
 //  Created by Wiktor Drab on 22/08/2025.
@@ -8,14 +8,14 @@
 import FirebaseFirestore
 import NSFWDetector
 
-protocol UserProfileServiceProtocol {
+protocol ProfileServiceProtocol {
     func fetchProfile(uid: String) async throws -> UserProfile?
     func saveProfile(_ profile: UserProfile) async throws
     func deleteProfile(uid: String) async throws
     func validateAvatar(image: UIImage, threshold: Float) async throws -> Bool
 }
 
-final class UserProfileService: UserProfileServiceProtocol {
+final class ProfileService: ProfileServiceProtocol {
     private let db = Firestore.firestore()
     private let detector = NSFWDetector.shared
     
@@ -24,11 +24,22 @@ final class UserProfileService: UserProfileServiceProtocol {
         // doc to pojedyńczy dokument pobrany z Firestore
         let doc = try await db.collection("users").document(uid).getDocument()
         guard let data = doc.data() else { return nil }
-        return UserProfile(id: doc.documentID, nickname: data["nickname"] as? String ?? "", avatarBase64: data["avatarBase64"] as? String)
+        return UserProfile(
+            id: doc.documentID,
+            nickname: data["nickname"] as? String ?? "",
+            avatarBase64: data["avatarBase64"] as? String,
+            musicEnabled: data["musicEnabled"] as? Bool ?? true,
+            sfxEnabled: data["sfxEnabled"] as? Bool ?? true
+        )
     }
     
     func saveProfile(_ profile: UserProfile) async throws {
-        try await db.collection("users").document(profile.id).setData(["nickname": profile.nickname, "avatarBase64": profile.avatarBase64 as Any])
+        try await db.collection("users").document(profile.id).setData([
+            "nickname": profile.nickname,
+            "avatarBase64": profile.avatarBase64 as Any,
+            "musicEnabled": profile.musicEnabled,
+            "sfxEnabled": profile.sfxEnabled
+        ])
     }
     
     func deleteProfile(uid: String) async throws {

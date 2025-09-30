@@ -15,10 +15,10 @@ extension GameScene {
     }
     
     func showUpgradePopup() {
-        self.run(SKAction.playSoundFileNamed("successSound.wav", waitForCompletion: false))
+        AudioService.shared.playSFX(node: self, fileName: "successSound.wav")
         let popup = UpgradePopup(size: self.size) { [weak self] option in
             guard let self = self else { return }
-            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             self.pendingUpgrade = upgradeFactory.createUpgrade(option: option)
             
             // Zamykamy popup 1
@@ -34,7 +34,7 @@ extension GameScene {
     func showLineSelectionPopup() {
         let popup = LineSelectionPopup(size: self.size, amountOfLines: routeLines.count) { [weak self] index in
             guard let self = self else { return }
-            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             
             if let upgrade = self.pendingUpgrade {
                 // Aplikujemy do odpowiedniej linii

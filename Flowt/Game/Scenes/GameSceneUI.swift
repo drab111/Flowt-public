@@ -137,7 +137,7 @@ extension GameScene {
     }
     
     func addExtraLine(lineColor: UIColor, buttonColor: UIColor) {
-        self.run(SKAction.playSoundFileNamed("milestoneSound.wav", waitForCompletion: false))
+        AudioService.shared.playSFX(node: self, fileName: "milestoneSound.wav")
         
         // Tworzymy reprezentację graficzną
         let notificationCircle = makeNotificationCircle(color: buttonColor, lineColor: lineColor)
@@ -206,7 +206,7 @@ extension GameScene {
         
         invalidateTimers()
         showGameOverLabel(camera: camera)
-        AudioServicesPlaySystemSound(SystemSoundID(1254))
+        AudioService.shared.playSystemSFX(id: 1254)
         
         let move = SKAction.move(to: port.position, duration: duration)
         let zoom = SKAction.scale(to: scale, duration: duration)

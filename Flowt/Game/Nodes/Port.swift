@@ -37,8 +37,8 @@ class Port: SKSpriteNode {
         self.position = position
         self.zPosition = 2
         self.name = "Port"
-
-        self.run(SKAction.playSoundFileNamed("portSpawnSound.wav", waitForCompletion: false))
+        
+        AudioService.shared.playSFX(node: self, fileName: "portSpawnSound.wav")
         makePortShape()
         runSpawnAnimation()
     }
@@ -258,7 +258,7 @@ class Port: SKSpriteNode {
     
     private func startGlobalAlarm() {
         let wait = SKAction.wait(forDuration: 1.0)
-        let playSound = SKAction.run { AudioServicesPlaySystemSound(SystemSoundID(1151)) }
+        let playSound = SKAction.run { AudioService.shared.playSystemSFX(id: 1151) }
         let sequence = SKAction.sequence([wait, playSound])
         let repeatAction = SKAction.repeatForever(sequence)
         scene?.run(repeatAction, withKey: Port.alarmActionKey)

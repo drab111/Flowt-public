@@ -5,13 +5,16 @@
 //  Created by Wiktor Drab on 26/09/2025.
 //
 
+import AudioToolbox
 import AVFoundation
+import SpriteKit
 
 protocol AudioServiceProtocol {
     func start()
     func stop()
-    func pause()
-    func resume()
+    var hasPlayer: Bool { get }
+    var musicEnabled: Bool { get set }
+    var sfxEnabled: Bool { get set }
 }
 
 final class AudioService: AudioServiceProtocol {
@@ -22,19 +25,27 @@ final class AudioService: AudioServiceProtocol {
     private var trackNames = ["track1", "track2", "track3", "track4"]
     private var currentIndex = 0
     
+    var hasPlayer: Bool { return player != nil }
+    var musicEnabled: Bool = true
+    var sfxEnabled: Bool = true
+    
     private init() {}
     
+    deinit { if let endObserver { NotificationCenter.default.removeObserver(endObserver) } }
+    
+    // MARK: - Music
+    
     func start() {
-        guard player == nil else { return }
+        guard musicEnabled, player == nil else { return }
         
         // Losujemy playlistę
         trackNames.shuffle()
         currentIndex = 0
-        
         playTrack(index: currentIndex)
     }
     
     private func playTrack(index: Int) {
+        guard musicEnabled else { return }
         guard index < trackNames.count else {
             currentIndex = 0 // Jeśli dojdziemy do końca to zaczynamy od nowa
             playTrack(index: currentIndex)
@@ -57,13 +68,21 @@ final class AudioService: AudioServiceProtocol {
     }
     
     func stop() {
-        player?.pause()
-        player = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         endObserver = nil
+        player?.pause()
+        player = nil
     }
     
-    func pause() { player?.pause() }
+    // MARK: - SFX
     
-    func resume() { player?.play() }
+    func playSFX(node: SKNode, fileName: String) {
+        guard sfxEnabled else { return }
+        node.run(SKAction.playSoundFileNamed(fileName, waitForCompletion: false))
+    }
+    
+    func playSystemSFX(id: SystemSoundID) {
+        guard sfxEnabled else { return }
+        AudioServicesPlaySystemSound(id)
+    }
 }

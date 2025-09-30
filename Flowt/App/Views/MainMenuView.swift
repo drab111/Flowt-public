@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MainMenuView: View {
     @StateObject var mainMenuVM: MainMenuViewModel
-    @EnvironmentObject var audioVM: AudioViewModel
     
     let selectedTab: MainMenuTab
     let onTabChange: (MainMenuTab) -> Void
@@ -25,7 +24,7 @@ struct MainMenuView: View {
                 // Główna treść
                 ZStack {
                     switch selectedTab {
-                    case .account: AccountView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.userProfileVM, accountScoreVM: mainMenuVM.accountScoreVM)
+                    case .profile: ProfileView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.profileVM, accountScoreVM: mainMenuVM.accountScoreVM)
                     case .tutorial: TutorialView(tutorialVM: mainMenuVM.tutorialVM, onTabChange: onTabChange)
                     case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, onTabChange: onTabChange)
                     case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
@@ -38,7 +37,6 @@ struct MainMenuView: View {
             }
             .ignoresSafeArea(edges: .bottom)
         }
-        .onAppear { audioVM.start() }
     }
 }
 

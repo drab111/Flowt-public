@@ -1,5 +1,5 @@
 //
-//  AccountView.swift
+//  ProfileView.swift
 //  Flowt
 //
 //  Created by Wiktor Drab on 22/08/2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 
-struct AccountView: View {
+struct ProfileView: View {
     enum ActiveAlert: Identifiable {
         case signOut, deleteAccount
         
@@ -21,7 +21,7 @@ struct AccountView: View {
     }
     
     @ObservedObject var authVM: AuthViewModel
-    @ObservedObject var userProfileVM: UserProfileViewModel
+    @ObservedObject var userProfileVM: ProfileViewModel
     @ObservedObject var accountScoreVM: AccountScoreViewModel
     @State private var pickerItem: PhotosPickerItem? = nil // wybrany element w selektorze zdjęć
     @State private var activeAlert: ActiveAlert? = nil
@@ -44,6 +44,9 @@ struct AccountView: View {
                             
                             // MARK: - Pozycja w rankingu
                             scorePanel
+                            
+                            // MARK: - Preferencje użytkownika
+                            preferencesPanel
                             
                             // MARK: - Akcje konta
                             actionsPanel
@@ -218,6 +221,51 @@ struct AccountView: View {
         }
     }
     
+    // MARK: - Panel preferencji
+    private var preferencesPanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Preferences")
+                .font(.headline)
+                .foregroundColor(.white.opacity(0.8))
+            
+            Toggle(isOn: Binding(
+                get: { userProfileVM.appState.currentUserProfile?.musicEnabled ?? true },
+                set: { newValue in
+                    if var profile = userProfileVM.appState.currentUserProfile {
+                        profile.musicEnabled = newValue
+                        userProfileVM.appState.currentUserProfile = profile
+                    }
+                    Task {
+                        await userProfileVM.updatePreferences(
+                            musicEnabled: newValue,
+                            sfxEnabled: userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true
+                        )
+                    }
+                }
+            )) { Label("Music", systemImage: "music.note") }
+            .tint(.blue)
+
+            
+            Toggle(isOn: Binding(
+                get: { userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true },
+                set: { newValue in
+                    if var profile = userProfileVM.appState.currentUserProfile {
+                        profile.sfxEnabled = newValue
+                        userProfileVM.appState.currentUserProfile = profile
+                    }
+                    Task {
+                        await userProfileVM.updatePreferences(
+                            musicEnabled: userProfileVM.appState.currentUserProfile?.musicEnabled ?? true,
+                            sfxEnabled: newValue
+                        )
+                    }
+                }
+            )) { Label("Sound Effects", systemImage: "speaker.wave.2.fill") }
+            .tint(.blue)
+        }
+    }
+
+    
     // MARK: - Panel akcji
     private var actionsPanel: some View {
         VStack(spacing: 12) {
@@ -251,10 +299,10 @@ struct AccountView: View {
 
 #Preview {
     let appState = AppState()
-    let userProfileVM = UserProfileViewModel(appState: appState, profileService: UserProfileService())
+    let userProfileVM = ProfileViewModel(appState: appState, profileService: ProfileService())
     let authVM = AuthViewModel(appState: appState, authService: AuthService())
     let accountScoreVM = AccountScoreViewModel(appState: appState, scoreService: ScoreService())
     
-    AccountView(authVM: authVM, userProfileVM: userProfileVM, accountScoreVM: accountScoreVM)
+    ProfileView(authVM: authVM, userProfileVM: userProfileVM, accountScoreVM: accountScoreVM)
         .environmentObject(appState)
 }

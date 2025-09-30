@@ -11,37 +11,31 @@ import FirebaseCore
 @main
 struct FlowtApp: App {
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var audioVM = AudioViewModel(service: AudioService.shared)
+    @StateObject private var appState = AppState()
+    @StateObject private var audioVM: AudioViewModel
     
-    init() { FirebaseApp.configure() }
+    init() {
+        FirebaseApp.configure()
+        let appState = AppState()
+        // pzypisujemy obiekty do samego wrappera a nie zmiennej
+        _appState = StateObject(wrappedValue: appState)
+        _audioVM = StateObject(wrappedValue: AudioViewModel(service: AudioService.shared))
+    }
     
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootView(appState: appState)
                 .preferredColorScheme(.dark)
-                .environmentObject(audioVM)
-                .onChange(of: scenePhase) { oldPhase, newPhase in
-                    switch newPhase {
-                    case .active:
-                        audioVM.resume()
-                    case .inactive, .background:
-                        audioVM.pause()
-                    default:
-                        break
-                    }
-                }
         }
     }
 }
 
 struct RootView: View {
-    @StateObject private var appState: AppState
+    @ObservedObject var appState: AppState
     @StateObject private var mainMenuVM: MainMenuViewModel
     
-    init() {
-        let appState = AppState()
-        // pzypisujemy obiekty do samego wrappera a nie zmiennej
-        _appState = StateObject(wrappedValue: appState)
+    init(appState: AppState) {
+        self.appState = appState
         _mainMenuVM = StateObject(wrappedValue: MainMenuViewModel(appState: appState))
     }
     

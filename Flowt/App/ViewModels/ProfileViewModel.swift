@@ -1,5 +1,5 @@
 //
-//  UserProfileViewModel.swift
+//  ProfileViewModel.swift
 //  Flowt
 //
 //  Created by Wiktor Drab on 22/08/2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @MainActor
-final class UserProfileViewModel: ObservableObject {
+final class ProfileViewModel: ObservableObject {
     enum SaveState { case idle, saving, saved, rejected }
     
     @Published var isLoading = false
@@ -18,10 +18,10 @@ final class UserProfileViewModel: ObservableObject {
     @Published var avatarData: Data?
     @Published var saveState: SaveState = .idle
     
-    private var appState: AppState
-    private let profileService: UserProfileServiceProtocol
+    private(set) var appState: AppState
+    private let profileService: ProfileServiceProtocol
     
-    init(appState: AppState, profileService: UserProfileServiceProtocol) {
+    init(appState: AppState, profileService: ProfileServiceProtocol) {
         self.appState = appState
         self.profileService = profileService
     }
@@ -39,7 +39,13 @@ final class UserProfileViewModel: ObservableObject {
                 errorMessage = "New profile"
                 currentNickname = "Player \(String(uid.prefix(5)))"
                 avatarData = nil
-                let profile = UserProfile(id: uid, nickname: currentNickname, avatarBase64: nil)
+                let profile = UserProfile(
+                    id: uid,
+                    nickname: currentNickname,
+                    avatarBase64: nil,
+                    musicEnabled: true,
+                    sfxEnabled: true
+                )
                 try await profileService.saveProfile(profile)
                 appState.currentUserProfile = profile
             }
@@ -72,7 +78,13 @@ final class UserProfileViewModel: ObservableObject {
                 avatarBase64 = resized.toBase64(maxSizeKB: 100)
             }
             
-            let profile = UserProfile(id: uid, nickname: finalNickname, avatarBase64: avatarBase64)
+            let profile = UserProfile(
+                id: uid,
+                nickname: finalNickname,
+                avatarBase64: avatarBase64,
+                musicEnabled: appState.currentUserProfile?.musicEnabled ?? true,
+                sfxEnabled: appState.currentUserProfile?.sfxEnabled ?? true
+            )
             try await profileService.saveProfile(profile)
             appState.currentUserProfile = profile
             currentNickname = profile.nickname
@@ -88,6 +100,17 @@ final class UserProfileViewModel: ObservableObject {
             errorMessage = error.localizedDescription
             saveState = .idle
         }
+    }
+    
+    func updatePreferences(musicEnabled: Bool, sfxEnabled: Bool) async {
+        guard var profile = appState.currentUserProfile else { return }
+        profile.musicEnabled = musicEnabled
+        profile.sfxEnabled = sfxEnabled
+        
+        do {
+            try await profileService.saveProfile(profile)
+            appState.currentUserProfile = profile
+        } catch { errorMessage = error.localizedDescription }
     }
     
     func deleteProfile() async {

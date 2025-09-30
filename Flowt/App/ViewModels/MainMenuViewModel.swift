@@ -10,7 +10,7 @@ import SwiftUI
 @MainActor
 final class MainMenuViewModel: ObservableObject {
     @Published var authVM: AuthViewModel
-    @Published var userProfileVM: UserProfileViewModel
+    @Published var profileVM: ProfileViewModel
     @Published var gameVM: GameViewModel
     @Published var scoreVM: ScoreViewModel
     @Published var accountScoreVM: AccountScoreViewModel
@@ -20,9 +20,9 @@ final class MainMenuViewModel: ObservableObject {
     init(appState: AppState) {
         self.appState = appState
         self.authVM = AuthViewModel(appState: appState, authService: AuthService())
-        self.userProfileVM = UserProfileViewModel(appState: appState, profileService: UserProfileService())
+        self.profileVM = ProfileViewModel(appState: appState, profileService: ProfileService())
         self.gameVM = GameViewModel()
-        self.scoreVM = ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService())
+        self.scoreVM = ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: ProfileService())
         self.accountScoreVM = AccountScoreViewModel(appState: appState, scoreService: ScoreService())
         self.tutorialVM = TutorialViewModel()
     }

@@ -52,7 +52,7 @@ final class AuthViewModel: ObservableObject {
                 appState.currentScreen = .verifyEmail
                 return
             }
-            appState.currentScreen = .mainMenu(.account)
+            appState.currentScreen = .mainMenu(.profile)
         } catch { errorMessage = error.localizedDescription }
     }
     
@@ -70,7 +70,7 @@ final class AuthViewModel: ObservableObject {
                     do {
                         let user = try await authService.handleAppleAuth(credential: credential)
                         appState.currentUser = user
-                        appState.currentScreen = .mainMenu(.account)
+                        appState.currentScreen = .mainMenu(.profile)
                     } catch { errorMessage = error.localizedDescription }
                 }
             }

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct VerifyEmailView: View {
     @StateObject var viewModel: VerifyEmailViewModel
-    @EnvironmentObject var audioVM: AudioViewModel
     
     var body: some View {
         ZStack {
@@ -60,10 +59,8 @@ struct VerifyEmailView: View {
             .padding(.horizontal, 24)
             .padding(.top, 30)
         }
-        .onAppear { audioVM.stop() }
     }
 }
-
 
 #Preview {
     let appState = AppState()

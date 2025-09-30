@@ -12,7 +12,6 @@ struct SignInView: View {
     enum Field { case email, password }
     
     @StateObject var viewModel: AuthViewModel
-    @EnvironmentObject var audioVM: AudioViewModel
     @FocusState private var focusedField: Field? // info w jakim polu tekstowym user ma klawiature (email czy password)
     
     var body: some View {
@@ -80,7 +79,6 @@ struct SignInView: View {
                     .cornerRadius(20)
             }
         }
-        .onAppear { audioVM.stop() }
     }
     
     @ViewBuilder

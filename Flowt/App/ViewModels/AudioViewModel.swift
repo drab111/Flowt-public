@@ -9,28 +9,30 @@ import SwiftUI
 
 @MainActor
 final class AudioViewModel: ObservableObject {
-    private let service: AudioServiceProtocol
-    @Published var isPlaying = false // przyda sie do SettingsView
-    
-    init(service: AudioServiceProtocol) { self.service = service }
-    
-    func start() {
-        service.start()
-        isPlaying = true
+    private var service: AudioServiceProtocol
+
+    init(service: AudioServiceProtocol) {
+        self.service = service
+        
+        // Obserwujemy zmiany w AppState
+        NotificationCenter.default.addObserver(forName: .userPreferencesChanged, object: nil, queue: .main) { [weak self] notification in
+            guard let profile = notification.object as? UserProfile else { return }
+            Task { @MainActor in
+                self?.applyPreferences(profile: profile)
+            }
+        }
     }
+
+    deinit { NotificationCenter.default.removeObserver(self) }
     
-    func stop() {
-        service.stop()
-        isPlaying = false
-    }
-    
-    func pause() {
-        service.pause()
-        isPlaying = false
-    }
-    
-    func resume() {
-        service.resume()
-        isPlaying = true
+    func applyPreferences(profile: UserProfile) {
+        service.sfxEnabled = profile.sfxEnabled
+        service.musicEnabled = profile.musicEnabled
+        
+        if profile.musicEnabled {
+            if !service.hasPlayer { service.start() }
+        } else {
+            if service.hasPlayer { service.stop() }
+        }
     }
 }

@@ -97,7 +97,7 @@ struct GameView: View {
     let appState = AppState()
     GameView(
         gameVM: GameViewModel(),
-        scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService()),
+        scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: ProfileService()),
         onTabChange: { tab in
             appState.currentScreen = .mainMenu(tab)
         }

@@ -13,11 +13,11 @@ enum Screen {
 }
 
 enum MainMenuTab: CaseIterable {
-    case account, tutorial, game, leaderboard, settings
+    case profile, tutorial, game, leaderboard, settings
     
     var title: String {
         switch self {
-        case .account: return "Account"
+        case .profile: return "Profile"
         case .tutorial: return "Tutorial"
         case .game: return "Game"
         case .leaderboard: return "Leaderboard"
@@ -27,7 +27,7 @@ enum MainMenuTab: CaseIterable {
     
     var icon: String {
         switch self {
-        case .account: return "person.circle"
+        case .profile: return "person.circle"
         case .tutorial: return "book.fill"
         case .game: return "gamecontroller"
         case .leaderboard: return "list.number"
@@ -40,7 +40,13 @@ enum MainMenuTab: CaseIterable {
 class AppState: ObservableObject {
     @Published var currentScreen: Screen = .loading
     @Published var currentUser: AuthUser? = nil
-    @Published var currentUserProfile: UserProfile? = nil
+    @Published var currentUserProfile: UserProfile? = nil {
+        didSet {
+            if let profile = currentUserProfile {
+                NotificationCenter.default.post(name: .userPreferencesChanged, object: profile)
+            }
+        }
+    }
     
     init() { checkUserSession() }
     
@@ -51,7 +57,7 @@ class AppState: ObservableObject {
                     try await user.reload()
                     currentUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
                     if user.isEmailVerified {
-                        currentScreen = .mainMenu(.account)
+                        currentScreen = .mainMenu(.profile)
                     } else {
                         currentScreen = .verifyEmail
                     }

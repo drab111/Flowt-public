@@ -84,7 +84,7 @@ class UpgradePopup: SKNode, Popup {
         let nodesAtPos = nodes(at: localPos)
         
         if let button = nodesAtPos.compactMap({ $0 as? UpgradeButton }).first {
-            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             onOptionSelected?(button.option)
             removeFromParent()
         }

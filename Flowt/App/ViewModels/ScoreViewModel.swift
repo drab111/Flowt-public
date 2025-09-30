@@ -22,10 +22,10 @@ final class ScoreViewModel: ObservableObject {
     
     private let appState: AppState
     private let scoreService: ScoreServiceProtocol
-    private let profileService: UserProfileServiceProtocol
+    private let profileService: ProfileServiceProtocol
     private var hasSaved: Bool = false
     
-    init(appState: AppState, scoreService: ScoreServiceProtocol, profileService: UserProfileServiceProtocol) {
+    init(appState: AppState, scoreService: ScoreServiceProtocol, profileService: ProfileServiceProtocol) {
         self.appState = appState
         self.scoreService = scoreService
         self.profileService = profileService

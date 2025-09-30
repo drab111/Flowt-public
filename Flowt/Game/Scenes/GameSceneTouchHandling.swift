@@ -20,16 +20,18 @@ extension GameScene {
         
         // Sprawdzamy czy kliknięto w "MENU"
         if nodes(at: location).contains(where: { $0.name == "BackToMenuButton" }) {
-            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             let popup = ConfirmExitPopup(size: self.size,
                 onConfirm: { [weak self] in
-                    self?.run(SKAction.playSoundFileNamed("failureSound.wav", waitForCompletion: false))
-                    self?.invalidateTimers()
-                    self?.gameVM.backToMenu()
+                    guard let self else { return }
+                    AudioService.shared.playSFX(node: self, fileName: "failureSound.wav")
+                    self.invalidateTimers()
+                    self.gameVM.backToMenu()
                 },
                 onCancel: { [weak self] in
-                    self?.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
-                    self?.activePopup = nil
+                    guard let self else { return }
+                    AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+                    self.activePopup = nil
                 })
             
             addChild(popup)
@@ -39,7 +41,7 @@ extension GameScene {
         
         // Sprawdzamy czy kliknięto w przycisk linii i szukamy jej indeksu
         if let tappedButton = nodes(at: location).compactMap({ $0 as? SKShapeNode }).first, let index = colorButtons.firstIndex(of: tappedButton) {
-            self.run(SKAction.playSoundFileNamed("clickSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             currentLineIndex = index
             createColorButtons()
             isDrawing = false
@@ -93,12 +95,12 @@ extension GameScene {
         
         // Sprawdzenie czy nowa linia spełnia zasady gry aby móc ją zrealizować
         if let (startPort, endPort) = checkConnectionForSegment(points: pathPoints, line: currentLine) {
-            self.run(SKAction.playSoundFileNamed("successSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "successSound.wav")
             currentLine.finalizeCurrentLine()
             currentLine.existingConnections.append((startPort, endPort))
             checkIfLoopClosed(line: currentLine)
         } else {
-            self.run(SKAction.playSoundFileNamed("failureSound.wav", waitForCompletion: false))
+            AudioService.shared.playSFX(node: self, fileName: "failureSound.wav")
             currentLine.currentPoints.removeAll()
             currentLine.updatePath()
         }

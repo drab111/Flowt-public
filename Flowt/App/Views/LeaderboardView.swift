@@ -92,5 +92,5 @@ struct LeaderboardView: View {
 
 #Preview {
     let appState = AppState()
-    LeaderboardView(scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: UserProfileService()))
+    LeaderboardView(scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: ProfileService()))
 }

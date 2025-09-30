@@ -58,7 +58,7 @@ extension GameScene {
         let stormNode = Storm(position: position, radius: radius)
         addChild(stormNode)
         storm = stormNode
-        self.run(SKAction.playSoundFileNamed("stormSound.wav", waitForCompletion: false))
+        AudioService.shared.playSFX(node: self, fileName: "stormSound.wav")
     }
     
     // MARK: - Collision helpers
