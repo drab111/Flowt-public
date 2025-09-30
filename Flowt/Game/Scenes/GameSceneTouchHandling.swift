@@ -18,7 +18,7 @@ extension GameScene {
             return
         }
         
-        // Sprawdzamy czy kliknięto w "MENU"
+        // Sprawdzamy czy kliknięto w "Menu"
         if nodes(at: location).contains(where: { $0.name == "BackToMenuButton" }) {
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             let popup = ConfirmExitPopup(size: self.size,
@@ -37,6 +37,14 @@ extension GameScene {
             addChild(popup)
             activePopup = popup
             return
+        }
+        
+        // Sprawdzamy czy kliknięto w "Pause"
+        if nodes(at: location).contains(where: { $0.name == "PauseButton" }) {
+            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            scene?.isPaused.toggle()
+            let text = (scene?.isPaused == true) ? "\u{25B6}\u{FE0E}" : "\u{23F8}\u{FE0E}"
+            pauseLabel?.text = text
         }
         
         // Sprawdzamy czy kliknięto w przycisk linii i szukamy jej indeksu

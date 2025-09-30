@@ -23,6 +23,8 @@ extension GameScene {
         
         scoreLabel.removeFromParent()
         backToMenuButton = nil
+        pauseButton = nil
+        pauseLabel = nil
         storm = nil
         ocean = nil
         activePopup = nil

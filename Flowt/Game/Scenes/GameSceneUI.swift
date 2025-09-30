@@ -10,14 +10,47 @@ import SpriteKit
 
 extension GameScene {
     private func createBackToMenuButton() {
-        let button = SKLabelNode(text: "Menu")
-        button.fontName = "HelveticaNeue-Bold"
-        button.fontSize = 24
-        button.fontColor = .white
-        button.position = CGPoint(x: 50, y: 50)
-        button.name = "BackToMenuButton"
-        addChild(button)
-        backToMenuButton = button
+        let background = SKShapeNode(rectOf: CGSize(width: 100, height: 40), cornerRadius: 10)
+        background.fillColor = .clear
+        background.strokeColor = .clear
+        background.lineWidth = 0
+        background.position = CGPoint(x: 50, y: 60)
+        background.name = "BackToMenuButton"
+        
+        let label = SKLabelNode(text: "Menu")
+        label.fontName = "HelveticaNeue-Bold"
+        label.fontSize = 20
+        label.fontColor = .white
+        label.verticalAlignmentMode = .center
+        label.horizontalAlignmentMode = .center
+        label.name = "BackToMenuButton"
+        
+        background.addChild(label)
+        addChild(background)
+        backToMenuButton = background
+    }
+    
+    private func createPauseButton() {
+        let background = SKShapeNode(rectOf: CGSize(width: 60, height: 60), cornerRadius: 12)
+        background.fillColor = .clear
+        background.strokeColor = .clear
+        background.lineWidth = 0
+        background.position = CGPoint(x: self.size.width - 50, y: 60)
+        background.name = "PauseButton"
+
+        let label = SKLabelNode(text: "\u{23F8}\u{FE0E}")
+        label.fontName = "Menlo"
+        label.fontSize = 28
+        label.fontColor = .white
+        label.verticalAlignmentMode = .center
+        label.horizontalAlignmentMode = .center
+        label.name = "PauseButton"
+
+        background.addChild(label)
+        addChild(background)
+
+        pauseButton = background
+        pauseLabel = label
     }
     
     func createColorButtons() {
@@ -101,6 +134,7 @@ extension GameScene {
     func setupButtons() {
         addChild(scoreLabel)
         createBackToMenuButton()
+        createPauseButton()
         createColorButtons()
     }
     

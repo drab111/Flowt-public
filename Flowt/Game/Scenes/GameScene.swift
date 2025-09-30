@@ -27,7 +27,9 @@ class GameScene: SKScene {
     var islands: [Island] = []
     var activePopup: SKNode?
     var pendingUpgrade: LineUpgrade?
-    var backToMenuButton: SKLabelNode?
+    var backToMenuButton: SKShapeNode?
+    var pauseButton: SKShapeNode?
+    var pauseLabel: SKLabelNode?
     var colors: [UIColor] = Array(GameConfig.routeColors.prefix(2))
     var cargoSpawnInterval: Double = GameConfig.spawnCargoInterval {
         didSet { resetCargoSpawnTimer() }

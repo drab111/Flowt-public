@@ -93,8 +93,12 @@ extension GameScene {
             if dist < minDistance { return true }
         }
         
-        // Dla backToMenuButton i ScoreLabel
+        // Dla backToMenuButton, pauseButton i ScoreLabel
         if let button = backToMenuButton {
+            let distToButton = hypot(button.position.x - pos.x, button.position.y - pos.y)
+            if distToButton < minDistance { return true }
+        }
+        if let button = pauseButton {
             let distToButton = hypot(button.position.x - pos.x, button.position.y - pos.y)
             if distToButton < minDistance { return true }
         }
