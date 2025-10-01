@@ -28,7 +28,7 @@ struct MainMenuView: View {
                     case .tutorial: TutorialView(tutorialVM: mainMenuVM.tutorialVM, onTabChange: onTabChange)
                     case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, onTabChange: onTabChange)
                     case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
-                    case .settings: SettingsView()
+                    case .info: InfoView(infoVM: mainMenuVM.infoVM)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -45,63 +45,103 @@ struct CustomTabBar: View {
     var animation: Namespace.ID
     let onTabChange: (MainMenuTab) -> Void
     
+    @State private var bubbleOffset: CGFloat = 0
+    
     var body: some View {
-        HStack {
-            ForEach(MainMenuTab.allCases, id: \.self) { tab in
-                VStack(spacing: 4) {
-                    ZStack {
-                        if selectedTab == tab {
-                            LinearGradient(colors: [
-                                    Color(red: 0.0, green: 0.25, blue: 0.55),
-                                    Color(red: 0.1, green: 0.4, blue: 0.75),
-                                    Color(red: 0.3, green: 0.2, blue: 0.6)
-                            ], startPoint: .topLeading, endPoint: .bottomTrailing)
-                            .mask(
+        ZStack {
+            // Tło paska
+            BlurView(style: .systemUltraThinMaterialDark)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.05, green: 0.15, blue: 0.3).opacity(0.85),
+                            Color(red: 0.1, green: 0.25, blue: 0.45).opacity(0.9)
+                        ], startPoint: .top, endPoint: .bottom
+                    )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .shadow(color: .black.opacity(0.35), radius: 12, x: 0, y: -4)
+            
+            // Ikony i highlight
+            HStack {
+                ForEach(MainMenuTab.allCases, id: \.self) { tab in
+                    VStack(spacing: 6) {
+                        ZStack {
+                            if selectedTab == tab {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.blue.opacity(0.4), Color.teal.opacity(0.3)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 28, height: 28)
+                                    .blur(radius: 3)
+                                    .frame(width: 35, height: 35)
+                                    .blur(radius: 3)
+                                    .matchedGeometryEffect(id: "HIGHLIGHT", in: animation)
+                                
+                                LinearGradient(
+                                    colors: [
+                                        Color(red: 0.1, green: 0.5, blue: 0.8),
+                                        Color(red: 0.3, green: 0.6, blue: 0.9)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                                .mask(
+                                    Image(systemName: tab.icon)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 28, height: 28)
+                                )
+                                .matchedGeometryEffect(id: "ICON", in: animation)
+                                .frame(width: 28, height: 28)
+                                .shadow(color: .white.opacity(0.4), radius: 8, x: 0, y: 0)
+                            } else {
                                 Image(systemName: tab.icon)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 26, height: 26)
-                            )
-                            .matchedGeometryEffect(id: "ICON", in: animation)
-                            .frame(width: 26, height: 26)
-                        } else {
-                            Image(systemName: tab.icon)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                                .foregroundColor(.white.opacity(0.7))
+                                    .foregroundColor(.white.opacity(0.65))
+                            }
                         }
+                        
+                        Text(tab.title)
+                            .font(.caption2)
+                            .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.55))
                     }
-                    
-                    Text(tab.title)
-                        .font(.caption2)
-                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.6))
-                }
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity)
-                .onTapGesture {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        onTabChange(tab) // zamiast bindingu, callback do RootView
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                            onTabChange(tab)
+                        }
                     }
                 }
             }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 8)
+        .frame(height: 80)
+        .padding(.horizontal, 20)
         .padding(.bottom, 20)
-        .background(
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.1, blue: 0.25).opacity(0.95),
-                    Color(red: 0.1, green: 0.3, blue: 0.55).opacity(0.95)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: -5)
     }
 }
+
+
+// Reusable blur wrapper (UIKit bridge)
+struct BlurView: UIViewRepresentable {
+    var style: UIBlurEffect.Style
+    
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: style))
+    }
+    
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
+}
+
 
 #Preview {
     let appState = AppState()
@@ -109,7 +149,7 @@ struct CustomTabBar: View {
     
     MainMenuView(
         mainMenuVM: mainMenuVM,
-        selectedTab: .settings,
+        selectedTab: .tutorial,
         onTabChange: { newTab in
             appState.currentScreen = .mainMenu(newTab)
         }

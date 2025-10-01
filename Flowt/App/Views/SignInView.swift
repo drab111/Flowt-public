@@ -13,70 +13,76 @@ struct SignInView: View {
     
     @StateObject var viewModel: AuthViewModel
     @FocusState private var focusedField: Field? // info w jakim polu tekstowym user ma klawiature (email czy password)
+    @AppStorage("hasAcceptedTerms") private var hasAccepted: Bool = false
     
     var body: some View {
         ZStack {
             BackgroundView(withLogo: false, hasBottomBar: false)
                 .onTapGesture { focusedField = nil } // jak klikamy gdzies poza TextField to ustawia sie na nil
             
-            VStack(spacing: 30) {
-                Image("FlowtLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 250, height: 250)
-                    .shadow(radius: 10)
-                
-                VStack(spacing: 16) {
-                    inputField(systemIcon: "envelope", placeholder: "Email", text: $viewModel.email, focused: $focusedField, field: .email)
-                    inputField(systemIcon: "lock", placeholder: "Password", text: $viewModel.password, isSecure: true, focused: $focusedField, field: .password)
+            if !hasAccepted {
+                TermsAgreementView(hasAccepted: $hasAccepted)
+                    .transition(.opacity)
+            } else {
+                VStack(spacing: 30) {
+                    Image("FlowtLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 250, height: 250)
+                        .shadow(radius: 10)
+                    
+                    VStack(spacing: 16) {
+                        inputField(systemIcon: "envelope", placeholder: "Email", text: $viewModel.email, focused: $focusedField, field: .email)
+                        inputField(systemIcon: "lock", placeholder: "Password", text: $viewModel.password, isSecure: true, focused: $focusedField, field: .password)
+                    }
+                    
+                    Button {
+                        Task { await viewModel.submit() }
+                    } label: {
+                        Text(viewModel.isRegistering ? "Sign Up" : "Sign In")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .background(viewModel.canSubmit ? Color.black.opacity(0.85) : Color.gray.opacity(0.5))
+                            .cornerRadius(20)
+                    }
+                    .disabled(!viewModel.canSubmit)
+                    
+                    SignInWithAppleButton(onRequest: viewModel.handleAppleRequest, onCompletion: viewModel.handleAppleCompletion)
+                        .signInWithAppleButtonStyle(.black)
+                        .frame(height: 50)
+                        .cornerRadius(20)
+                        .padding(.top, 10)
+                    
+                    HStack {
+                        Text(viewModel.isRegistering ? "Already have an account?" : "Don’t have an account?")
+                            .foregroundColor(.white.opacity(0.8))
+                        
+                        Button(viewModel.isRegistering ? "Sign In" : "Sign Up") { viewModel.toggleMode() }
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.top, 10)
+                    
+                    if let error = viewModel.errorMessage {
+                        Text(error)
+                            .foregroundColor(.yellow)
+                            .font(.callout)
+                            .padding(.top, 5)
+                    }
+                    
+                    Spacer()
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 30)
                 
-                Button {
-                    Task { await viewModel.submit() }
-                } label: {
-                    Text(viewModel.isRegistering ? "Sign Up" : "Sign In")
-                        .frame(maxWidth: .infinity)
+                if viewModel.isLoading {
+                    Color.black.opacity(0.4).ignoresSafeArea()
+                    ProgressView("Signing in...")
                         .padding()
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .background(viewModel.canSubmit ? Color.black.opacity(0.85) : Color.gray.opacity(0.5))
+                        .background(.ultraThinMaterial)
                         .cornerRadius(20)
                 }
-                .disabled(!viewModel.canSubmit)
-                
-                SignInWithAppleButton(onRequest: viewModel.handleAppleRequest, onCompletion: viewModel.handleAppleCompletion)
-                .signInWithAppleButtonStyle(.black)
-                .frame(height: 50)
-                .cornerRadius(20)
-                .padding(.top, 10)
-                
-                HStack {
-                    Text(viewModel.isRegistering ? "Already have an account?" : "Don’t have an account?")
-                        .foregroundColor(.white.opacity(0.8))
-                    
-                    Button(viewModel.isRegistering ? "Sign In" : "Sign Up") { viewModel.toggleMode() }
-                    .fontWeight(.semibold)
-                }
-                .padding(.top, 10)
-                
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundColor(.yellow)
-                        .font(.callout)
-                        .padding(.top, 5)
-                }
-                
-                Spacer()
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 30)
-            
-            if viewModel.isLoading {
-                Color.black.opacity(0.4).ignoresSafeArea()
-                ProgressView("Signing in...")
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(20)
             }
         }
     }

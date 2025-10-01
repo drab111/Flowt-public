@@ -55,12 +55,12 @@ struct BackgroundView: View {
                     AnimatedWave(amplitude: 14, frequency: 2.5, phase: wavePhase)
                         .fill(Color.white.opacity(0.05))
                         .frame(height: geo.size.height * 0.5)
-                        .offset(y: geo.size.height * (hasBottomBar ? 0.5 : 0.55))
+                        .offset(y: geo.size.height * (hasBottomBar ? 0.48 : 0.55))
                     
                     AnimatedWave(amplitude: 9, frequency: 3.5, phase: wavePhase + .pi/2)
                         .fill(Color.white.opacity(0.04))
                         .frame(height: geo.size.height * 0.55)
-                        .offset(y: geo.size.height * (hasBottomBar ? 0.6 : 0.65))
+                        .offset(y: geo.size.height * (hasBottomBar ? 0.58 : 0.65))
                 }
             }
             .ignoresSafeArea()

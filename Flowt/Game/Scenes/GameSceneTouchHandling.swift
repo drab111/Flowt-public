@@ -20,17 +20,17 @@ extension GameScene {
         
         // Sprawdzamy czy kliknięto w "Menu"
         if nodes(at: location).contains(where: { $0.name == "BackToMenuButton" }) {
-            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            AudioService.shared.playSystemSFX(id: 1110)
             let popup = ConfirmExitPopup(size: self.size,
                 onConfirm: { [weak self] in
                     guard let self else { return }
-                    AudioService.shared.playSFX(node: self, fileName: "failureSound.wav")
+                AudioService.shared.playSystemSFX(id: 1110)
                     self.invalidateTimers()
                     self.gameVM.backToMenu()
                 },
                 onCancel: { [weak self] in
                     guard let self else { return }
-                    AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+                AudioService.shared.playSystemSFX(id: 1110)
                     self.activePopup = nil
                 })
             
@@ -41,7 +41,7 @@ extension GameScene {
         
         // Sprawdzamy czy kliknięto w "Pause"
         if nodes(at: location).contains(where: { $0.name == "PauseButton" }) {
-            AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            AudioService.shared.playSystemSFX(id: 1110)
             scene?.isPaused.toggle()
             let text = (scene?.isPaused == true) ? "\u{25B6}\u{FE0E}" : "\u{23F8}\u{FE0E}"
             pauseLabel?.text = text
