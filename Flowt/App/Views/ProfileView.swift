@@ -25,6 +25,8 @@ struct ProfileView: View {
     @ObservedObject var accountScoreVM: AccountScoreViewModel
     @State private var pickerItem: PhotosPickerItem? = nil // wybrany element w selektorze zdjęć
     @State private var activeAlert: ActiveAlert? = nil
+    @State private var signOutButtonPressed = false
+    @State private var deleteButtonPressed = false
     @FocusState private var focusedField: Bool
     
     var body: some View {
@@ -34,27 +36,14 @@ struct ProfileView: View {
                     .scaleEffect(1.5)
                     .tint(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.2))
+                    .background(Color.black.opacity(0.3))
             } else {
-                ScrollView {
+                ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 24) {
-                        Group {
-                            // MARK: - Profil użytkownika
-                            profilePanel
-                            
-                            // MARK: - Pozycja w rankingu
-                            scorePanel
-                            
-                            // MARK: - Preferencje użytkownika
-                            preferencesPanel
-                            
-                            // MARK: - Akcje konta
-                            actionsPanel
-                        }
-                        .padding()
-                        .background(Color.white.opacity(0.03))
-                        .cornerRadius(8)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.15), lineWidth: 1))
+                        profilePanel
+                        scorePanel
+                        preferencesPanel
+                        actionsPanel
                     }
                     .padding()
                 }
@@ -89,213 +78,318 @@ struct ProfileView: View {
                 )
             }
         }
-
     }
     
-    // MARK: - Panel profilu
+    // MARK: - Panels
+    
     private var profilePanel: some View {
-        VStack(spacing: 16) {
-            Group {
-                if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
-                    Image(uiImage: image)
-                        .resizable()
-                } else {
-                    Image("FlowtLogo")
-                        .resizable()
-                }
-            }
-            .scaledToFill()
-            .clipShape(Circle())
-            .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 2))
-            .frame(width: 140, height: 140)
-            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
-            
-            Text(userProfileVM.currentNickname)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
-            
-            PhotosPicker("Change Avatar", selection: $pickerItem, matching: .images)
-                .onChange(of: pickerItem) { _, newItem in
-                    Task {
-                        if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                            userProfileVM.avatarData = data
+        EdgeLitContainer {
+            VStack(spacing: 20) {
+                // Avatar
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(colors: [Color.cyan.opacity(0.4), Color.teal.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 150, height: 150)
+                        .shadow(color: Color.cyan.opacity(0.5), radius: 20, x: 5, y: 5)
+                        .blur(radius: 1)
+                        .overlay(Circle().stroke(Color.white.opacity(0.9), lineWidth: 4).frame(width: 150, height: 150))
+                    
+                    Group {
+                        if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
+                            Image(uiImage: image)
+                                .resizable()
+                        } else {
+                            Image("FlowtLogo")
+                                .resizable()
                         }
                     }
+                    .scaledToFill()
+                    .frame(width: 150, height: 150)
+                    .clipShape(Circle())
                 }
-                .buttonStyle(.bordered)
-                .tint(.blue.opacity(0.65))
-            
-            TextField("Enter new nickname", text: $userProfileVM.newNickname)
-                .focused($focusedField)
-                .padding(10)
-                .background(Color.white.opacity(0.1))
-                .cornerRadius(20)
-                .foregroundColor(.white)
+                .overlay(alignment: .bottomTrailing) {
+                    if userProfileVM.avatarData == nil {
+                        PhotosPicker(selection: $pickerItem, matching: .images) {
+                            Circle()
+                                .fill(LinearGradient(colors: [Color.cyan.opacity(0.6), Color.teal.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Image(systemName: "camera.fill")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 16, weight: .bold))
+                                )
+                                .shadow(color: Color.cyan.opacity(0.6), radius: 6, x: 0, y: 2)
+                                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                        }
+                        .onChange(of: pickerItem) { _, newItem in
+                            Task {
+                                if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                    withAnimation { userProfileVM.avatarData = data }
+                                }
+                            }
+                        }
+                        .accessibilityLabel("Change Avatar")
+                    } else {
+                        Button { withAnimation { userProfileVM.avatarData = nil } } label: {
+                            Circle()
+                                .fill(Color.red.opacity(0.6))
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Image(systemName: "trash.fill")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 16, weight: .bold))
+                                )
+                                .shadow(color: Color.red.opacity(0.6), radius: 6, x: 0, y: 2)
+                                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                        }
+                        .accessibilityLabel("Remove Avatar")
+                    }
+                }
+                
+                // Nickname
+                Text(userProfileVM.currentNickname)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(LinearGradient(colors: [.white, .cyan.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 3)
+                
+                // Text Field
+                GlassField(systemIcon: "pencil.and.outline", placeholder: "Enter new nickname", text: $userProfileVM.newNickname, isSecure: false, submitLabel: .done, focused: $focusedField, field: true, onSubmit: {
+                    focusedField = false
+                    Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
+                })
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
                 .onChange(of: userProfileVM.newNickname) { _, newValue in
                     if newValue.count > 15 { userProfileVM.newNickname = String(newValue.prefix(15)) }
                 }
-            
-            switch userProfileVM.saveState {
-            case .idle:
-                Button {
-                    Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
-                    focusedField = false
-                } label: {
-                    Text("Save Changes")
-                        .font(.body.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                }
-                .padding(.vertical, 8)
-                .gradientBackground()
-                .foregroundColor(.white)
-                .cornerRadius(20)
-
-            case .saving:
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .gradientBackground()
-                    .cornerRadius(20)
-
-            case .saved:
-                Label("Saved!", systemImage: "checkmark.circle.fill")
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.green.opacity(0.8))
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.white.opacity(0.06))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(focusedField ? Color.cyan : Color.white.opacity(0.08), lineWidth: 1.5)
+                        )
+                )
                 
-            case .rejected:
-                Label("Inappropriate avatar!", systemImage: "xmark.octagon.fill")
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.red.opacity(0.9))
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
-            }
-        }
-    }
-    
-    // MARK: - Panel wyniku
-    private var scorePanel: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Performance")
-                .font(.headline)
-                .foregroundColor(.white.opacity(0.8))
-            
-            if let error = accountScoreVM.errorMessage {
-                Text(error)
-                    .foregroundColor(.yellow)
-            } else {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Highest Score")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.6))
-                        Text("\(accountScoreVM.bestScore ?? 0)")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Rank")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.6))
-                        if let rank = accountScoreVM.globalRank {
-                            Text("#\(rank)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.yellow)
-                        } else {
-                            Text("-")
-                                .font(.title2)
-                                .foregroundColor(.gray)
+                // Save Buttons
+                Group {
+                    switch userProfileVM.saveState {
+                    case .idle:
+                        AnimatedGradientButton(title: "Save Changes", symbol: "checkmark.seal.fill", gradientColors: animatedGradientButtonColors) {
+                            Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
+                            focusedField = false
                         }
+                        
+                    case .saving:
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 24)
+                            .padding(.vertical, 12)
+                            .background(Color.cyan.opacity(0.2))
+                            .cornerRadius(20)
+                            .transition(.opacity)
+                        
+                    case .saved:
+                        Label("Saved!", systemImage: "checkmark.circle.fill")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 24)
+                            .padding(.vertical, 12)
+                            .background(LinearGradient(colors: [Color.cyan, Color.teal], startPoint: .leading, endPoint: .trailing))
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                            .shadow(color: Color.cyan.opacity(0.5), radius: 10)
+                            .transition(.opacity)
+                        
+                    case .rejected:
+                        Label("Inappropriate avatar!", systemImage: "xmark.octagon.fill")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 24)
+                            .padding(.vertical, 12)
+                            .background(LinearGradient(colors: [Color.orange, Color.red], startPoint: .leading, endPoint: .trailing))
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                            .shadow(color: Color.red.opacity(0.5), radius: 10)
+                            .transition(.opacity)
                     }
                 }
             }
         }
     }
     
-    // MARK: - Panel preferencji
-    private var preferencesPanel: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Preferences")
-                .font(.headline)
-                .foregroundColor(.white.opacity(0.8))
-            
-            Toggle(isOn: Binding(
-                get: { userProfileVM.appState.currentUserProfile?.musicEnabled ?? true },
-                set: { newValue in
-                    if var profile = userProfileVM.appState.currentUserProfile {
-                        profile.musicEnabled = newValue
-                        userProfileVM.appState.currentUserProfile = profile
+    private var scorePanel: some View {
+        EdgeLitContainer {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeader(title: "Performance", subtitle: "Your global standing")
+                
+                if let error = accountScoreVM.errorMessage {
+                    Text(error)
+                        .foregroundColor(.orange)
+                } else {
+                    HStack(alignment: .center, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Highest Score", systemImage: "trophy.fill")
+                                .font(.footnote)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white.opacity(0.7))
+                            Text("\(accountScoreVM.bestScore ?? 0)")
+                                .font(.system(size: 34, weight: .heavy, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundStyle(LinearGradient(colors: [.white, .cyan], startPoint: .top, endPoint: .bottom))
+                                .shadow(color: .cyan.opacity(0.6), radius: 10)
+                        }
+                        
+                        Spacer(minLength: 12)
+                        
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(LinearGradient(colors: [.white.opacity(0.05), .white.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(LinearGradient(colors: [.cyan.opacity(0.5), .teal.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+                                )
+                                .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 6)
+                            HStack(spacing: 10) {
+                                Image(systemName: "crown.fill")
+                                    .foregroundStyle(LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                    .font(.system(size: 20))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Rank")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(.white.opacity(0.65))
+                                    Group {
+                                        if let rank = accountScoreVM.globalRank {
+                                            Text("#\(rank)")
+                                        } else {
+                                            Text("-")
+                                        }
+                                    }
+                                    .font(.title3)
+                                    .fontWeight(.heavy)
+                                    .foregroundStyle(LinearGradient(colors: [.white, .cyan], startPoint: .top, endPoint: .bottom))
+                                }
+                            }
+                            .padding(.horizontal, 14).padding(.vertical, 12)
+                        }
+                        .frame(height: 58)
                     }
-                    Task {
-                        await userProfileVM.updatePreferences(
-                            musicEnabled: newValue,
-                            sfxEnabled: userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true
-                        )
-                    }
-                }
-            )) { Label("Music", systemImage: "music.note") }
-            .tint(.blue)
+                    Divider()
+                        .overlay(LinearGradient(colors: [.white.opacity(0.0), .white.opacity(0.25), .white.opacity(0.0)], startPoint: .leading, endPoint: .trailing))
+                        .padding(.vertical, 2)
 
-            
-            Toggle(isOn: Binding(
-                get: { userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true },
-                set: { newValue in
-                    if var profile = userProfileVM.appState.currentUserProfile {
-                        profile.sfxEnabled = newValue
-                        userProfileVM.appState.currentUserProfile = profile
+                    HStack(spacing: 10) {
+                        Image(systemName: "sparkles")
+                        Text("Tip: Flow rewards balance over force.")
                     }
-                    Task {
-                        await userProfileVM.updatePreferences(
-                            musicEnabled: userProfileVM.appState.currentUserProfile?.musicEnabled ?? true,
-                            sfxEnabled: newValue
-                        )
-                    }
+                    .font(.footnote)
+                    .foregroundStyle(.white.opacity(0.7))
                 }
-            )) { Label("Sound Effects", systemImage: "speaker.wave.2.fill") }
-            .tint(.blue)
+            }
+            .overlay(alignment: .topTrailing) {
+                FlowDecoration()
+                    .opacity(0.15)
+                    .padding(.trailing, 8)
+                    .padding(.bottom, 6)
+            }
+        }
+    }
+    
+    private var preferencesPanel: some View {
+        EdgeLitContainer {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeader(title: "Preferences", subtitle: "Audio settings")
+                
+                VStack(spacing: 12) {
+                    Toggle(isOn: Binding(
+                        get: { userProfileVM.appState.currentUserProfile?.musicEnabled ?? true },
+                        set: { newValue in
+                            if var profile = userProfileVM.appState.currentUserProfile {
+                                profile.musicEnabled = newValue
+                                userProfileVM.appState.currentUserProfile = profile
+                            }
+                            Task {
+                                await userProfileVM.updatePreferences(
+                                    musicEnabled: newValue,
+                                    sfxEnabled: userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true
+                                )
+                            }
+                        }
+                    )) { Label("Music", systemImage: "music.note") }
+                        .tint(.cyan)
+                    
+                    
+                    Toggle(isOn: Binding(
+                        get: { userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true },
+                        set: { newValue in
+                            if var profile = userProfileVM.appState.currentUserProfile {
+                                profile.sfxEnabled = newValue
+                                userProfileVM.appState.currentUserProfile = profile
+                            }
+                            Task {
+                                await userProfileVM.updatePreferences(
+                                    musicEnabled: userProfileVM.appState.currentUserProfile?.musicEnabled ?? true,
+                                    sfxEnabled: newValue
+                                )
+                            }
+                        }
+                    )) { Label("Sound Effects", systemImage: "speaker.wave.2.fill") }
+                        .tint(.cyan)
+                }
+            }
         }
     }
 
-    
-    // MARK: - Panel akcji
     private var actionsPanel: some View {
         VStack(spacing: 12) {
-            Button {
-                activeAlert = .signOut
-            } label: {
-                Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity)
+            Button(action: {
+                Task {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { signOutButtonPressed = true }
+                    try? await Task.sleep(nanoseconds: 150_000_000)
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { signOutButtonPressed = false }
+                    activeAlert = .signOut
+                }
+            }) {
+                OutlineActionButtonLabel(
+                    title: "Sign Out",
+                    systemImage: "rectangle.portrait.and.arrow.right",
+                    gradient: [.cyan, .teal]
+                )
             }
-            .padding()
-            .gradientBackground()
-            .foregroundColor(.white)
-            .cornerRadius(20)
+            .scaleEffect(signOutButtonPressed ? 0.94 : 1.0)
+            .padding(.horizontal, 35)
             
-            Button {
-                activeAlert = .deleteAccount
-            } label: {
-                Label("Delete Account", systemImage: "trash")
-                    .font(.body.weight(.semibold))
+            Button(action: {
+                Task {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { deleteButtonPressed = true }
+                    try? await Task.sleep(nanoseconds: 150_000_000)
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { deleteButtonPressed = false }
+                    activeAlert = .deleteAccount
+                }
+            }) {
+                Label("Delete Account", systemImage: "trash.fill")
+                    .font(.body)
+                    .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .foregroundColor(.white)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.orange, Color.red]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(20)
+                    .scaleEffect(deleteButtonPressed ? 0.94 : 1.0)
             }
-            .padding()
-            .background(Color.red).opacity(0.75)
-            .foregroundColor(.white)
-            .cornerRadius(20)
+            .padding(.horizontal, 65)
         }
     }
 }
-
 
 #Preview {
     let appState = AppState()

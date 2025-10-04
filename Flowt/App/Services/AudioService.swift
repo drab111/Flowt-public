@@ -22,7 +22,7 @@ final class AudioService: AudioServiceProtocol {
     
     private var endObserver: Any?
     private var player: AVPlayer?
-    private var trackNames = ["track1", "track2", "track3", "track4"]
+    private var trackNames = ["track1", "track2", "track3"]
     private var currentIndex = 0
     
     var hasPlayer: Bool { return player != nil }

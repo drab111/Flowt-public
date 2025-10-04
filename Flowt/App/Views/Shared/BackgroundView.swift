@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-var animatedGradientButtonColors: [Color] = [
-    Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.5),
-    Color(red: 0.0, green: 0.55, blue: 0.55).opacity(0.4),
-    Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.5)
-]
-
 struct BackgroundView: View {
     var withLogo: Bool = true
     var hasBottomBar: Bool = true
@@ -124,19 +118,8 @@ struct BackgroundView: View {
     }
 }
 
-struct GradientBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background(LinearGradient(colors: [
-                    Color(red: 0.0, green: 0.25, blue: 0.55),
-                    Color(red: 0.1, green: 0.4, blue: 0.75),
-                    Color(red: 0.3, green: 0.2, blue: 0.6)
-                ], startPoint: .topLeading, endPoint: .bottomTrailing))
-    }
-}
-
-extension View {
-    public func gradientBackground() -> some View {
-        modifier(GradientBackground())
-    }
-}
+var animatedGradientButtonColors: [Color] = [
+    Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.5),
+    Color(red: 0.0, green: 0.55, blue: 0.55).opacity(0.4),
+    Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.5)
+]

@@ -18,6 +18,7 @@ protocol AuthServiceProtocol {
     func getCurrentUser() -> User?
     func signOut() throws
     func sendVerificationEmail() async throws
+    func sendPasswordReset(email: String) async throws
 }
 
 final class AuthService: AuthServiceProtocol {
@@ -66,6 +67,10 @@ final class AuthService: AuthServiceProtocol {
     func sendVerificationEmail() async throws {
         guard let user = Auth.auth().currentUser else { return }
         try await user.sendEmailVerification()
+    }
+    
+    func sendPasswordReset(email: String) async throws {
+        try await Auth.auth().sendPasswordReset(withEmail: email)
     }
 }
 

@@ -59,10 +59,10 @@ final class ProfileViewModel: ObservableObject {
         do {
             let finalNickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? currentNickname : nickname
             
-            var avatarBase64: String? = appState.currentUserProfile?.avatarBase64
+            var avatarBase64: String? = nil
             if let imageData = imageData, let image = UIImage(data: imageData) {
                 
-                // Sprawdzanie czy zdjęcie nie jest niestosowne używając modelu ML
+                // Sprawdzenie czy zdjęcie jest stosowne używając modelu ML
                 let isSafe = try await profileService.validateAvatar(image: image, threshold: 0.5)
                 
                 // Odrzucenie zapisu w przypadku niestosowności
@@ -75,7 +75,7 @@ final class ProfileViewModel: ObservableObject {
                 
                 // Zdjęcie jest stosowne
                 let resized = image.resized(to: 200)
-                avatarBase64 = resized.toBase64(maxSizeKB: 100)
+                avatarBase64 = resized.toBase64(maxSizeKB: 50)
             }
             
             let profile = UserProfile(
@@ -85,6 +85,8 @@ final class ProfileViewModel: ObservableObject {
                 musicEnabled: appState.currentUserProfile?.musicEnabled ?? true,
                 sfxEnabled: appState.currentUserProfile?.sfxEnabled ?? true
             )
+            
+            // aktualizacja lokalnego stanu
             try await profileService.saveProfile(profile)
             appState.currentUserProfile = profile
             currentNickname = profile.nickname

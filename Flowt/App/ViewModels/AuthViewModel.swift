@@ -89,7 +89,17 @@ final class AuthViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
     
+    // MARK: Reset password
+    func resetPasswordWithEmail(_ email: String) async {
+        guard !email.isEmpty else { return }
+        do {
+            try await authService.sendPasswordReset(email: email)
+            errorMessage = "Password reset link sent to \(email)."
+        } catch { errorMessage = error.localizedDescription }
+    }
+    
     // MARK: - Helpers
+    
     var isEmailValid: Bool {
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)

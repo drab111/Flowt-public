@@ -26,7 +26,7 @@ struct MainMenuView: View {
                     switch selectedTab {
                     case .profile: ProfileView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.profileVM, accountScoreVM: mainMenuVM.accountScoreVM)
                     case .tutorial: TutorialView(tutorialVM: mainMenuVM.tutorialVM, onTabChange: onTabChange)
-                    case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, onTabChange: onTabChange)
+                    case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, accountScoreVM: mainMenuVM.accountScoreVM, onTabChange: onTabChange)
                     case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
                     case .info: InfoView(infoVM: mainMenuVM.infoVM)
                     }
@@ -50,16 +50,20 @@ struct CustomTabBar: View {
     var body: some View {
         ZStack {
             // Tło paska
-            BlurView(style: .systemUltraThinMaterialDark)
-                .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.05, green: 0.15, blue: 0.3).opacity(0.85),
-                            Color(red: 0.1, green: 0.25, blue: 0.45).opacity(0.9)
-                        ], startPoint: .top, endPoint: .bottom
+                            Color(red: 0.02, green: 0.06, blue: 0.15).opacity(0.95),
+                            Color(red: 0.12, green: 0.22, blue: 0.35).opacity(0.92)
+                        ],
+                        startPoint: .top, endPoint: .bottom
                     )
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.25), lineWidth: 1)
+                )
                 .shadow(color: .black.opacity(0.35), radius: 12, x: 0, y: -4)
             
             // Ikony i highlight
@@ -71,24 +75,21 @@ struct CustomTabBar: View {
                                 Circle()
                                     .fill(
                                         LinearGradient(
-                                            colors: [Color.blue.opacity(0.4), Color.teal.opacity(0.3)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
+                                            colors: [
+                                                Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.5),
+                                                Color(red: 0.0, green: 0.55, blue: 0.55).opacity(0.4)
+                                            ], startPoint: .topLeading, endPoint: .bottomTrailing
                                         )
                                     )
-                                    .frame(width: 28, height: 28)
-                                    .blur(radius: 3)
-                                    .frame(width: 35, height: 35)
-                                    .blur(radius: 3)
+                                    .frame(width: 36, height: 36)
+                                    .blur(radius: 6)
                                     .matchedGeometryEffect(id: "HIGHLIGHT", in: animation)
                                 
                                 LinearGradient(
                                     colors: [
-                                        Color(red: 0.1, green: 0.5, blue: 0.8),
-                                        Color(red: 0.3, green: 0.6, blue: 0.9)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                                        Color(red: 0.0, green: 0.65, blue: 0.8),
+                                        Color(red: 0.95, green: 0.75, blue: 0.2)
+                                    ], startPoint: .topLeading, endPoint: .bottomTrailing
                                 )
                                 .mask(
                                     Image(systemName: tab.icon)
@@ -98,13 +99,13 @@ struct CustomTabBar: View {
                                 )
                                 .matchedGeometryEffect(id: "ICON", in: animation)
                                 .frame(width: 28, height: 28)
-                                .shadow(color: .white.opacity(0.4), radius: 8, x: 0, y: 0)
+                                .shadow(color: .white.opacity(0.5), radius: 8)
                             } else {
                                 Image(systemName: tab.icon)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 26, height: 26)
-                                    .foregroundColor(.white.opacity(0.65))
+                                    .foregroundColor(.white.opacity(0.6))
                             }
                         }
                         
@@ -129,19 +130,6 @@ struct CustomTabBar: View {
         .padding(.bottom, 20)
     }
 }
-
-
-// Reusable blur wrapper (UIKit bridge)
-struct BlurView: UIViewRepresentable {
-    var style: UIBlurEffect.Style
-    
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        return UIVisualEffectView(effect: UIBlurEffect(style: style))
-    }
-    
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
-}
-
 
 #Preview {
     let appState = AppState()

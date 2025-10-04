@@ -30,7 +30,7 @@ enum MainMenuTab: CaseIterable {
         case .profile: return "gearshape"
         case .tutorial: return "book"
         case .game: return "gamecontroller"
-        case .leaderboard: return "list.bullet.indent"
+        case .leaderboard: return "list.star"
         case .info: return "info"
         }
     }

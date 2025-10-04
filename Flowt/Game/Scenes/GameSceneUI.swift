@@ -208,7 +208,7 @@ extension GameScene {
         let circle = SKShapeNode(circleOfRadius: 120)
         circle.fillColor = color
         circle.strokeColor = .black
-        circle.lineWidth = 2
+        circle.lineWidth = 4
         circle.position = CGPoint(x: size.width / 2, y: size.height / 2)
         circle.zPosition = 5.5
 
