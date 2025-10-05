@@ -119,22 +119,47 @@ struct EndGameView: View {
     
     private var actionsPanel: some View {
         VStack(spacing: 12) {
-            ShareLink(
-                item: "I scored \(scoreVM.score ?? 0) in Flowt! 🌊",
-                subject: Text("My Flowt score"),
-                message: Text("Try to beat me!")
-            ) {
-                OutlineActionButtonLabel(
-                    title: "Share Score",
-                    systemImage: "square.and.arrow.up",
-                    gradient: [.cyan, .teal]
+            if let payload = scoreVM.makeSharePayload() {
+                ShareLink(
+                    items: [payload],
+                    subject: Text("My Flowt score"),
+                    message: Text("Try to beat me!"),
+                    preview: { (_: ScoreSharePayload) in
+                        SharePreview("Flowt Score", image: Image("FlowtLogo"))
+                    },
+                    label: {
+                        OutlineActionButtonLabel(
+                            title: "Share Score",
+                            systemImage: "square.and.arrow.up",
+                            gradient: [.cyan, .teal]
+                        )
+                    }
                 )
+                .buttonStyle(.plain)
+                .padding(.horizontal, 35)
+            } else {
+                // sam tekst (gdy render nie wyjdzie)
+                ShareLink(
+                    item: "I scored \(scoreVM.score ?? 0) in Flowt.",
+                    subject: Text("My Flowt score"),
+                    message: Text("Think you can beat me?")
+                ) {
+                    OutlineActionButtonLabel(
+                        title: "Share Score",
+                        systemImage: "square.and.arrow.up",
+                        gradient: [.cyan, .teal]
+                    )
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 35)
             }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 35)
-            
-            AnimatedGradientButton(title: "Back to Menu", symbol: "rectangle.portrait.and.arrow.right", gradientColors: animatedGradientButtonColors, action: { gameVM.backToMenu() })
-                .padding(.horizontal, 65)
+
+            AnimatedGradientButton(
+                title: "Back to Menu",
+                symbol: "rectangle.portrait.and.arrow.right",
+                gradientColors: animatedGradientButtonColors
+            ) { gameVM.backToMenu() }
+            .padding(.horizontal, 65)
         }
     }
 }

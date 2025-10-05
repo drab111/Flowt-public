@@ -85,6 +85,7 @@ class UpgradePopup: SKNode, Popup {
         
         if let button = nodesAtPos.compactMap({ $0 as? UpgradeButton }).first {
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             onOptionSelected?(button.option)
             removeFromParent()
         }

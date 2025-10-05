@@ -19,6 +19,7 @@ extension GameScene {
         let popup = UpgradePopup(size: self.size) { [weak self] option in
             guard let self = self else { return }
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             self.pendingUpgrade = upgradeFactory.createUpgrade(option: option)
             
             // Zamykamy popup 1
@@ -35,6 +36,7 @@ extension GameScene {
         let popup = LineSelectionPopup(size: self.size, amountOfLines: routeLines.count) { [weak self] index in
             guard let self = self else { return }
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             
             if let upgrade = self.pendingUpgrade {
                 // Aplikujemy do odpowiedniej linii

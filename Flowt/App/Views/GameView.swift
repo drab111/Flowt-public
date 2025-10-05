@@ -21,6 +21,7 @@ struct GameView: View {
             VStack(spacing: 20) {
                 headerPanel
                 statsPanel
+                Spacer()
                 playPanel
             }
             .padding(.horizontal, 14)
@@ -64,22 +65,16 @@ struct GameView: View {
             HStack(spacing: 14) {
                 VStack(alignment: .leading, spacing: 6) {
                     SectionHeader(title: "Flowt", subtitle: "Puzzle strategy on the water")
-                    
-                    Divider()
-                        .overlay(LinearGradient(colors: [.white.opacity(0.0), .white.opacity(0.25), .white.opacity(0.0)], startPoint: .leading, endPoint: .trailing))
-                        .padding(.vertical, 2)
-                    
-                    HStack(spacing: 8) {
-                        Image(systemName: "sparkles")
-                        Text("Every move shapes your rank")
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.75))
                 }
                 Spacer()
             }
+            .overlay(alignment: .topTrailing) {
+                FlowDecoration()
+                    .opacity(0.15)
+                    .padding(.trailing, 8)
+                    .padding(.bottom, 6)
+            }
         }
-        .padding(.horizontal, 14)
     }
     
     private var statsPanel: some View {
@@ -122,6 +117,7 @@ struct GameView: View {
         }
         .accessibilityLabel("Play")
         .padding(.horizontal, 35)
+        .padding(.bottom, 30)
     }
     
     // MARK: - Helpers

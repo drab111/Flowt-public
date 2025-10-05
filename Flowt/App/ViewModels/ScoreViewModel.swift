@@ -88,5 +88,21 @@ final class ScoreViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
     
+    func makeSharePayload() -> ScoreSharePayload? {
+        let score = self.score ?? 0
+        let rank = self.userRank
+
+        let card = ScoreShareCardView(score: score, rank: rank)
+            .frame(width: 600, height: 320)
+
+        // renderujemy do PNG
+        let renderer = ImageRenderer(content: card)
+        renderer.scale = 2.0
+
+        guard let uiImage = renderer.uiImage, let png = uiImage.pngData() else { return nil }
+
+        return ScoreSharePayload(imageData: png)
+    }
+    
     private func playSuccessSound() { AudioServicesPlaySystemSound(1022) }
 }

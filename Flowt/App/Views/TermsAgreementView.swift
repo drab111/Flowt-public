@@ -52,7 +52,10 @@ struct TermsAgreementView: View {
             VStack(alignment: .leading, spacing: 14) {
                 SectionHeader(title: "User Agreement", subtitle: "What you’re agreeing to")
                 
-                Button { showTerms = true } label: {
+                Button {
+                    showTerms = true
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                } label: {
                     OutlineActionButtonLabel(
                         title: "Terms of Service",
                         systemImage: "doc.text.fill",
@@ -65,7 +68,10 @@ struct TermsAgreementView: View {
                     .overlay(LinearGradient(colors: [.white.opacity(0.0), .white.opacity(0.25), .white.opacity(0.0)], startPoint: .leading, endPoint: .trailing))
                     .padding(.vertical, 2)
                 
-                Button { showPrivacy = true } label: {
+                Button {
+                    showPrivacy = true
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                } label: {
                     OutlineActionButtonLabel(
                         title: "Privacy Policy",
                         systemImage: "lock.fill",

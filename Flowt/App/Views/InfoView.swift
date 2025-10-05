@@ -79,9 +79,12 @@ struct InfoView: View {
                         infoVM.contactSupport()
                     }
                     ShareLink(
-                        item: URL(string: "https://apps.apple.com/app/flowt/id6753603068")!,
+                        items: [URL(string: "https://apps.apple.com/app/flowt/id6753603068?utm_source=share")!],
                         subject: Text("Flowt"),
-                        message: Text("Join me in Flowt!")
+                        message: Text("A calm, strategic arcade. Try it!"),
+                        preview: { (_: URL) in
+                            SharePreview("Flowt", image: Image("FlowtLogo"))
+                        }
                     ) { ActionCardChrome(title: "Share Flowt", icon: "square.and.arrow.up.fill", gradient: [.cyan, .teal]) }
                     .buttonStyle(.plain)
                 }
@@ -183,6 +186,7 @@ private struct ActionCard: View {
     var body: some View {
         Button(action: {
             Task {
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { pressed = true }
                 try? await Task.sleep(nanoseconds: 120_000_000)
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { pressed = false }

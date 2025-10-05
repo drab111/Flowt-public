@@ -50,6 +50,7 @@ extension GameScene {
         // Sprawdzamy czy kliknięto w przycisk linii i szukamy jej indeksu
         if let tappedButton = nodes(at: location).compactMap({ $0 as? SKShapeNode }).first, let index = colorButtons.firstIndex(of: tappedButton) {
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             currentLineIndex = index
             createColorButtons()
             isDrawing = false
@@ -104,6 +105,7 @@ extension GameScene {
         // Sprawdzenie czy nowa linia spełnia zasady gry aby móc ją zrealizować
         if let (startPort, endPort) = checkConnectionForSegment(points: pathPoints, line: currentLine) {
             AudioService.shared.playSFX(node: self, fileName: "successSound.wav")
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             currentLine.finalizeCurrentLine()
             currentLine.existingConnections.append((startPort, endPort))
             checkIfLoopClosed(line: currentLine)

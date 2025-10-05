@@ -130,7 +130,10 @@ struct ProfileView: View {
                         }
                         .accessibilityLabel("Change Avatar")
                     } else {
-                        Button { withAnimation { userProfileVM.avatarData = nil } } label: {
+                        Button { withAnimation {
+                            userProfileVM.avatarData = nil
+                            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                        } } label: {
                             Circle()
                                 .fill(Color.red.opacity(0.6))
                                 .frame(width: 40, height: 40)
@@ -273,7 +276,8 @@ struct ProfileView: View {
                                     .foregroundStyle(LinearGradient(colors: [.white, .cyan], startPoint: .top, endPoint: .bottom))
                                 }
                             }
-                            .padding(.horizontal, 14).padding(.vertical, 12)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 12)
                         }
                         .frame(height: 58)
                     }
@@ -307,6 +311,7 @@ struct ProfileView: View {
                     Toggle(isOn: Binding(
                         get: { userProfileVM.appState.currentUserProfile?.musicEnabled ?? true },
                         set: { newValue in
+                            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                             if var profile = userProfileVM.appState.currentUserProfile {
                                 profile.musicEnabled = newValue
                                 userProfileVM.appState.currentUserProfile = profile
@@ -325,6 +330,7 @@ struct ProfileView: View {
                     Toggle(isOn: Binding(
                         get: { userProfileVM.appState.currentUserProfile?.sfxEnabled ?? true },
                         set: { newValue in
+                            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                             if var profile = userProfileVM.appState.currentUserProfile {
                                 profile.sfxEnabled = newValue
                                 userProfileVM.appState.currentUserProfile = profile
@@ -347,6 +353,7 @@ struct ProfileView: View {
         VStack(spacing: 12) {
             Button(action: {
                 Task {
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { signOutButtonPressed = true }
                     try? await Task.sleep(nanoseconds: 150_000_000)
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { signOutButtonPressed = false }
@@ -364,6 +371,7 @@ struct ProfileView: View {
             
             Button(action: {
                 Task {
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { deleteButtonPressed = true }
                     try? await Task.sleep(nanoseconds: 150_000_000)
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { deleteButtonPressed = false }

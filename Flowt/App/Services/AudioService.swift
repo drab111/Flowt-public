@@ -85,4 +85,25 @@ final class AudioService: AudioServiceProtocol {
         guard sfxEnabled else { return }
         AudioServicesPlaySystemSound(id)
     }
+    
+    func playEndGameSound() async {
+        guard sfxEnabled, let url = Bundle.main.url(forResource: "explodeSound", withExtension: "wav") else { return }
+        stop()
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        
+        let item = AVPlayerItem(url: url)
+        let soundPlayer = AVPlayer(playerItem: item)
+        player = soundPlayer
+        soundPlayer.volume = 0.8
+        soundPlayer.play()
+        
+        // czekamy na powiadomienie o zakończeniu dźwięku
+        for await _ in NotificationCenter.default.notifications(named: .AVPlayerItemDidPlayToEndTime, object: item) {
+            break // pierwszy event wystarczy
+        }
+        player = nil
+        
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        start()
+    }
 }

@@ -123,6 +123,7 @@ struct SignInView: View {
         Button {
             resetEmail = viewModel.email
             showForgotPasswordSheet = true
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "questionmark.circle")
@@ -148,6 +149,7 @@ struct SignInView: View {
                 .font(.footnote)
             Button(viewModel.isRegistering ? "Sign In" : "Sign Up") {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { viewModel.toggleMode() }
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             }
             .font(.footnote)
             .fontWeight(.semibold)
@@ -171,7 +173,10 @@ struct SignInView: View {
             .keyboardType(.emailAddress)
 
             HStack {
-                Button("Cancel") { showForgotPasswordSheet = false }
+                Button("Cancel") {
+                    showForgotPasswordSheet = false
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                }
                 .foregroundColor(.red)
 
                 Spacer()
@@ -179,6 +184,7 @@ struct SignInView: View {
                 Button("Send Link") {
                     Task { if !resetEmail.isEmpty { await viewModel.resetPasswordWithEmail(resetEmail) } }
                     showForgotPasswordSheet = false
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
                 .disabled(resetEmail.isEmpty)
             }

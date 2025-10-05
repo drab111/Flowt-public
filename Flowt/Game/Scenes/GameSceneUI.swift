@@ -240,7 +240,7 @@ extension GameScene {
         
         invalidateTimers()
         showGameOverLabel(camera: camera)
-        AudioService.shared.playSystemSFX(id: 1254)
+        Task { await AudioService.shared.playEndGameSound() }
         
         let move = SKAction.move(to: port.position, duration: duration)
         let zoom = SKAction.scale(to: scale, duration: duration)

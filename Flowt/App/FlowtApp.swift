@@ -53,6 +53,7 @@ struct RootView: View {
                 selectedTab: selectedTab,
                 onTabChange: { newTab in
                     appState.currentScreen = .mainMenu(newTab)
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
             )
             .id(appState.currentUser?.uid) // jak zmieni się user (czyli jego uid) to tworzymy nową instancję aby nie pamiętała wcześniejszych danych

@@ -74,7 +74,10 @@ struct LeaderboardView: View {
                     }
                 }
                 Spacer()
-                Button { Task { await scoreVM.loadLeaderboard(limit: 50) } } label: {
+                Button {
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    Task { await scoreVM.loadLeaderboard(limit: 50) }
+                } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.clockwise")
                         Text("Refresh")

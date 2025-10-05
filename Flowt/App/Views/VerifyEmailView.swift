@@ -136,7 +136,9 @@ struct VerifyEmailView: View {
     private var signOutPanel: some View {
         Button(role: .destructive) { viewModel.signOut() } label: {
             Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                .font(.footnote.weight(.semibold))
+                .font(.footnote)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
                 .padding(.horizontal, 14).padding(.vertical, 10)
                 .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(.white.opacity(0.05)))
                 .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))

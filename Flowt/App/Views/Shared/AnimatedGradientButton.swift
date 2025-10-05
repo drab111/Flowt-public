@@ -20,6 +20,7 @@ struct AnimatedGradientButton: View {
     var body: some View {
         Button(action: {
             Task {
+                AudioService.shared.playSystemSFX(id: 1110)
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { pressed = true }
                 try? await Task.sleep(nanoseconds: 150_000_000)
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { pressed = false }
