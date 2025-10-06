@@ -9,14 +9,14 @@ import SwiftUI
 
 @MainActor
 final class MainMenuViewModel: ObservableObject {
-    @Published var authVM: AuthViewModel
-    @Published var profileVM: ProfileViewModel
-    @Published var gameVM: GameViewModel
-    @Published var scoreVM: ScoreViewModel
-    @Published var accountScoreVM: AccountScoreViewModel
-    @Published var tutorialVM: TutorialViewModel
-    @Published var infoVM: InfoViewModel
-    private var appState: AppState
+    let authVM: AuthViewModel
+    let profileVM: ProfileViewModel
+    let gameVM: GameViewModel
+    let scoreVM: ScoreViewModel
+    let accountScoreVM: AccountScoreViewModel
+    let tutorialVM: TutorialViewModel
+    let infoVM: InfoViewModel
+    private let appState: AppState
     
     init(appState: AppState) {
         self.appState = appState

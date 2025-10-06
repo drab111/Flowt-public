@@ -10,16 +10,14 @@ import FirebaseCore
 
 @main
 struct FlowtApp: App {
-    @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var appState = AppState()
-    @StateObject private var audioVM: AudioViewModel
+    @StateObject private var appState: AppState
     
     init() {
         FirebaseApp.configure()
         let appState = AppState()
-        // pzypisujemy obiekty do samego wrappera a nie zmiennej
+        // pzypisujemy obiekt do samego wrappera a nie zmiennej
         _appState = StateObject(wrappedValue: appState)
-        _audioVM = StateObject(wrappedValue: AudioViewModel(service: AudioService.shared))
+        _ = AudioService.shared // wywołujemy żeby zainicjalizował observer
     }
     
     var body: some Scene {

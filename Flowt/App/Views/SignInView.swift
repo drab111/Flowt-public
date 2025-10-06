@@ -9,16 +9,18 @@ import SwiftUI
 import AuthenticationServices
 
 struct SignInView: View {
+    enum Field: Hashable { case email, password, sheet }
+    
     @StateObject var viewModel: AuthViewModel
     @State private var showForgotPasswordSheet = false
     @State private var resetEmail: String = ""
-    @FocusState private var focusedField: Bool
+    @FocusState private var focusedField: Field?
     @AppStorage("hasAcceptedTerms") private var hasAccepted: Bool = false
     
     var body: some View {
         ZStack {
             BackgroundView(withLogo: false, hasBottomBar: false)
-                .onTapGesture { focusedField = false }
+                .onTapGesture { focusedField = nil }
                 .ignoresSafeArea()
             
             if !hasAccepted {
@@ -84,12 +86,12 @@ struct SignInView: View {
     private var formPanel: some View {
         EdgeLitContainer {
             VStack(spacing: 12) {
-                GlassField(systemIcon: "envelope", placeholder: "Email", text: $viewModel.email, isSecure: false, submitLabel: .next, focused: $focusedField, field: true, onSubmit: { focusedField = true })
+                GlassField(systemIcon: "envelope", placeholder: "Email", text: $viewModel.email, isSecure: false, submitLabel: .next, focused: $focusedField, field: .email, onSubmit: { focusedField = .password })
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.emailAddress)
 
-                GlassField(systemIcon: "lock", placeholder: "Password", text: $viewModel.password, isSecure: true, submitLabel: .go, focused: $focusedField, field: true, onSubmit: { Task { await viewModel.submit() } })
+                GlassField(systemIcon: "lock", placeholder: "Password", text: $viewModel.password, isSecure: true, submitLabel: .go, focused: $focusedField, field: .password, onSubmit: { Task { await viewModel.submit() } })
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
             }
@@ -163,8 +165,8 @@ struct SignInView: View {
                 .font(.headline)
                 .padding(.top, 12)
             
-            GlassField(systemIcon: "envelope", placeholder: "Enter your email", text: $resetEmail, isSecure: false, submitLabel: .go, focused: $focusedField, field: true, onSubmit: {
-                focusedField = false
+            GlassField(systemIcon: "envelope", placeholder: "Enter your email", text: $resetEmail, isSecure: false, submitLabel: .go, focused: $focusedField, field: .sheet, onSubmit: {
+                focusedField = nil
                 Task { await viewModel.resetPasswordWithEmail(resetEmail) }
                 showForgotPasswordSheet = false
             })

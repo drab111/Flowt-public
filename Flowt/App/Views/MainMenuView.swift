@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct MainMenuView: View {
-    @StateObject var mainMenuVM: MainMenuViewModel
-    
+    @ObservedObject var mainMenuVM: MainMenuViewModel
     let selectedTab: MainMenuTab
     let onTabChange: (MainMenuTab) -> Void
     
@@ -26,7 +25,7 @@ struct MainMenuView: View {
                     switch selectedTab {
                     case .profile: ProfileView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.profileVM, accountScoreVM: mainMenuVM.accountScoreVM)
                     case .tutorial: TutorialView(tutorialVM: mainMenuVM.tutorialVM, onTabChange: onTabChange)
-                    case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, accountScoreVM: mainMenuVM.accountScoreVM, onTabChange: onTabChange)
+                    case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, accountScoreVM: mainMenuVM.accountScoreVM)
                     case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
                     case .info: InfoView(infoVM: mainMenuVM.infoVM)
                     }

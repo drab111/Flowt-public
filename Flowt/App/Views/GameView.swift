@@ -12,7 +12,6 @@ struct GameView: View {
     @ObservedObject var gameVM: GameViewModel
     @ObservedObject var scoreVM: ScoreViewModel
     @ObservedObject var accountScoreVM: AccountScoreViewModel
-    let onTabChange: (MainMenuTab) -> Void
     
     @State private var sheen = false
     
@@ -326,10 +325,7 @@ private struct ToOneBar: View {
     GameView(
         gameVM: GameViewModel(),
         scoreVM: ScoreViewModel(appState: appState, scoreService: scoreService, profileService: ProfileService()),
-        accountScoreVM: AccountScoreViewModel(appState: appState, scoreService: scoreService),
-        onTabChange: { tab in
-            appState.currentScreen = .mainMenu(tab)
-        }
+        accountScoreVM: AccountScoreViewModel(appState: appState, scoreService: scoreService)
     )
     .environmentObject(appState)
 }

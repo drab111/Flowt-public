@@ -21,6 +21,7 @@ final class AudioService: AudioServiceProtocol {
     static let shared = AudioService()
     
     private var endObserver: Any?
+    private var preferencesObserver: Any?
     private var player: AVPlayer?
     private var trackNames = ["track1", "track2", "track3"]
     private var currentIndex = 0
@@ -29,9 +30,32 @@ final class AudioService: AudioServiceProtocol {
     var musicEnabled: Bool = true
     var sfxEnabled: Bool = true
     
-    private init() {}
+    private init() {
+        preferencesObserver = NotificationCenter.default.addObserver(forName: .userPreferencesChanged, object: nil, queue: .main) { [weak self] notification in
+            guard let profile = notification.object as? UserProfile else { return }
+            Task { @MainActor in
+                self?.applyPreferences(profile: profile)
+            }
+        }
+    }
     
-    deinit { if let endObserver { NotificationCenter.default.removeObserver(endObserver) } }
+    deinit {
+        if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
+        if let preferencesObserver { NotificationCenter.default.removeObserver(preferencesObserver) }
+    }
+    
+    // MARK: - Settings Observation
+    
+    private func applyPreferences(profile: UserProfile) {
+        sfxEnabled = profile.sfxEnabled
+        musicEnabled = profile.musicEnabled
+        
+        if profile.musicEnabled {
+            if !hasPlayer { start() }
+        } else {
+            if hasPlayer { stop() }
+        }
+    }
     
     // MARK: - Music
     
@@ -50,6 +74,11 @@ final class AudioService: AudioServiceProtocol {
             currentIndex = 0 // Jeśli dojdziemy do końca to zaczynamy od nowa
             playTrack(index: currentIndex)
             return
+        }
+        
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
+            self.endObserver = nil
         }
         
         guard let url = Bundle.main.url(forResource: trackNames[index], withExtension: "mp3") else { return }
@@ -103,7 +132,7 @@ final class AudioService: AudioServiceProtocol {
         }
         player = nil
         
-        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
         start()
     }
 }

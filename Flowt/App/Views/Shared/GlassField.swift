@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct GlassField: View {
+struct GlassField<Value: Hashable>: View {
     let systemIcon: String
     let placeholder: String
     @Binding var text: String
     var isSecure: Bool = false
     var submitLabel: SubmitLabel = .done
-    var focused: FocusState<Bool>.Binding
-    var field: Bool
+    var focused: FocusState<Value?>.Binding
+    var field: Value
     var onSubmit: (() -> Void)? = nil
 
     @FocusState private var isFocused: Bool
@@ -47,7 +47,7 @@ struct GlassField: View {
                 .fill(Color.white.opacity(0.06))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(isFocused ? Color.cyan : Color.white.opacity(0.08), lineWidth: 1.5)
+                        .stroke(focused.wrappedValue == field ? Color.cyan : Color.white.opacity(0.08), lineWidth: 1.5)
                 )
         )
         .contentShape(Rectangle())

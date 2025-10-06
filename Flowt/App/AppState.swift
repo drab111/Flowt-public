@@ -51,20 +51,14 @@ class AppState: ObservableObject {
     init() { checkUserSession() }
     
     func checkUserSession() {
-        Task {
-            if let user = Auth.auth().currentUser {
+        if let user = Auth.auth().currentUser {
+            Task {
                 do {
                     try await user.reload()
                     currentUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
-                    if user.isEmailVerified {
-                        currentScreen = .mainMenu(.profile)
-                    } else {
-                        currentScreen = .verifyEmail
-                    }
+                    currentScreen = user.isEmailVerified ? .mainMenu(.profile) : .verifyEmail
                 } catch { currentScreen = .signIn }
-            } else {
-                currentScreen = .signIn
             }
-        }
+        } else { currentScreen = .signIn }
     }
 }

@@ -27,7 +27,7 @@ struct ProfileView: View {
     @State private var activeAlert: ActiveAlert? = nil
     @State private var signOutButtonPressed = false
     @State private var deleteButtonPressed = false
-    @FocusState private var focusedField: Bool
+    @FocusState private var focusedField: Int?
     
     var body: some View {
         ZStack {
@@ -53,7 +53,7 @@ struct ProfileView: View {
             await userProfileVM.loadUserProfile()
             await accountScoreVM.loadUserStats()
         }
-        .onTapGesture { focusedField = false }
+        .onTapGesture { focusedField = nil }
         .alert(item: $activeAlert) { alertType in
             switch alertType {
             case .signOut:
@@ -156,8 +156,8 @@ struct ProfileView: View {
                     .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 3)
                 
                 // Text Field
-                GlassField(systemIcon: "pencil.and.outline", placeholder: "Enter new nickname", text: $userProfileVM.newNickname, isSecure: false, submitLabel: .done, focused: $focusedField, field: true, onSubmit: {
-                    focusedField = false
+                GlassField(systemIcon: "pencil.and.outline", placeholder: "Enter new nickname", text: $userProfileVM.newNickname, isSecure: false, submitLabel: .done, focused: $focusedField, field: 0, onSubmit: {
+                    focusedField = nil
                     Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
                 })
                 .textInputAutocapitalization(.never)
@@ -165,14 +165,6 @@ struct ProfileView: View {
                 .onChange(of: userProfileVM.newNickname) { _, newValue in
                     if newValue.count > 15 { userProfileVM.newNickname = String(newValue.prefix(15)) }
                 }
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color.white.opacity(0.06))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(focusedField ? Color.cyan : Color.white.opacity(0.08), lineWidth: 1.5)
-                        )
-                )
                 
                 // Save Buttons
                 Group {
@@ -180,7 +172,7 @@ struct ProfileView: View {
                     case .idle:
                         AnimatedGradientButton(title: "Save Changes", symbol: "checkmark.seal.fill", gradientColors: animatedGradientButtonColors) {
                             Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
-                            focusedField = false
+                            focusedField = nil
                         }
                         
                     case .saving:
