@@ -19,7 +19,6 @@ final class ScoreViewModel: ObservableObject {
         didSet { if leaderboard.contains(where: { $0.isLatest }) { playSuccessSound() } }
     }
     
-    
     private let appState: AppState
     private let scoreService: ScoreServiceProtocol
     private let profileService: ProfileServiceProtocol
@@ -92,7 +91,7 @@ final class ScoreViewModel: ObservableObject {
         let score = self.score ?? 0
         let rank = self.userRank
 
-        let card = ScoreShareCardView(score: score, rank: rank)
+        let card = ScoreShareCardView(score: score, rank: rank, nickname: appState.currentUserProfile?.nickname)
             .frame(width: 600, height: 320)
 
         // renderujemy do PNG

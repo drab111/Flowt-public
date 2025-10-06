@@ -23,7 +23,7 @@ extension UIImage {
         }
     }
     
-    func toBase64(maxSizeKB: Int = 50) -> String? {
+    func toBase64(maxSizeKB: Int = 40) -> String? {
         var quality: CGFloat = 0.8
         let minQuality: CGFloat = 0.1
         let maxBytes = maxSizeKB * 1024

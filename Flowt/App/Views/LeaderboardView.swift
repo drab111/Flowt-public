@@ -29,7 +29,7 @@ struct LeaderboardView: View {
                 .padding(.top, 18)
                 .padding(.bottom, 28)
             }
-            .refreshable { await scoreVM.loadLeaderboard(limit: 50) }
+            .refreshable { await scoreVM.loadLeaderboard(limit: 30) }
             
             // Loading
             if scoreVM.isLoading == true {
@@ -41,7 +41,7 @@ struct LeaderboardView: View {
                     .ignoresSafeArea()
             }
         }
-        .task { await scoreVM.loadLeaderboard(limit: 50) }
+        .task { await scoreVM.loadLeaderboard(limit: 30) }
         .onAppear {
             withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) { shimmer.toggle() }
         }
@@ -53,7 +53,7 @@ struct LeaderboardView: View {
         EdgeLitContainer {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
-                    SectionHeader(title: "Leaderboard", subtitle: "Global Top 50")
+                    SectionHeader(title: "Leaderboard", subtitle: "Global Top 30")
                     
                     Divider()
                         .overlay(LinearGradient(colors: [.white.opacity(0.0), .white.opacity(0.25), .white.opacity(0.0)], startPoint: .leading, endPoint: .trailing))
@@ -76,7 +76,7 @@ struct LeaderboardView: View {
                 Spacer()
                 Button {
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                    Task { await scoreVM.loadLeaderboard(limit: 50) }
+                    Task { await scoreVM.loadLeaderboard(limit: 30) }
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.clockwise")

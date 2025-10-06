@@ -24,13 +24,13 @@ extension GameScene {
             let popup = ConfirmExitPopup(size: self.size,
                 onConfirm: { [weak self] in
                     guard let self else { return }
-                AudioService.shared.playSystemSFX(id: 1110)
+                    AudioService.shared.playSystemSFX(id: 1110)
                     self.invalidateTimers()
                     self.gameVM.backToMenu()
                 },
                 onCancel: { [weak self] in
                     guard let self else { return }
-                AudioService.shared.playSystemSFX(id: 1110)
+                    AudioService.shared.playSystemSFX(id: 1110)
                     self.activePopup = nil
                 })
             
