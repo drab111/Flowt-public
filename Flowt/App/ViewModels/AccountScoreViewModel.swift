@@ -30,11 +30,13 @@ final class AccountScoreViewModel: ObservableObject {
         
         do {
             if let best = try await scoreService.fetchBestScore(userId: userId) {
-                self.bestScore = best.score
-                self.globalRank = try await scoreService.fetchRank(documentId: best.id!)
+                bestScore = best.score
+                if let bestId = best.id {
+                   globalRank = try await scoreService.fetchRank(documentId: bestId)
+                } else { globalRank = nil}
             } else {
-                self.bestScore = nil
-                self.globalRank = nil
+                bestScore = nil
+                globalRank = nil
             }
         } catch { errorMessage = error.localizedDescription }
     }

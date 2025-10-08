@@ -8,11 +8,11 @@
 import SwiftUI
 import FirebaseAuth
 
-enum Screen {
+enum Screen: Equatable {
     case loading, signIn, verifyEmail, mainMenu(MainMenuTab)
 }
 
-enum MainMenuTab: CaseIterable {
+enum MainMenuTab: CaseIterable, Equatable {
     case profile, tutorial, game, leaderboard, info
     
     var title: String {
@@ -55,10 +55,17 @@ class AppState: ObservableObject {
             Task {
                 do {
                     try await user.reload()
-                    currentUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
-                    currentScreen = user.isEmailVerified ? .mainMenu(.profile) : .verifyEmail
-                } catch { currentScreen = .signIn }
+                    let newUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
+                    if currentUser != newUser { currentUser = newUser }
+                    
+                    let newScreen: Screen = user.isEmailVerified ? .mainMenu(.profile) : .verifyEmail
+                    if currentScreen != newScreen { currentScreen = newScreen }
+                } catch {
+                    if currentScreen != .signIn { currentScreen = .signIn }
+                }
             }
-        } else { currentScreen = .signIn }
+        } else {
+            if currentScreen != .signIn { currentScreen = .signIn }
+        }
     }
 }

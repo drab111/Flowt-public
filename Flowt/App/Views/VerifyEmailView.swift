@@ -8,15 +8,9 @@
 import SwiftUI
 
 struct VerifyEmailView: View {
-    @StateObject var viewModel: VerifyEmailViewModel
+    @ObservedObject var verifyVM: VerifyEmailViewModel
     @Environment(\.openURL) private var openURL
-    
     @State private var tipsOpen = false
-    @State private var isResending = false
-    @State private var cooldownLeft = 0
-    private let cooldownSeconds = 30
-
-    private var canResend: Bool { !isResending && cooldownLeft == 0 }
 
     var body: some View {
         ZStack {
@@ -81,32 +75,15 @@ struct VerifyEmailView: View {
                         if let url = URL(string: "message://") { openURL(url) }
                     }
 
-                    ActionPill(title: resendTitle, system: "arrow.clockwise", disabled: !canResend) {
-                        Task {
-                            isResending = true
-                            defer { isResending = false }
-                            await viewModel.resendVerificationEmail()
-                            startCooldown()
-                        }
+                    ActionPill(title: "Resend email", system: "arrow.clockwise") {
+                        Task { await verifyVM.resendVerificationEmail() }
                     }
                 }
 
-                if cooldownLeft > 0 {
-                    Text("You can request another email in \(cooldownLeft)s.")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
-                }
-
-                if let error = viewModel.errorMessage {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        Text(error)
-                    }
-                    .font(.callout)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 2)
+                if let error = verifyVM.errorMessage {
+                    messageRow(system: "exclamationmark.triangle.fill", color: [.yellow, .orange], text: error)
+                } else if let info = verifyVM.infoMessage {
+                    messageRow(system: "checkmark.seal.fill", color: [.cyan, .teal], text: info)
                 }
             }
         }
@@ -134,7 +111,7 @@ struct VerifyEmailView: View {
     }
     
     private var signOutPanel: some View {
-        Button(role: .destructive) { viewModel.signOut() } label: {
+        Button(role: .destructive) { verifyVM.signOut() } label: {
             Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                 .font(.footnote)
                 .fontWeight(.semibold)
@@ -148,19 +125,17 @@ struct VerifyEmailView: View {
     }
 
     // MARK: - Helpers
-
-    private var resendTitle: String {
-        if isResending { return "Sending…" }
-        if cooldownLeft > 0 { return "Resend (\(cooldownLeft)s)" }
-        return "Resend email"
-    }
-
-    private func startCooldown() {
-        cooldownLeft = cooldownSeconds
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-            cooldownLeft = max(0, cooldownLeft - 1)
-            if cooldownLeft == 0 { timer.invalidate() }
+    
+    private func messageRow(system: String, color: [Color], text: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: system)
+                .foregroundStyle(LinearGradient(colors: color, startPoint: .topLeading, endPoint: .bottomTrailing))
+            Text(text)
         }
+        .font(.callout)
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 2)
     }
 }
 
@@ -169,14 +144,10 @@ struct VerifyEmailView: View {
 private struct ActionPill: View {
     let title: String
     let system: String
-    var disabled: Bool = false
     var action: () -> Void
 
     var body: some View {
-        Button {
-            guard !disabled else { return }
-            action()
-        } label: {
+        Button { action() } label: {
             HStack(spacing: 8) {
                 Image(systemName: system)
                     .font(.system(size: 14, weight: .bold))
@@ -187,13 +158,12 @@ private struct ActionPill: View {
             .foregroundStyle(.white)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.white.opacity(disabled ? 0.04 : 0.06))
+                    .fill(Color.white.opacity(0.05))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(disabled ? AnyShapeStyle(Color.white.opacity(0.12)) : AnyShapeStyle(LinearGradient(colors: [.cyan, .teal], startPoint: .leading, endPoint: .trailing)), lineWidth: 1)
+                    .stroke(LinearGradient(colors: [.cyan, .teal], startPoint: .leading, endPoint: .trailing), lineWidth: 1)
             )
-            .opacity(disabled ? 0.5 : 1.0)
         }
         .buttonStyle(.plain)
     }
@@ -218,6 +188,6 @@ private struct BulletRow: View {
 #Preview {
     let appState = AppState()
     let viewModel = VerifyEmailViewModel(appState: appState, authService: AuthService())
-    VerifyEmailView(viewModel: viewModel)
+    VerifyEmailView(verifyVM: viewModel)
         .environmentObject(appState)
 }

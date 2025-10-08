@@ -11,7 +11,7 @@ import AuthenticationServices
 struct SignInView: View {
     enum Field: Hashable { case email, password, sheet }
     
-    @StateObject var viewModel: AuthViewModel
+    @ObservedObject var authVM: AuthViewModel
     @State private var showForgotPasswordSheet = false
     @State private var resetEmail: String = ""
     @FocusState private var focusedField: Field?
@@ -34,13 +34,14 @@ struct SignInView: View {
                     actionsPanel
                     forgotPasswordRow
                     modeSwitcher
-                    if let error = viewModel.errorMessage { errorBanner(error) }
+                    if let error = authVM.errorMessage { banner(message: error, colors: [.yellow, .orange], symbol: "exclamationmark.triangle.fill") }
+                    else if let info = authVM.infoMessage { banner(message: info, colors: [.cyan, .teal], symbol: "checkmark.seal.fill") }
                     Spacer(minLength: 20)
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 30)
                 
-                if viewModel.isLoading {
+                if authVM.isLoading {
                     Color.black.opacity(0.4)
                         .ignoresSafeArea()
                     ProgressView("Signing in...")
@@ -60,8 +61,8 @@ struct SignInView: View {
             HStack(spacing: 14) {
                 VStack(alignment: .leading, spacing: 6) {
                     SectionHeader(
-                        title: viewModel.isRegistering ? "Create Account" : "Welcome Back",
-                        subtitle: viewModel.isRegistering ? "Sync scores & compete" : "Sign in to continue"
+                        title: authVM.isRegistering ? "Create Account" : "Welcome Back",
+                        subtitle: authVM.isRegistering ? "Sync scores & compete" : "Sign in to continue"
                     )
                 }
                 Spacer()
@@ -86,12 +87,12 @@ struct SignInView: View {
     private var formPanel: some View {
         EdgeLitContainer {
             VStack(spacing: 12) {
-                GlassField(systemIcon: "envelope", placeholder: "Email", text: $viewModel.email, isSecure: false, submitLabel: .next, focused: $focusedField, field: .email, onSubmit: { focusedField = .password })
+                GlassField(systemIcon: "envelope", placeholder: "Email", text: $authVM.email, isSecure: false, submitLabel: .next, focused: $focusedField, field: .email, onSubmit: { focusedField = .password })
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.emailAddress)
 
-                GlassField(systemIcon: "lock", placeholder: "Password", text: $viewModel.password, isSecure: true, submitLabel: .go, focused: $focusedField, field: .password, onSubmit: { Task { await viewModel.submit() } })
+                GlassField(systemIcon: "lock", placeholder: "Password", text: $authVM.password, isSecure: true, submitLabel: .go, focused: $focusedField, field: .password, onSubmit: { Task { await authVM.submit() } })
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
             }
@@ -101,15 +102,15 @@ struct SignInView: View {
     private var actionsPanel: some View {
         VStack(spacing: 12) {
             AnimatedGradientButton(
-                title: viewModel.isRegistering ? "Sign Up" : "Sign In",
-                symbol: viewModel.isRegistering ? "person.badge.plus" : "arrow.right.circle.fill",
+                title: authVM.isRegistering ? "Sign Up" : "Sign In",
+                symbol: authVM.isRegistering ? "person.badge.plus" : "arrow.right.circle.fill",
                 gradientColors: animatedGradientButtonColors
-            ) { Task { await viewModel.submit() } }
+            ) { Task { await authVM.submit() } }
             .frame(height: 52)
-            .disabled(!viewModel.canSubmit)
-            .opacity(viewModel.canSubmit ? 1 : 0.5)
+            .disabled(!authVM.canSubmit)
+            .opacity(authVM.canSubmit ? 1 : 0.5)
             
-            SignInWithAppleButton(onRequest: viewModel.handleAppleRequest, onCompletion: viewModel.handleAppleCompletion)
+            SignInWithAppleButton(onRequest: authVM.handleAppleRequest, onCompletion: authVM.handleAppleCompletion)
             .signInWithAppleButtonStyle(.black)
             .frame(height: 50)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -123,7 +124,7 @@ struct SignInView: View {
     
     private var forgotPasswordRow: some View {
         Button {
-            resetEmail = viewModel.email
+            resetEmail = authVM.email
             showForgotPasswordSheet = true
             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         } label: {
@@ -146,11 +147,11 @@ struct SignInView: View {
     
     private var modeSwitcher: some View {
         HStack(spacing: 8) {
-            Text(viewModel.isRegistering ? "Already have an account?" : "Don’t have an account?")
+            Text(authVM.isRegistering ? "Already have an account?" : "Don’t have an account?")
                 .foregroundStyle(.white.opacity(0.8))
                 .font(.footnote)
-            Button(viewModel.isRegistering ? "Sign In" : "Sign Up") {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { viewModel.toggleMode() }
+            Button(authVM.isRegistering ? "Sign In" : "Sign Up") {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { authVM.toggleMode() }
                 UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             }
             .font(.footnote)
@@ -167,7 +168,7 @@ struct SignInView: View {
             
             GlassField(systemIcon: "envelope", placeholder: "Enter your email", text: $resetEmail, isSecure: false, submitLabel: .go, focused: $focusedField, field: .sheet, onSubmit: {
                 focusedField = nil
-                Task { await viewModel.resetPasswordWithEmail(resetEmail) }
+                Task { await authVM.resetPasswordWithEmail(resetEmail) }
                 showForgotPasswordSheet = false
             })
             .textInputAutocapitalization(.never)
@@ -184,7 +185,7 @@ struct SignInView: View {
                 Spacer()
 
                 Button("Send Link") {
-                    Task { if !resetEmail.isEmpty { await viewModel.resetPasswordWithEmail(resetEmail) } }
+                    Task { if !resetEmail.isEmpty { await authVM.resetPasswordWithEmail(resetEmail) } }
                     showForgotPasswordSheet = false
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
@@ -200,10 +201,10 @@ struct SignInView: View {
     }
     
     @ViewBuilder
-    private func errorBanner(_ message: String) -> some View {
+    private func banner(message: String, colors: [Color], symbol: String) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
+            Image(systemName: symbol)
+                .foregroundStyle(LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing))
                 .font(.system(size: 14, weight: .bold))
             Text(message)
                 .font(.callout)
@@ -220,6 +221,6 @@ struct SignInView: View {
 #Preview {
     let appState = AppState()
     let viewModel = AuthViewModel(appState: appState, authService: AuthService())
-    SignInView(viewModel: viewModel)
+    SignInView(authVM: viewModel)
         .environmentObject(appState)
 }

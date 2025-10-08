@@ -15,6 +15,7 @@ final class AuthViewModel: ObservableObject {
     @Published var isRegistering: Bool = false
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var infoMessage: String?
     
     private var appState: AppState
     private let authService: AuthServiceProtocol
@@ -94,7 +95,7 @@ final class AuthViewModel: ObservableObject {
         guard !email.isEmpty else { return }
         do {
             try await authService.sendPasswordReset(email: email)
-            errorMessage = "Password reset link sent to \(email)."
+            infoMessage = "Password reset link sent to \(email)."
         } catch { errorMessage = error.localizedDescription }
     }
     
@@ -122,6 +123,7 @@ final class AuthViewModel: ObservableObject {
         withAnimation(.spring()) {
             isRegistering.toggle()
             errorMessage = nil
+            infoMessage = nil
         }
     }
 }

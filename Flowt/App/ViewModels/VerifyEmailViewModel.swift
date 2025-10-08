@@ -10,10 +10,11 @@ import SwiftUI
 @MainActor
 final class VerifyEmailViewModel: ObservableObject {
     @Published var errorMessage: String?
+    @Published var infoMessage: String?
     
     private var appState: AppState
     private let authService: AuthServiceProtocol
-    private var timer: Timer?
+    private var sessionTimer: Timer?
     
     init(appState: AppState, authService: AuthServiceProtocol) {
         self.appState = appState
@@ -21,16 +22,20 @@ final class VerifyEmailViewModel: ObservableObject {
         startAutoCheck()
     }
     
-    deinit { timer?.invalidate() }
+    deinit { sessionTimer?.invalidate() }
     
     func resendVerificationEmail() async {
         do {
             try await authService.sendVerificationEmail()
-            errorMessage = "A verification email has been sent."
+            infoMessage = "A verification email has been sent."
         } catch { errorMessage = error.localizedDescription }
+        
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(5))
+            self.errorMessage = nil
+            self.infoMessage = nil
+        }
     }
-    
-    func refreshSession() { appState.checkUserSession() }
     
     func signOut() {
         do {
@@ -42,7 +47,7 @@ final class VerifyEmailViewModel: ObservableObject {
     }
     
     private func startAutoCheck() {
-        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+        sessionTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.appState.checkUserSession()
             }
