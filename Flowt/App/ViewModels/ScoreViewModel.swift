@@ -23,6 +23,7 @@ final class ScoreViewModel: ObservableObject {
     private let scoreService: ScoreServiceProtocol
     private let profileService: ProfileServiceProtocol
     private var hasSaved: Bool = false
+    private var profileCache: [String: UserProfile] = [:]
     
     init(appState: AppState, scoreService: ScoreServiceProtocol, profileService: ProfileServiceProtocol) {
         self.appState = appState
@@ -37,6 +38,7 @@ final class ScoreViewModel: ObservableObject {
         userRank = nil
         errorMessage = nil
         hasSaved = false
+        profileCache = [:]
     }
     
     func setScore(_ score: Int) { self.score = score }
@@ -44,47 +46,64 @@ final class ScoreViewModel: ObservableObject {
     func saveAndLoadLeaderboard(limit: Int) async {
         isLoading = true
         defer { isLoading = false }
-        
         guard !hasSaved, let userId = appState.currentUser?.uid, let score = score else { return }
         hasSaved = true
         
-        let entry = ScoreEntry(id: nil, userId: userId, score: score)
+        let entry = ScoreEntry(id: nil, userId: userId, score: score, createdAt: nil)
         
         do {
             let documentId = try await scoreService.saveScore(entry)
             latestScoreId = documentId
             
-            let rawScores = try await scoreService.fetchTopScores(limit: limit)
-            var results: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = []
-            for score in rawScores { // wyciągamy usera do którego należy wynik
-                let profile = try await profileService.fetchProfile(uid: score.userId)
-                let isCurrent = (score.userId == userId)
-                let isLatest = (score.id == latestScoreId)
-                results.append((entry: score, profile: profile, isCurrentUser: isCurrent, isLatest: isLatest))
-            }
-            leaderboard = results
-            
-            userRank = try await scoreService.fetchRank(documentId: documentId)
+            guard let saved = try await scoreService.fetchScore(id: documentId), let createdAt = saved.createdAt else {
+                 // jeśli brak stempla to próbujemy jeszcze raz po chwili
+                 try? await Task.sleep(nanoseconds: 200_000_000)
+                 if let retry = try await scoreService.fetchScore(id: documentId), let createdAtRetry = retry.createdAt {
+                     userRank = try await scoreService.fetchRank(score: retry.score, createdAt: createdAtRetry)
+                 }
+                 try await loadLeaderboardInternal(limit: limit, highlightLatestId: documentId)
+                 return
+             }
+             userRank = try await scoreService.fetchRank(score: saved.score, createdAt: createdAt)
+             try await loadLeaderboardInternal(limit: limit, highlightLatestId: documentId)
         } catch { errorMessage = error.localizedDescription }
     }
     
     func loadLeaderboard(limit: Int) async {
         isLoading = true
         defer { isLoading = false }
-        
         reset()
-        guard let userId = appState.currentUser?.uid else { return }
-        
         do {
-            let rawScores = try await scoreService.fetchTopScores(limit: limit)
-            var results: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = []
-            for score in rawScores {
-                let profile = try await profileService.fetchProfile(uid: score.userId)
-                let isCurrent = (score.userId == userId)
-                results.append((entry: score, profile: profile, isCurrentUser: isCurrent, isLatest: false))
-            }
-            leaderboard = results
+            try await loadLeaderboardInternal(limit: limit, highlightLatestId: nil)
         } catch { errorMessage = error.localizedDescription }
+    }
+    
+    private func loadLeaderboardInternal(limit: Int, highlightLatestId: String?) async throws {
+        guard let userId = appState.currentUser?.uid else { return }
+        let rawScores = try await scoreService.fetchTopScores(limit: limit)
+
+        // Równoległe pobieranie profili + prosty cache, aby nie powielać odczytów
+        let uniqueUserIds = Array(Set(rawScores.map { $0.userId }))
+        try await withThrowingTaskGroup(of: (String, UserProfile?).self) { group in
+            for uid in uniqueUserIds where profileCache[uid] == nil {
+                group.addTask { [profileService] in
+                    let profile = try? await profileService.fetchProfile(uid: uid)
+                    return (uid, profile)
+                }
+            }
+            for try await (uid, profile) in group {
+                if let profile { profileCache[uid] = profile }
+            }
+        }
+
+        let mapped = rawScores.map { scoreEntry in
+            let profile = profileCache[scoreEntry.userId] ?? nil
+            let isCurrent = (scoreEntry.userId == userId)
+            let isLatest  = (scoreEntry.id == highlightLatestId)
+            return (entry: scoreEntry, profile: profile, isCurrentUser: isCurrent, isLatest: isLatest)
+        }
+
+        leaderboard = mapped
     }
     
     func makeSharePayload() -> ScoreSharePayload? {

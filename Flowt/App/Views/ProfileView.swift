@@ -69,9 +69,9 @@ struct ProfileView: View {
                     message: Text("This will permanently remove your account and all associated data. This action cannot be undone."),
                     primaryButton: .destructive(Text("Delete Account")) {
                         Task {
+                            await accountScoreVM.deleteUserScores()
                             await userProfileVM.deleteProfile()
                             await authVM.deleteUserAccount()
-                            await accountScoreVM.deleteUserScores()
                         }
                     },
                     secondaryButton: .cancel(Text("Cancel"))

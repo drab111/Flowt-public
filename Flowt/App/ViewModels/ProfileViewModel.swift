@@ -68,7 +68,7 @@ final class ProfileViewModel: ObservableObject {
                 // Odrzucenie zapisu w przypadku niestosowności
                 if !isSafe {
                     saveState = .rejected
-                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
                     if !Task.isCancelled { saveState = .idle }
                     return
                 }
@@ -95,8 +95,8 @@ final class ProfileViewModel: ObservableObject {
             
             // sukces
             saveState = .saved
-            // automatyczny powrót do "idle" po 1.5 sekundy
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            // automatyczny powrót do "idle" po 5 sekundach
+            try? await Task.sleep(nanoseconds: 5_000_000_000)
             if !Task.isCancelled { saveState = .idle }
         } catch {
             errorMessage = error.localizedDescription

@@ -29,11 +29,9 @@ final class AccountScoreViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            if let best = try await scoreService.fetchBestScore(userId: userId) {
+            if let best = try await scoreService.fetchBestScore(userId: userId), let createdAt = best.createdAt {
                 bestScore = best.score
-                if let bestId = best.id {
-                   globalRank = try await scoreService.fetchRank(documentId: bestId)
-                } else { globalRank = nil}
+                globalRank = try await scoreService.fetchRank(score: best.score, createdAt: createdAt)
             } else {
                 bestScore = nil
                 globalRank = nil

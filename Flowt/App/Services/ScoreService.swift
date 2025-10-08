@@ -10,8 +10,9 @@ import FirebaseFirestore
 protocol ScoreServiceProtocol {
     func saveScore(_ entry: ScoreEntry) async throws -> String
     func fetchTopScores(limit: Int) async throws -> [ScoreEntry]
-    func fetchRank(documentId: String) async throws -> Int?
+    func fetchRank(score: Int, createdAt: Date) async throws -> Int
     func fetchBestScore(userId: String) async throws -> ScoreEntry?
+    func fetchScore(id: String) async throws -> ScoreEntry?
     func deleteScores(userId: String) async throws
 }
 
@@ -21,7 +22,8 @@ final class ScoreService: ScoreServiceProtocol {
     func saveScore(_ entry: ScoreEntry) async throws -> String {
         let data: [String: Any] = [
             "userId": entry.userId,
-            "score": entry.score
+            "score": entry.score,
+            "createdAt": FieldValue.serverTimestamp()
         ]
         
         let ref = try await db.collection("scores").addDocument(data: data)
@@ -31,6 +33,7 @@ final class ScoreService: ScoreServiceProtocol {
     func fetchTopScores(limit: Int) async throws -> [ScoreEntry] {
         let snapshot = try await db.collection("scores")
             .order(by: "score", descending: true)
+            .order(by: "createdAt", descending: false)
             .limit(to: limit)
             .getDocuments()
         
@@ -38,24 +41,37 @@ final class ScoreService: ScoreServiceProtocol {
             ScoreEntry(
                 id: doc.documentID,
                 userId: doc["userId"] as? String ?? "",
-                score: doc["score"] as? Int ?? 0
+                score: doc["score"] as? Int ?? 0,
+                createdAt: (doc["createdAt"] as? Timestamp)?.dateValue()
             )
         }
     }
     
-    func fetchRank(documentId: String) async throws -> Int? {
-        let snapshot = try await db.collection("scores")
-            .order(by: "score", descending: true)
-            .getDocuments()
-        
-        if let index = snapshot.documents.firstIndex(where: { $0.documentID == documentId }) { return index + 1 }
-        return nil
+    func fetchRank(score: Int, createdAt: Date) async throws -> Int {
+        // konwersja Date -> Timestamp dla zapytania
+        let ts = Timestamp(date: createdAt)
+
+        // ile osób ma wyższy wynik
+        let greaterQ = db.collection("scores")
+            .whereField("score", isGreaterThan: score)
+        let greaterAgg = try await greaterQ.count.getAggregation(source: .server)
+        let greater = greaterAgg.count.intValue
+
+        // ile osób ma ten sam wynik ale wcześniejszy czas
+        let tieQ = db.collection("scores")
+            .whereField("score", isEqualTo: score)
+            .whereField("createdAt", isLessThan: ts)
+        let tieAgg = try await tieQ.count.getAggregation(source: .server)
+        let ties = tieAgg.count.intValue
+
+        return greater + ties + 1
     }
     
     func fetchBestScore(userId: String) async throws -> ScoreEntry? {
         let snapshot = try await db.collection("scores")
             .whereField("userId", isEqualTo: userId)
             .order(by: "score", descending: true)
+            .order(by: "createdAt", descending: false)
             .limit(to: 1)
             .getDocuments()
         
@@ -63,7 +79,19 @@ final class ScoreService: ScoreServiceProtocol {
         return ScoreEntry(
             id: doc.documentID,
             userId: doc["userId"] as? String ?? "",
-            score: doc["score"] as? Int ?? 0
+            score: doc["score"] as? Int ?? 0,
+            createdAt: (doc["createdAt"] as? Timestamp)?.dateValue()
+        )
+    }
+    
+    func fetchScore(id: String) async throws -> ScoreEntry? {
+        let doc = try await db.collection("scores").document(id).getDocument()
+        guard let data = doc.data() else { return nil }
+        return ScoreEntry(
+            id: doc.documentID,
+            userId: data["userId"] as? String ?? "",
+            score: data["score"] as? Int ?? 0,
+            createdAt: (data["createdAt"] as? Timestamp)?.dateValue()
         )
     }
     
