@@ -23,6 +23,7 @@ class GameScene: SKScene {
     var colorButtons: [SKShapeNode] = []
     var score: Int = 0 { didSet { scoreLabel.score = score } }
     var storm: Storm?
+    var additionalStorm: Storm?
     var ocean: Ocean?
     var islands: [Island] = []
     var activePopup: SKNode?
@@ -40,6 +41,7 @@ class GameScene: SKScene {
         static let spawnPort = "SpawnPortAction"
         static let spawnCargo = "SpawnCargoAction"
         static let spawnStorm = "SpawnStormAction"
+        static let spawnAdditionalStorm = "SpawnAdditionalStormAction"
         static let upgrade = "UpgradeAction"
     }
     

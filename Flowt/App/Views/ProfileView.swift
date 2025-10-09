@@ -98,6 +98,7 @@ struct ProfileView: View {
                         if let data = userProfileVM.avatarData, let image = UIImage(data: data) {
                             Image(uiImage: image)
                                 .resizable()
+                                .accessibilityLabel("Avatar of \(userProfileVM.currentNickname)")
                         } else {
                             Image("FlowtLogo")
                                 .resizable()
@@ -128,7 +129,8 @@ struct ProfileView: View {
                                 }
                             }
                         }
-                        .accessibilityLabel("Change Avatar")
+                        .accessibilityLabel("Change avatar")
+                        .accessibilityHint("Opens photo picker.")
                     } else {
                         Button { withAnimation {
                             userProfileVM.avatarData = nil
@@ -145,7 +147,7 @@ struct ProfileView: View {
                                 .shadow(color: Color.red.opacity(0.6), radius: 6, x: 0, y: 2)
                                 .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
                         }
-                        .accessibilityLabel("Remove Avatar")
+                        .accessibilityLabel("Remove avatar")
                     }
                 }
                 
@@ -290,6 +292,7 @@ struct ProfileView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
     }

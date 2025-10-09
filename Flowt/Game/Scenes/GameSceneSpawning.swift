@@ -61,6 +61,22 @@ extension GameScene {
         AudioService.shared.playSFX(node: self, fileName: "stormSound.wav")
     }
     
+    func spawnAdditionalStorm() {
+        additionalStorm?.removeFromParent()
+        additionalStorm = nil
+
+        let randomX = CGFloat.random(in: GameConfig.stormMargin...(size.width - GameConfig.stormMargin))
+        let randomY = CGFloat.random(in: GameConfig.stormMargin...(size.height - GameConfig.stormMargin))
+        let position = CGPoint(x: randomX, y: randomY)
+        let radius: CGFloat = GameConfig.stormRadius
+
+        let stormNode = Storm(position: position, radius: radius)
+        addChild(stormNode)
+        additionalStorm = stormNode
+        AudioService.shared.playSFX(node: self, fileName: "stormSound.wav")
+    }
+
+    
     // MARK: - Collision helpers
     private func isTooCloseToAnyPort(_ pos: CGPoint, minDistance: CGFloat) -> Bool {
         for port in ports {

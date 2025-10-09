@@ -214,6 +214,7 @@ private struct ResultRowCard: View {
             
             HStack(spacing: 12) {
                 RankBadge(rank: index)
+                    .accessibilityLabel("Rank \(index)")
                 
                 AvatarCircle(base64: profile?.avatarBase64, fallback: "FlowtLogo", size: 42)
                     .overlay(Circle().stroke(Color.white.opacity(0.55), lineWidth: 1))
@@ -243,6 +244,7 @@ private struct ResultRowCard: View {
                 .opacity(0.14)
                 .padding(.trailing, 8)
                 .padding(.bottom, 6)
+                .accessibilityHidden(true)
         }
     }
     

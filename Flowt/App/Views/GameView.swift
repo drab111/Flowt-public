@@ -72,6 +72,7 @@ struct GameView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -93,7 +94,9 @@ struct GameView: View {
                     // prawa kolumna
                     VStack(spacing: 10) {
                         StatChip(icon: "crown.fill", title: "Your Best Rank", value: rankText, style: .gold)
+                            .accessibilityLabel("Your best rank")
                         StatChip(icon: "trophy.fill", title: "Global #1", value: topScoreText, style: .cyan)
+                            .accessibilityLabel("Global number 1")
                         
                         ToOneBar(progress: progress, userBest: userBest, top: top)
                             .frame(height: 28)
@@ -106,6 +109,7 @@ struct GameView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
     }

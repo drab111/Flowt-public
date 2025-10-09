@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InfoView: View {
     @ObservedObject var infoVM: InfoViewModel
+    @Environment(\.openURL) private var openURL
     @State private var sheen = false
     @State private var showTerms = false
     @State private var showPrivacy = false
@@ -76,7 +77,7 @@ struct InfoView: View {
                         showTerms = true
                     }
                     ActionCard(title: "Contact Support", icon: "envelope.fill", gradient: [.cyan, .teal]) {
-                        infoVM.contactSupport()
+                        if let url = URL(string: "mailto:flowt.apps@gmail.com") { openURL(url) }
                     }
                     ShareLink(
                         items: [URL(string: "https://apps.apple.com/app/flowt/id6753603068?utm_source=share")!],
@@ -94,6 +95,7 @@ struct InfoView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
         .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL) }
@@ -143,6 +145,7 @@ struct InfoView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
     }

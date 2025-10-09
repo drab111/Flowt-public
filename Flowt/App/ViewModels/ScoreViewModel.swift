@@ -5,7 +5,6 @@
 //  Created by Wiktor Drab on 24/09/2025.
 //
 
-import AudioToolbox
 import SwiftUI
 
 @MainActor
@@ -122,5 +121,5 @@ final class ScoreViewModel: ObservableObject {
         return ScoreSharePayload(imageData: png)
     }
     
-    private func playSuccessSound() { AudioServicesPlaySystemSound(1022) }
+    private func playSuccessSound() { AudioService.shared.playSystemSFX(id: 1022) }
 }

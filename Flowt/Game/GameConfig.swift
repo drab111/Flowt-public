@@ -12,6 +12,7 @@ enum GameConfig {
     static let spawnPortInterval: TimeInterval = 30.0
     static let spawnCargoInterval: TimeInterval = 2.5 // Tylko początkowo
     static let spawnStormInterval: TimeInterval = 38.7
+    static let spawnAdditionalStormInterval: TimeInterval = 42.9
     static let upgradePopupInterval: TimeInterval = 100.0
     
     // Logika rozgrywki
@@ -27,6 +28,7 @@ enum GameConfig {
     static let minDistanceToPort: CGFloat = 50
     static let minDistanceToIsland: CGFloat = 52
     static let minDistanceToButton: CGFloat = 45
+    static let PointsToSpawnAdditionalStorm: Int = 300
     
     // Cargo
     static let cargoSize = CGSize(width: 15, height: 15)

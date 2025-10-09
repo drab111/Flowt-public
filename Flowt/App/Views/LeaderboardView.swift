@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LeaderboardView: View {
     @ObservedObject var scoreVM: ScoreViewModel
-    @State private var shimmer = false
     
     var body: some View {
         ZStack {
@@ -29,7 +28,10 @@ struct LeaderboardView: View {
                 .padding(.top, 18)
                 .padding(.bottom, 28)
             }
-            .refreshable { await scoreVM.loadLeaderboard(limit: 30) }
+            .refreshable {
+                await scoreVM.loadLeaderboard(limit: 30)
+                scoreVM.errorMessage = nil
+            }
             
             // Loading
             if scoreVM.isLoading == true {
@@ -42,9 +44,6 @@ struct LeaderboardView: View {
             }
         }
         .task { await scoreVM.loadLeaderboard(limit: 30) }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) { shimmer.toggle() }
-        }
     }
     
     // MARK: - Panels
@@ -95,6 +94,8 @@ struct LeaderboardView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Refresh leaderboard")
+                .accessibilityHint("Reloads the top 30 scores.")
             }
         }
     }
@@ -175,9 +176,9 @@ private struct PodiumView: View {
     let items: [(entry: ScoreEntry, profile: UserProfile?)]
     
     var body: some View {
-        let first = items.indices.contains(0) ? items[0] : nil
-        let second = items.indices.contains(1) ? items[1] : nil
-        let third = items.indices.contains(2) ? items[2] : nil
+        let first = items.first
+        let second = items.dropFirst().first
+        let third = items.dropFirst(2).first
         
         VStack(spacing: 16) {
             HStack(alignment: .bottom, spacing: 14) {
@@ -327,6 +328,7 @@ private struct LeaderboardRowCard: View {
             
             HStack(spacing: 12) {
                 RankBadge(rank: index)
+                    .accessibilityLabel("Rank \(index)")
                 
                 AvatarCircle(base64: profile?.avatarBase64, fallback: "FlowtLogo", size: 42)
                     .overlay(Circle().stroke(Color.white.opacity(0.55), lineWidth: 1))
@@ -364,6 +366,7 @@ private struct LeaderboardRowCard: View {
                 .opacity(0.14)
                 .padding(.trailing, 8)
                 .padding(.bottom, 6)
+                .accessibilityHidden(true)
         }
     }
     

@@ -24,6 +24,7 @@ struct LoadingView: View {
                         .frame(width: 170, height: 170)
                         .blur(radius: 16)
                         .opacity(appear ? 1 : 0)
+                        .accessibilityHidden(true)
 
                     // logo
                     Image("FlowtLogo")
@@ -56,6 +57,7 @@ struct LoadingView: View {
                         )
                         .scaleEffect(pulse ? 1.01 : 1.0)
                         .animation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true), value: pulse)
+                        .accessibilityLabel("Flowt")
                 }
 
                 Text("Flowt")
@@ -66,6 +68,7 @@ struct LoadingView: View {
                     .opacity(appear ? 1 : 0)
                     .offset(y: appear ? 0 : 10)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.05), value: appear)
+                    .accessibilityHidden(true)
 
                 Text("Loading…")
                     .font(.footnote)
@@ -73,6 +76,7 @@ struct LoadingView: View {
                     .foregroundStyle(.white.opacity(0.75))
                     .opacity(pulse ? 0.95 : 0.35)
                     .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: pulse)
+                    .accessibilityHidden(true)
             }
             .padding(.horizontal, 24)
         }

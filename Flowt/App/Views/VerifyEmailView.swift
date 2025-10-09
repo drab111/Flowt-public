@@ -55,6 +55,7 @@ struct VerifyEmailView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -74,10 +75,14 @@ struct VerifyEmailView: View {
                     ActionPill(title: "Open Mail", system: "envelope.open.fill") {
                         if let url = URL(string: "message://") { openURL(url) }
                     }
+                    .accessibilityLabel("Open Mail")
+                    .accessibilityHint("Opens the Mail app to find the verification email.")
 
                     ActionPill(title: "Resend email", system: "arrow.clockwise") {
                         Task { await verifyVM.resendVerificationEmail() }
                     }
+                    .accessibilityLabel("Resend verification email")
+                    .accessibilityHint("Sends a new verification link to your email address.")
                 }
 
                 if let error = verifyVM.errorMessage {

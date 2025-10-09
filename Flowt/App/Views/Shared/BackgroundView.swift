@@ -47,15 +47,18 @@ struct BackgroundView: View {
                     .opacity(0.6)
                     .blendMode(.screen)
                     .offset(x: parallaxX * 0.5, y: parallaxY * 0.5)
+                    .accessibilityHidden(true)
                 
                 // subtle sea network lines with flowing dash
                 SeaCanvas()
                     .opacity(0.18)
                     .offset(x: parallaxX * 0.3, y: parallaxY * 0.3)
+                    .accessibilityHidden(true)
                 
                 // animated waves (respect bottom bar offset)
                 WavesLayer(hasBottomBar: hasBottomBar, reduceMotion: reduceMotion)
                     .offset(x: parallaxX * 0.2, y: parallaxY * 0.2)
+                    .accessibilityHidden(true)
                 
                 // logo watermark
                 if withLogo {
@@ -64,10 +67,12 @@ struct BackgroundView: View {
                         .offset(y: -size.height * (hasBottomBar ? 0.04 : 0.02))
                         .offset(x: parallaxX * 0.1, y: parallaxY * 0.1)
                         .allowsHitTesting(false)
+                        .accessibilityHidden(true)
                 }
             }
             .contentShape(Rectangle())
-            .modifier(ParallaxGesture(enabled: enableParallax))
+            .modifier(ParallaxGesture(enabled: enableParallax, x: $parallaxX, y: $parallaxY))
+            .onDisappear { parallaxX = 0; parallaxY = 0 }
         }
     }
 }
@@ -96,10 +101,9 @@ private struct WavesLayer: View {
                 }
                 .onAppear {
                     guard !reduceMotion else { return }
-                    withAnimation(.linear(duration: 14).repeatForever(autoreverses: false)) {
-                        phase = .pi * 2
-                    }
+                    withAnimation(.linear(duration: 14).repeatForever(autoreverses: false)) { phase = .pi * 2 }
                 }
+                .onDisappear { phase = 0 }
             }
         }
         .ignoresSafeArea()
@@ -214,12 +218,8 @@ private struct LogoWatermark: View {
             .blur(radius: 1.2)
             .offset(y: drift)
             .onAppear {
-                withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
-                    opacity = 0.12
-                }
-                withAnimation(.easeInOut(duration: 10).repeatForever(autoreverses: true)) {
-                    drift = 5
-                }
+                withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) { opacity = 0.12 }
+                withAnimation(.easeInOut(duration: 10).repeatForever(autoreverses: true)) { drift = 5 }
             }
     }
 }
@@ -227,8 +227,8 @@ private struct LogoWatermark: View {
 private struct ParallaxGesture: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var enabled: Bool
-    @State private var x: CGFloat = 0
-    @State private var y: CGFloat = 0
+    @Binding var x: CGFloat
+    @Binding var y: CGFloat
 
     func body(content: Content) -> some View {
         content

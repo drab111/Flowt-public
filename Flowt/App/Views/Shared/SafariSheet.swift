@@ -15,6 +15,7 @@ struct SafariSheet: UIViewControllerRepresentable {
         let vc = SFSafariViewController(url: url)
         vc.preferredBarTintColor = UIColor(Color.black.opacity(0.9))
         vc.preferredControlTintColor = UIColor.white
+        vc.dismissButtonStyle = .close
         return vc
     }
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}

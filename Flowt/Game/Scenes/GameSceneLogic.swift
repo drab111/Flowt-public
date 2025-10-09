@@ -26,6 +26,7 @@ extension GameScene {
         pauseButton = nil
         pauseLabel = nil
         storm = nil
+        additionalStorm = nil
         ocean = nil
         activePopup = nil
         pendingUpgrade = nil
@@ -43,6 +44,22 @@ extension GameScene {
         }
 
         cargoSpawnInterval = cargoInterval(score: score)
+        
+        if score == GameConfig.PointsToSpawnAdditionalStorm && additionalStorm == nil { unlockAdditionalStorm() }
+    }
+    
+    private func unlockAdditionalStorm() {
+        spawnAdditionalStorm()
+
+        let action = SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: GameConfig.spawnAdditionalStormInterval),
+                SKAction.run { [weak self] in
+                    self?.spawnAdditionalStorm()
+                }
+            ])
+        )
+        run(action, withKey: TimerKeys.spawnAdditionalStorm)
     }
     
     private func cargoInterval(score: Int) -> TimeInterval {
@@ -78,7 +95,9 @@ extension GameScene {
         return distance <= portRadius
     }
     
-    func isInStormZone(_ point: CGPoint) -> Bool { return storm?.contains(point) ?? false }
+    func isInStormZone(_ point: CGPoint) -> Bool {
+        return (storm?.contains(point) ?? false) || (additionalStorm?.contains(point) ?? false)
+    }
     
     func checkIfLoopClosed(line: RouteLine) {
         guard line.permanentPoints.count >= 3 else { return }
@@ -180,6 +199,7 @@ extension GameScene {
         removeAction(forKey: TimerKeys.spawnPort)
         removeAction(forKey: TimerKeys.spawnCargo)
         removeAction(forKey: TimerKeys.spawnStorm)
+        removeAction(forKey: TimerKeys.spawnAdditionalStorm)
         removeAction(forKey: TimerKeys.upgrade)
         scene?.removeAction(forKey: Port.alarmActionKey)
         Port.overloadCount = 0

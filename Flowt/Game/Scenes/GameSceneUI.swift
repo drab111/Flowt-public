@@ -5,7 +5,6 @@
 //  Created by Wiktor Drab on 19/09/2025.
 //
 
-import AudioToolbox
 import SpriteKit
 
 extension GameScene {
@@ -208,7 +207,7 @@ extension GameScene {
         let circle = SKShapeNode(circleOfRadius: 120)
         circle.fillColor = color
         circle.strokeColor = .black
-        circle.lineWidth = 6
+        circle.lineWidth = 8
         circle.position = CGPoint(x: size.width / 2, y: size.height / 2)
         circle.zPosition = 5.5
 

@@ -72,6 +72,7 @@ struct SignInView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -91,10 +92,12 @@ struct SignInView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.emailAddress)
+                .accessibilityLabel("Email address")
 
                 GlassField(systemIcon: "lock", placeholder: "Password", text: $authVM.password, isSecure: true, submitLabel: .go, focused: $focusedField, field: .password, onSubmit: { Task { await authVM.submit() } })
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .accessibilityLabel("Password")
             }
         }
     }
@@ -174,6 +177,7 @@ struct SignInView: View {
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .keyboardType(.emailAddress)
+            .accessibilityLabel("Email address")
 
             HStack {
                 Button("Cancel") {

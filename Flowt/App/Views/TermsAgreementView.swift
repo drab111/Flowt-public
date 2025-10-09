@@ -90,6 +90,7 @@ struct TermsAgreementView: View {
                     .opacity(0.15)
                     .padding(.trailing, 8)
                     .padding(.bottom, 6)
+                    .accessibilityHidden(true)
             }
         }
         .padding(.horizontal, 20)
