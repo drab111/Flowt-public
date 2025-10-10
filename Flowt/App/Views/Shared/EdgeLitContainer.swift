@@ -13,6 +13,7 @@ struct EdgeLitContainer<Content: View>: View {
     @ViewBuilder var content: Content
     @State private var sweep = false
     
+    // MARK: - Body
     var body: some View {
         content
             .padding(contentPadding)
@@ -20,7 +21,7 @@ struct EdgeLitContainer<Content: View>: View {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(Color.white.opacity(0.05))
                     .overlay(
-                        // Animacja
+                        // Animation
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                             .stroke(.clear)
                             .overlay(
@@ -37,7 +38,7 @@ struct EdgeLitContainer<Content: View>: View {
                             )
                     )
                     .overlay(
-                        // Rozjaśnienie górnej krawędzi
+                        // Lighten the top edge
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(LinearGradient(colors: [Color.white.opacity(0.15), .clear], startPoint: .top, endPoint: .center), lineWidth: 0.5)
                             .blendMode(.plusLighter)

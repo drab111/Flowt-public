@@ -21,7 +21,7 @@ final class ProfileService: ProfileServiceProtocol {
     
     // MARK: - Firestore
     func fetchProfile(uid: String) async throws -> UserProfile? {
-        // doc to pojedyńczy dokument pobrany z Firestore
+        // 'doc' represents a single Firestore document
         let doc = try await db.collection("users").document(uid).getDocument()
         guard let data = doc.data() else { return nil }
         return UserProfile(
@@ -46,10 +46,12 @@ final class ProfileService: ProfileServiceProtocol {
         try await db.collection("users").document(uid).delete()
     }
     
-    // MARK: - helper do modelu ML (opakowujemy stare, callback-owe API w mechanizm async/await - wymuszając zaczekanie na wynik klasyfikatora)
+    // MARK: - Avatar Validation (ML)
+    // Wraps legacy callback-based API into async/await, ensuring proper suspension until the classifier returns a result
     func validateAvatar(image: UIImage, threshold: Float) async throws -> Bool {
-        try await withCheckedThrowingContinuation { continuation in // to wykryje brak wywołania resume lub podwójne resume i zgłosi problem — pomaga debugować
-            var didResume = false // flaga aby wiele razy nie dokonywać predykcji
+        try await withCheckedThrowingContinuation { continuation in
+            // Detects missing or multiple 'resume' calls — helpful for debugging
+            var didResume = false
             
             detector.check(image: image) { result in
                 guard !didResume else { return }
@@ -58,10 +60,10 @@ final class ProfileService: ProfileServiceProtocol {
                 switch result {
                 case let .success(nsfwConfidence: confidence):
                     if confidence > threshold {
-                        // zdjęcie nieodpowiednie
+                        // Inappropriate image
                         continuation.resume(returning: false)
                     } else {
-                        // zdjęcie ok
+                        // Image accepted
                         continuation.resume(returning: true)
                     }
                 case let .error(error):

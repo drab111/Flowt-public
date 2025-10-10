@@ -8,6 +8,7 @@
 import SpriteKit
 
 extension GameScene {
+    // MARK: - Buttons
     private func createBackToMenuButton() {
         let background = SKShapeNode(rectOf: CGSize(width: 100, height: 40), cornerRadius: 10)
         background.fillColor = .clear
@@ -137,6 +138,7 @@ extension GameScene {
         createColorButtons()
     }
     
+    // MARK: - Islands
     func setupIslands() {
         let islandConfigs: [(CGPoint, CGFloat, String)] = [
             (CGPoint(x: size.width * 0.25, y: size.height * 0.35), 40, "IslandTexture1"),
@@ -155,6 +157,7 @@ extension GameScene {
         islands.append(island)
     }
     
+    // MARK: - Background and Camera
     func setupBackground() {
         let ocean = Ocean(size: size)
         addChild(ocean)
@@ -169,14 +172,15 @@ extension GameScene {
         cameraNode.setScale(1.0)
     }
     
+    // MARK: - Line Rewards
     func addExtraLine(lineColor: UIColor, buttonColor: UIColor) {
         AudioService.shared.playSFX(node: self, fileName: "milestoneSound.wav")
         
-        // Tworzymy reprezentację graficzną
+        // Create graphical representation
         let notificationCircle = makeNotificationCircle(color: buttonColor, lineColor: lineColor)
         addChild(notificationCircle)
         
-        // Tworzymy animację
+        // Create animation
         let targetPosition = CGPoint(x: size.width - 40, y: size.height - CGFloat(40 + (routeLines.count * 50)))
         let delay = SKAction.wait(forDuration: 1.0)
         let scaleAction = SKAction.scale(to: 0.2, duration: 1.0)
@@ -186,7 +190,7 @@ extension GameScene {
         let sequence = SKAction.sequence([delay, groupAction, removeAction])
         
         notificationCircle.run(sequence) {
-            // Po animacji dodajemy nową linię
+            // After animation completes, add the new line
             self.colors.append(buttonColor)
             let newLine = RouteLine(lineColor: lineColor, checkIslandCollision: { [weak self] point in
                 self?.checkIslandCollision(point) ?? false
@@ -220,6 +224,7 @@ extension GameScene {
         return circle
     }
     
+    // MARK: - End Game Focus
     func focusOnPort(port: Port, scale: CGFloat = 0.14, duration: TimeInterval = 2.0) {
         guard let camera = camera else { return }
 
@@ -228,7 +233,7 @@ extension GameScene {
             activePopup = nil
         }
         
-        // zamrażamy wszystko poza portami i kamerą
+        // Freeze everything except ports and camera
         for node in children {
             if node is Port {
                 (node as! Port).stopOverloadTimer()
@@ -263,6 +268,7 @@ extension GameScene {
         label.run(fadeIn)
     }
     
+    // MARK: - Frame Updates
     override func update(_ currentTime: TimeInterval) {
         let dt = CGFloat(1.0 / 60.0)
         ocean?.update(dt)

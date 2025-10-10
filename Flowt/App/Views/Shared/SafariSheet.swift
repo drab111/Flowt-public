@@ -8,9 +8,10 @@
 import SafariServices
 import SwiftUI
 
-// Wewnątrz naszej aplikacji otwiera się strona
+// Opens the page inside the app
 struct SafariSheet: UIViewControllerRepresentable {
     let url: URL
+    
     func makeUIViewController(context: Context) -> SFSafariViewController {
         let vc = SFSafariViewController(url: url)
         vc.preferredBarTintColor = UIColor(Color.black.opacity(0.9))
@@ -18,5 +19,6 @@ struct SafariSheet: UIViewControllerRepresentable {
         vc.dismissButtonStyle = .close
         return vc
     }
+    
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }

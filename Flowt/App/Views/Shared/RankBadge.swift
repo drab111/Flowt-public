@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-// Ranga z kolorem medalu dla miejsc 1–3
+// Rank with medal color for top 3 positions
 struct RankBadge: View {
     let rank: Int
+    
+    // MARK: - Body
     var body: some View {
         ZStack {
             Capsule()
@@ -28,6 +30,8 @@ struct RankBadge: View {
             }
         }
     }
+    
+    // MARK: - Helpers
     private var rankGradient: LinearGradient {
         switch rank {
         case 1: return LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)

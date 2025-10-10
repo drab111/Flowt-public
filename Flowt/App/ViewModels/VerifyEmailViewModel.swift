@@ -24,6 +24,7 @@ final class VerifyEmailViewModel: ObservableObject {
     
     deinit { sessionTimer?.invalidate() }
     
+    // MARK: - Email Verification
     func resendVerificationEmail() async {
         do {
             try await authService.sendVerificationEmail()
@@ -37,6 +38,16 @@ final class VerifyEmailViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Session Handling
+    private func startAutoCheck() {
+        sessionTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.appState.checkUserSession()
+            }
+        }
+    }
+    
+    // MARK: - Account Management
     func signOut() {
         do {
             try authService.signOut()
@@ -44,13 +55,5 @@ final class VerifyEmailViewModel: ObservableObject {
             appState.currentUserProfile = nil
             appState.currentScreen = .signIn
         } catch { errorMessage = error.localizedDescription }
-    }
-    
-    private func startAutoCheck() {
-        sessionTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.appState.checkUserSession()
-            }
-        }
     }
 }

@@ -23,6 +23,7 @@ class Cargo: SKSpriteNode {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
 }
 
+// MARK: - Enum: CargoType
 enum CargoType: CaseIterable {
     case oil, gas, food
     

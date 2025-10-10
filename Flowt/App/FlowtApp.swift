@@ -15,9 +15,9 @@ struct FlowtApp: App {
     init() {
         FirebaseApp.configure()
         let appState = AppState()
-        // pzypisujemy obiekt do samego wrappera a nie zmiennej
+        // Assign object directly to the wrapper instead of the variable
         _appState = StateObject(wrappedValue: appState)
-        _ = AudioService.shared // wywołujemy żeby zainicjalizował observer
+        _ = AudioService.shared // Trigger initialization to set up the observer
     }
     
     var body: some Scene {
@@ -30,11 +30,11 @@ struct FlowtApp: App {
 
 struct RootView: View {
     @ObservedObject var appState: AppState
-    @StateObject private var mainMenuVM: MainMenuViewModel
+    @StateObject private var container: MainMenuContainer
     
     init(appState: AppState) {
         self.appState = appState
-        _mainMenuVM = StateObject(wrappedValue: MainMenuViewModel(appState: appState))
+        _container = StateObject(wrappedValue: MainMenuContainer(appState: appState))
     }
     
     var body: some View {
@@ -42,19 +42,19 @@ struct RootView: View {
         case .loading:
             LoadingView()
         case .signIn:
-            SignInView(authVM: AuthViewModel(appState: appState, authService: AuthService())) // appState to klasa więc przekazujemy oryginał
+            SignInView(authVM: AuthViewModel(appState: appState, authService: AuthService())) // appState is a class, so we pass the original instance
         case .verifyEmail:
             VerifyEmailView(verifyVM: VerifyEmailViewModel(appState: appState, authService: AuthService()))
         case .mainMenu(let selectedTab):
             MainMenuView(
-                mainMenuVM: mainMenuVM,
+                container: container,
                 selectedTab: selectedTab,
                 onTabChange: { newTab in
                     appState.currentScreen = .mainMenu(newTab)
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
             )
-            .id(appState.currentUser?.uid) // jak zmieni się user (czyli jego uid) to tworzymy nową instancję aby nie pamiętała wcześniejszych danych
+            .id(appState.currentUser?.uid) // When the user (uid) changes, create a new instance to reset previous state
         }
     }
 }

@@ -11,6 +11,8 @@ struct OutlineActionButtonLabel: View {
     var title: String
     var systemImage: String
     var gradient: [Color]
+    
+    // MARK: - Body
     var body: some View {
         Label(title, systemImage: systemImage)
             .font(.body)

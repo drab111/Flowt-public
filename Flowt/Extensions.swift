@@ -11,9 +11,9 @@ extension UIImage {
     func resized(to maxSize: CGFloat = 200) -> UIImage {
         let aspectRatio = size.width / size.height
         var newSize: CGSize
-        if aspectRatio > 1 { // szeroki obraz
+        if aspectRatio > 1 { // Wide image
             newSize = CGSize(width: maxSize, height: maxSize / aspectRatio)
-        } else { // wysoki obraz
+        } else { // Tall image
             newSize = CGSize(width: maxSize * aspectRatio, height: maxSize)
         }
         

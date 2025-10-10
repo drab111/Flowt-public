@@ -31,7 +31,6 @@ class Wave: SKNode {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
     // MARK: - Setup
-    
     private func makeContainer() {
         let container = SKNode()
         container.position = CGPoint(x: sizeRef.width / 2, y: sizeRef.height / 2)
@@ -42,7 +41,7 @@ class Wave: SKNode {
     }
     
     private func makeWaves() {
-        let diagonal = CGFloat(hypot(Double(sizeRef.width), Double(sizeRef.height))) // fale muszą być dłuższe niż ekran
+        let diagonal = CGFloat(hypot(Double(sizeRef.width), Double(sizeRef.height))) // Waves must extend beyond the screen
         
         for i in 0..<waveCount {
             let offsetY = CGFloat(i) * (diagonal / CGFloat(waveCount + 1))
@@ -74,7 +73,6 @@ class Wave: SKNode {
     }
     
     // MARK: - Highlight
-    
     private func scheduleHighlights() {
         let waitRandom = SKAction.wait(forDuration: 2.0, withRange: 4.0)
         let highlightAction = SKAction.run { [weak self] in

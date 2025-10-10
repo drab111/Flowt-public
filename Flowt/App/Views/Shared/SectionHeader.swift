@@ -10,6 +10,8 @@ import SwiftUI
 struct SectionHeader: View {
     var title: String
     var subtitle: String? = nil
+    
+    // MARK: - Body
     var body: some View {
         HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 4)

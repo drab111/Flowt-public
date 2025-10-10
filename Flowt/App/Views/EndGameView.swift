@@ -13,6 +13,7 @@ struct EndGameView: View {
     
     @State private var sheen = false
     
+    // MARK: - Body
     var body: some View {
         ZStack {
             BackgroundView()
@@ -36,7 +37,6 @@ struct EndGameView: View {
     }
     
     // MARK: - Panels
-    
     private var scorePanel: some View {
         EdgeLitContainer {
             VStack(spacing: 14) {
@@ -138,7 +138,7 @@ struct EndGameView: View {
                 .buttonStyle(.plain)
                 .padding(.horizontal, 35)
             } else {
-                // sam tekst (gdy render nie wyjdzie)
+                // Text fallback (when rendering fails)
                 ShareLink(
                     item: "I scored \(scoreVM.score ?? 0) in Flowt.",
                     subject: Text("My Flowt score"),
@@ -165,7 +165,6 @@ struct EndGameView: View {
 }
 
 // MARK: - Subviews
-
 private struct ResultRowCard: View {
     let index: Int
     let profile: UserProfile?
@@ -178,7 +177,7 @@ private struct ResultRowCard: View {
     
     var body: some View {
         ZStack {
-            // Szklane tło
+            // Glass background
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Color.white.opacity(highlight || latest ? 0.10 : 0.06))
                 .overlay(
@@ -193,7 +192,7 @@ private struct ResultRowCard: View {
                 )
                 .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 6)
             
-            // Animowany połysk
+            // Animated shine effect
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.clear)
                 .overlay(

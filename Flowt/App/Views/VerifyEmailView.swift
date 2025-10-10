@@ -12,6 +12,7 @@ struct VerifyEmailView: View {
     @Environment(\.openURL) private var openURL
     @State private var tipsOpen = false
 
+    // MARK: - Body
     var body: some View {
         ZStack {
             BackgroundView(withLogo: false, hasBottomBar: false)
@@ -130,7 +131,6 @@ struct VerifyEmailView: View {
     }
 
     // MARK: - Helpers
-    
     private func messageRow(system: String, color: [Color], text: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: system)
@@ -145,7 +145,6 @@ struct VerifyEmailView: View {
 }
 
 // MARK: - Subviews
-
 private struct ActionPill: View {
     let title: String
     let system: String

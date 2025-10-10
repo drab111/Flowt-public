@@ -14,6 +14,7 @@ struct InfoView: View {
     @State private var showTerms = false
     @State private var showPrivacy = false
     
+    // MARK: - Body
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 22) {
@@ -34,7 +35,6 @@ struct InfoView: View {
     }
     
     // MARK: - Panels
-    
     private var headerPanel: some View {
         EdgeLitContainer {
             HStack(alignment: .center, spacing: 14) {
@@ -176,7 +176,6 @@ struct InfoView: View {
 }
 
 // MARK: - Subviews
-
 private struct ActionCard: View {
     let title: String
     let icon: String
@@ -205,7 +204,7 @@ private struct ActionCard: View {
                     )
                     .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 6)
                 
-                // efekt połysku
+                // Animated shine effect
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(.clear)
                     .overlay(
@@ -263,7 +262,7 @@ private struct ActionCardChrome: View {
                 )
                 .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 6)
 
-            // połysk
+            // Sheen
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.clear)
                 .overlay(
@@ -347,23 +346,6 @@ private struct FAQItem<Content: View>: View {
         .background(RoundedRectangle(cornerRadius: 14).fill(.white.opacity(0.05)))
         .overlay(RoundedRectangle(cornerRadius: 14).stroke(.white.opacity(0.12), lineWidth: 1))
     }
-}
-
-private var techStops: [TechStopData] {
-    [
-        .init(name: "Swift", icon: "chevron.left.forwardslash.chevron.right", description: "Core language"),
-        .init(name: "SwiftUI", icon: "square.stack.3d.up", description: "UI framework"),
-        .init(name: "SpriteKit", icon: "gamecontroller.fill", description: "2D engine"),
-        .init(name: "Firebase Auth", icon: "lock.open.fill", description: "Sign-in & identity"),
-        .init(name: "Firestore", icon: "tray.full.fill", description: "Realtime database")
-    ]
-}
-
-private struct TechStopData: Identifiable {
-    let id = UUID()
-    let name: String
-    let icon: String
-    let description: String
 }
 
 private struct TechMap: View {
@@ -479,6 +461,24 @@ private struct Tooltip: View {
             .foregroundColor(.white)
             .transition(.move(edge: .top).combined(with: .opacity))
     }
+}
+
+// MARK: - Helpers
+private var techStops: [TechStopData] {
+    [
+        .init(name: "Swift", icon: "chevron.left.forwardslash.chevron.right", description: "Core language"),
+        .init(name: "SwiftUI", icon: "square.stack.3d.up", description: "UI framework"),
+        .init(name: "SpriteKit", icon: "gamecontroller.fill", description: "2D engine"),
+        .init(name: "Firebase Auth", icon: "lock.open.fill", description: "Sign-in & identity"),
+        .init(name: "Firestore", icon: "tray.full.fill", description: "Realtime database")
+    ]
+}
+
+private struct TechStopData: Identifiable {
+    let id = UUID()
+    let name: String
+    let icon: String
+    let description: String
 }
 
 #if DEBUG

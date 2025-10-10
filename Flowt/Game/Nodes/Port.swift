@@ -8,8 +8,8 @@
 import SpriteKit
 
 class Port: SKSpriteNode {
-    static var overloadCount = 0  // ilu portów jest przeciążonych
-    static let alarmActionKey = "GlobalAlarmAction" // animacja do grania dźwięku co sekundę
+    static var overloadCount = 0 // Number of overloaded ports
+    static let alarmActionKey = "GlobalAlarmAction" // Action that plays a sound every second
     
     private var overloadActionKey = "OverloadTimerAction"
     private var cargoFactory: CargoFactory
@@ -44,8 +44,7 @@ class Port: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
-    // MARK: - Wygląd
-    
+    // MARK: - Design
     private func makePortShape() {
         let circle = SKShapeNode(circleOfRadius: 16)
         circle.fillColor = .white
@@ -57,7 +56,7 @@ class Port: SKSpriteNode {
     }
     
     private func runSpawnAnimation() {
-        // Bounce-in (port skaluje się przy pojawieniu)
+        // Bounce-in effect (port scales up on appearance)
         let scaleUp = SKAction.scale(to: 1.2, duration: 0.3)
         scaleUp.timingMode = .easeOut
 
@@ -71,7 +70,7 @@ class Port: SKSpriteNode {
         ])
         self.run(appear)
         
-        // Rozbłysk kółka (sygnał nowego portu)
+        // Circle flash (signal of a new port)
         let flashCircle = SKShapeNode(circleOfRadius: 24)
         flashCircle.fillColor = .white
         flashCircle.alpha = 0.4
@@ -97,13 +96,13 @@ class Port: SKSpriteNode {
         }
     }
     
-    // Odpowiada za ustalenie które ładunki są obecnie w porcie i je renderuje
+    // Handles which cargos are currently in the port and renders them
     func updatePortCargoDisplay() {
-        // Usuwamy wszystkie poprzednie Node'y
+        // Remove all previous nodes
         let oldIcons = children.filter { $0.name == "MiniCargoPort" }
         oldIcons.forEach { $0.removeFromParent() }
         
-        // Dodajemy obecne Node'y
+        // Add current nodes
         let radius: CGFloat = 22
         let angleStep = CGFloat.pi / 6
         for (index, cargo) in cargoBuffer.enumerated() {
@@ -119,12 +118,11 @@ class Port: SKSpriteNode {
         }
     }
     
-    // MARK: Logika dla ładunków
-    
+    // MARK: - Cargo Logic
     private func addCargo(_ cargo: Cargo) {
-        cargoBuffer.append(cargo) // ta tablica to źródło prawdy
-        cargo.removeFromParent() // w updatePortCargoDisplay() dodamy je do rodzica
-        cargo.isHidden = true // potem wyrenderujemy jego grafikę
+        cargoBuffer.append(cargo) // This array is the single source of truth
+        cargo.removeFromParent() // In updatePortCargoDisplay(), cargos are added to the parent node
+        cargo.isHidden = true // Then their graphics are rendered
         
         updatePortCargoDisplay()
         checkOverload()
@@ -138,7 +136,7 @@ class Port: SKSpriteNode {
         addCargo(cargo)
     }
     
-    // Tą funkcją Ship zabiera tyle Cargo na ile ma miejsca
+    // This function lets the ship take as much cargo as it can carry
     func removeCargo(type: CargoType, maxCount: Int) -> [Cargo] {
         var taken: [Cargo] = []
         
@@ -146,9 +144,7 @@ class Port: SKSpriteNode {
         while i < cargoBuffer.count && taken.count < maxCount {
             if cargoBuffer[i].cargoType != portType {
                 taken.append(cargoBuffer.remove(at: i))
-            } else {
-                i += 1
-            }
+            } else { i += 1 }
         }
         
         updatePortCargoDisplay()
@@ -160,20 +156,19 @@ class Port: SKSpriteNode {
         let toUnload = ship.cargoBuffer.filter { $0.cargoType == portType }
         
         for cargo in toUnload {
-            // Znajdujemy cargo we właściwej tablicy i je usuwamy
+            // Find and remove cargo from the appropriate array
             if let idx = ship.cargoBuffer.firstIndex(of: cargo) {
                 ship.cargoBuffer.remove(at: idx)
                 cargo.removeFromParent()
                 
-                // +1 punkt
+                // +1 point
                 increaseScore()
                 flashPortCircleSuccess()
             }
         }
     }
     
-    // MARK: Wskaźnik czasu
-    
+    // MARK: - Time Indicator
     private func checkOverload() {
         if cargoBuffer.count > maxBuffer {
             if !isOverloaded {
@@ -201,7 +196,7 @@ class Port: SKSpriteNode {
             self.remainingTime -= 1.0
             self.updateOverloadIndicator()
             
-            // Przekroczenie czasu i koniec gry
+            // Time limit exceeded — end of game
             if self.remainingTime <= 0 && self.cargoBuffer.count > self.maxBuffer { self.endGame() }
         }
         let sequence = SKAction.sequence([wait, tick])

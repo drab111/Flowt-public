@@ -15,6 +15,7 @@ struct GameView: View {
     
     @State private var sheen = false
     
+    // MARK: - Body
     var body: some View {
         VStack(spacing: 18) {
             VStack(spacing: 20) {
@@ -58,7 +59,6 @@ struct GameView: View {
     }
     
     // MARK: - Panels
-    
     private var headerPanel: some View {
         EdgeLitContainer {
             HStack(spacing: 14) {
@@ -87,11 +87,11 @@ struct GameView: View {
                 SectionHeader(title: "Quick Stats", subtitle: "Snapshot")
                 
                 HStack(spacing: 16) {
-                    // animowany wskaźnik wyniku
+                    // Animated score indicator
                     ScoreGauge(userBest: userBest, top: top)
                         .frame(width: 150, height: 150)
                     
-                    // prawa kolumna
+                    // Right column
                     VStack(spacing: 10) {
                         StatChip(icon: "crown.fill", title: "Your Best Rank", value: rankText, style: .gold)
                             .accessibilityLabel("Your best rank")
@@ -124,7 +124,6 @@ struct GameView: View {
     }
     
     // MARK: - Helpers
-    
     private var rankText: String {
         if let rank = accountScoreVM.globalRank { return "#\(rank)" }
         return "—"
@@ -143,7 +142,6 @@ struct GameView: View {
 }
 
 // MARK: - Subviews
-
 private struct ScoreGauge: View {
     let userBest: Int
     let top: Int

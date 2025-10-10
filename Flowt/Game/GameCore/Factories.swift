@@ -5,8 +5,7 @@
 //  Created by Wiktor Drab on 18/09/2025.
 //
 
-// MARK: Ulepszenia
-
+// MARK: - Upgrade Factory
 protocol UpgradeFactory {
     func createUpgrade(option: UpgradeOption) -> LineUpgrade
 }
@@ -24,8 +23,7 @@ class SimpleUpgradeFactory: UpgradeFactory {
     }
 }
 
-// MARK: Ładunki
-
+// MARK: - Cargo Factory
 protocol CargoFactory {
     func createCargo(type: CargoType) -> Cargo
 }

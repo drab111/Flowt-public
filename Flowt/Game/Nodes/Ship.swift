@@ -16,7 +16,7 @@ class Ship: SKNode {
     private var getPorts: (() -> [Port])
     private lazy var loopMovementStrategy: LoopMovementStrategy = LoopMovementStrategy()
     
-    // Potrzebne dla wzorca Strategii
+    // Required for the Strategy pattern
     var shipSpeed: CGFloat = GameConfig.shipSpeed
     var speedBoost: CGFloat = 1.0
     var maxCapacity = 4
@@ -39,17 +39,16 @@ class Ship: SKNode {
         self.position = position
         self.zPosition = 3
         self.name = "ShipNode"
-        addChild(shipSprite) // obracamy tylko sprite'a
-        addChild(cargoContainer) // container nie obraca się
+        addChild(shipSprite) // Rotate only the sprite
+        addChild(cargoContainer) // Container remains static (no rotation)
         
-        // od razu sprawdzamy czy statek stoi na porcie
+        // Immediately check if the ship is standing on a port
         if let startPort = findPort(point: position) { handlePortIfNeeded(port: startPort) }
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
-    // MARK: Wygląd
-    
+    // MARK: - Design
     private func updateShipCargoDisplay() {
         cargoContainer.removeAllChildren()
         
@@ -76,8 +75,7 @@ class Ship: SKNode {
         shipSprite.run(rotateAction)
     }
     
-    // MARK: - Ruch i rozładunek
-    
+    // MARK: - Movement and Unloading
     func setMovementContext(_ context: ShipMovementContext) { self.movementContext = context }
     
     func startNextSegment() {
@@ -89,7 +87,7 @@ class Ship: SKNode {
     
     func checkStormIfNeeded() {
         shipSpeed = GameConfig.shipSpeed * speedBoost
-        // Sprawdzamy czy nasza pozycja jest w burzy
+        // Check if the current position is inside a storm
         if isInStormZone(self.position) { shipSpeed *= GameConfig.stormSlowdown }
     }
     
@@ -127,10 +125,9 @@ class Ship: SKNode {
     }
     
     // MARK: - Helpers
-    
     func distanceBetween(_ a: CGPoint, _ b: CGPoint) -> CGFloat { hypot(a.x - b.x, a.y - b.y) }
     
-    // Sprawdzamy czy aktualny punkt na którym jest statek znajduje się w zasięgu któregoś z portów
+    // Check if the ship’s current point is within range of any port
     func findPort(point: CGPoint) -> Port? {
         let maxDistance = GameConfig.portDetectionRadius
         for port in getPorts() {

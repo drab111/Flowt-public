@@ -26,6 +26,7 @@ final class ProfileViewModel: ObservableObject {
         self.profileService = profileService
     }
     
+    // MARK: - Profile Management
     func loadUserProfile() async {
         isLoading = true
         defer { isLoading = false }
@@ -63,10 +64,10 @@ final class ProfileViewModel: ObservableObject {
             var avatarBase64: String? = nil
             if let imageData = imageData, let image = UIImage(data: imageData) {
                 
-                // Sprawdzenie czy zdjęcie jest stosowne używając modelu ML
+                // Validate avatar using the ML model
                 let isSafe = try await profileService.validateAvatar(image: image, threshold: 0.5)
                 
-                // Odrzucenie zapisu w przypadku niestosowności
+                // Reject submission if the image is inappropriate
                 if !isSafe {
                     saveState = .rejected
                     try? await Task.sleep(nanoseconds: 5_000_000_000)
@@ -74,7 +75,7 @@ final class ProfileViewModel: ObservableObject {
                     return
                 }
                 
-                // Zdjęcie jest stosowne
+                // Image approved
                 let resized = image.resized(to: 200)
                 avatarBase64 = resized.toBase64(maxSizeKB: 40)
             }
@@ -87,16 +88,16 @@ final class ProfileViewModel: ObservableObject {
                 sfxEnabled: appState.currentUserProfile?.sfxEnabled ?? true
             )
             
-            // aktualizacja lokalnego stanu
+            // Update local state
             try await profileService.saveProfile(profile)
             appState.currentUserProfile = profile
             currentNickname = profile.nickname
             avatarData = profile.avatarBase64.flatMap { Data(base64Encoded: $0) }
             newNickname = ""
             
-            // sukces
+            // Success
             saveState = .saved
-            // automatyczny powrót do "idle" po 5 sekundach
+            // Automatically reset to 'idle' after 5 seconds
             try? await Task.sleep(nanoseconds: 5_000_000_000)
             if !Task.isCancelled { saveState = .idle }
         } catch {
@@ -105,6 +106,16 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
+    func deleteProfile() async {
+        guard let uid = appState.currentUser?.uid else { return }
+        do {
+            try await profileService.deleteProfile(uid: uid)
+            appState.currentUserProfile = nil
+            appState.currentScreen = .signIn
+        } catch { errorMessage = error.localizedDescription }
+    }
+    
+    // MARK: - Preferences
     func updatePreferences(musicEnabled: Bool, sfxEnabled: Bool) async {
         guard var profile = appState.currentUserProfile else { return }
         profile.musicEnabled = musicEnabled
@@ -113,15 +124,6 @@ final class ProfileViewModel: ObservableObject {
         do {
             try await profileService.saveProfile(profile)
             appState.currentUserProfile = profile
-        } catch { errorMessage = error.localizedDescription }
-    }
-    
-    func deleteProfile() async {
-        guard let uid = appState.currentUser?.uid else { return }
-        do {
-            try await profileService.deleteProfile(uid: uid)
-            appState.currentUserProfile = nil
-            appState.currentScreen = .signIn
         } catch { errorMessage = error.localizedDescription }
     }
 }

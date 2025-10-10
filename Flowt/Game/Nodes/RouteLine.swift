@@ -10,7 +10,7 @@ import SpriteKit
 class RouteLine: SKShapeNode {
     private let checkIslandCollision: ((CGPoint) -> Bool)
     
-    // Dla wzorca fabryki i zarządzania przez Scene
+    // For factory pattern and Scene-based management
     let isInStormZone: ((CGPoint) -> Bool)
     let getPorts: (() -> [Port])
     var permanentPoints: [CGPoint] = []
@@ -31,6 +31,7 @@ class RouteLine: SKShapeNode {
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
+    // MARK: - Path Management
     private func resetCurrentPoints() {
         currentPoints.removeAll()
         updatePath()
@@ -43,7 +44,7 @@ class RouteLine: SKShapeNode {
     }
     
     func addPoint(_ point: CGPoint) {
-        // Najpierw sprawdźmy czy punkt jest w obszarze jakiejś wyspy
+        // First, check if the point lies within any island area
         if checkIslandCollision(point) {
             resetCurrentPoints()
             return
@@ -54,26 +55,26 @@ class RouteLine: SKShapeNode {
     
     func finalizeCurrentLine() {
         if isAppendingAtFront {
-            // Zatrzymujemy statki
+            // Stop all ships
             for ship in ships { ship.removeAllActions() }
             
-            // Odwracamy currentPoints i wstawiamy na początek
+            // Reverse currentPoints and insert at the beginning
             permanentPoints.insert(contentsOf: currentPoints.reversed(), at: 0)
             isAppendingAtFront = false
             
-            // Ustawiamy statki na nowej pozycji w tablicy tak aby się nie teleportowały
+            // Reposition ships so they don’t teleport
             for ship in ships {
                 ship.currentSegmentIndex += currentPoints.count
                 ship.startNextSegment()
             }
         } else {
-            // normalnie
+            // Default behavior
             permanentPoints.append(contentsOf: currentPoints)
         }
         currentPoints.removeAll()
         updatePath()
         
-        // Tworzymy pierwszy statek jeśli go brak
+        // Create the first ship if none exists
         if ships.isEmpty && permanentPoints.count >= 2 {
             let newShip = Ship(position: permanentPoints[0], parentLine: self, isInStormZone: isInStormZone, getPorts: getPorts)
             ships.append(newShip)

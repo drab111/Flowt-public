@@ -12,13 +12,13 @@ extension GameScene {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         
-        // Sprawdzamy czy jest widoczne okienko UpgradePopup lub LineSelectionPopup
+        // Check if UpgradePopup or LineSelectionPopup is visible
         if let popup = activePopup as? Popup {
             popup.handleTouch(location)
             return
         }
         
-        // Sprawdzamy czy kliknięto w "Menu"
+        // Check if “Menu” was tapped
         if nodes(at: location).contains(where: { $0.name == "BackToMenuButton" }) {
             AudioService.shared.playSystemSFX(id: 1110)
             let popup = ConfirmExitPopup(size: self.size,
@@ -39,7 +39,7 @@ extension GameScene {
             return
         }
         
-        // Sprawdzamy czy kliknięto w "Pause"
+        // Check if “Pause” was tapped
         if nodes(at: location).contains(where: { $0.name == "PauseButton" }) {
             AudioService.shared.playSystemSFX(id: 1110)
             scene?.isPaused.toggle()
@@ -47,7 +47,7 @@ extension GameScene {
             pauseLabel?.text = text
         }
         
-        // Sprawdzamy czy kliknięto w przycisk linii i szukamy jej indeksu
+        // Check if a line button was tapped and find its index
         if let tappedButton = nodes(at: location).compactMap({ $0 as? SKShapeNode }).first, let index = colorButtons.firstIndex(of: tappedButton) {
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
@@ -66,22 +66,22 @@ extension GameScene {
             isDrawing = true
             currentLine.startNewLine(from: location)
         } else {
-            // Sprawdzamy dystans do first i last
+            // Check distance to first and last
             let firstP = currentLine.permanentPoints.first!
             let lastP = currentLine.permanentPoints.last!
             
             let distToFirst = hypot(location.x - firstP.x, location.y - firstP.y)
             let distToLast  = hypot(location.x - lastP.x,  location.y - lastP.y)
             
-            // Ustalamy czy bliżej do first czy do last
+            // Determine whether it's closer to first or last
             if distToFirst < GameConfig.portConnectionTolerance {
-                // Rysujemy "od początku"
+                // Draw from the beginning
                 isDrawing = true
-                // Ale w tym wypadku zapamiętamy że dodajemy na początek
+                // Remember that we’re adding to the start in this case
                 currentLine.isAppendingAtFront = true
                 currentLine.startNewLine(from: firstP)
             } else if distToLast < GameConfig.portConnectionTolerance {
-                // normalne rysowanie
+                // Normal drawing
                 isDrawing = true
                 currentLine.isAppendingAtFront = false
                 currentLine.startNewLine(from: lastP)
@@ -102,7 +102,7 @@ extension GameScene {
         currentLine.addPoint(touch.location(in: self))
         let pathPoints = currentLine.currentPoints
         
-        // Sprawdzenie czy nowa linia spełnia zasady gry aby móc ją zrealizować
+        // Validate whether the new line follows gameplay rules before applying it
         if let (startPort, endPort) = checkConnectionForSegment(points: pathPoints, line: currentLine) {
             AudioService.shared.playSFX(node: self, fileName: "successSound.wav")
             UIImpactFeedbackGenerator(style: .soft).impactOccurred()

@@ -25,8 +25,7 @@ class Island: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
-    // MARK: - Wygląd
-    
+    // MARK: - Design
     private func addBlurredShadow(texture: SKTexture, radius: CGFloat) {
         let shadowNode = SKSpriteNode(texture: texture)
         shadowNode.size = CGSize(width: radius*2, height: radius*2)
@@ -52,8 +51,7 @@ class Island: SKSpriteNode {
         addChild(border)
     }
     
-    // MARK: - Kolizja
-    
+    // MARK: - Collision Helper
     func contains(point: CGPoint) -> Bool {
         let dist = hypot(point.x - self.position.x, point.y - self.position.y)
         return dist <= radius

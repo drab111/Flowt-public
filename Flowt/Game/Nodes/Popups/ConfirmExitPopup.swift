@@ -27,6 +27,7 @@ class ConfirmExitPopup: SKNode, Popup {
     
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
     
+    // MARK: - Setup UI
     private func setupBackground(size: CGSize) {
         let bg = SKSpriteNode(color: .black, size: size)
         bg.alpha = 0.5
@@ -79,6 +80,7 @@ class ConfirmExitPopup: SKNode, Popup {
         return button
     }
     
+    // MARK: - Touch Handling
     func handleTouch(_ location: CGPoint) {
         guard let parent = parent else { return }
         let localPos = convert(location, from: parent)

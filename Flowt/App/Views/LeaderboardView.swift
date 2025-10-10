@@ -10,6 +10,7 @@ import SwiftUI
 struct LeaderboardView: View {
     @ObservedObject var scoreVM: ScoreViewModel
     
+    // MARK: - Body
     var body: some View {
         ZStack {
             // Content
@@ -17,11 +18,9 @@ struct LeaderboardView: View {
                 VStack(spacing: 22) {
                     headerPanel
                     podiumPanel
-                    
                     if let you = scoreVM.leaderboard.first(where: { $0.isCurrentUser }) {
                         yourPositionPanel(entry: you.entry, profile: you.profile)
                     }
-                    
                     listPanel
                 }
                 .padding(.horizontal)
@@ -47,7 +46,6 @@ struct LeaderboardView: View {
     }
     
     // MARK: - Panels
-    
     private var headerPanel: some View {
         EdgeLitContainer {
             HStack(alignment: .center, spacing: 12) {
@@ -170,9 +168,7 @@ struct LeaderboardView: View {
 }
 
 // MARK: - Subviews
-
-/// Top 3 z koronami i lekkim podświetleniem
-private struct PodiumView: View {
+private struct PodiumView: View { // Top 3 players with crowns and soft highlight
     let items: [(entry: ScoreEntry, profile: UserProfile?)]
     
     var body: some View {
@@ -188,7 +184,7 @@ private struct PodiumView: View {
             }
             .padding(.top, 4)
             
-            // raz jeszcze najlepszy wynik
+            // Display best score again
             if let lead = first {
                 HStack(spacing: 10) {
                     Image(systemName: "crown.fill")
@@ -292,7 +288,7 @@ private struct LeaderboardRowCard: View {
     
     var body: some View {
         ZStack {
-            // Podświetlenie gdy wynik należy do gracza
+            // Highlight when the score belongs to the player
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Color.white.opacity(highlight ? 0.09 : 0.06))
                 .overlay(
@@ -307,7 +303,7 @@ private struct LeaderboardRowCard: View {
                 )
                 .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 6)
             
-            // Animowany połysk
+            // Animated shine effect
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.clear)
                 .overlay(

@@ -25,6 +25,7 @@ final class GameViewModel: ObservableObject {
     @Published var activePhase: GamePhase?
     @AppStorage("gamesPlayed") var gamesPlayed: Int = 0
     
+    // MARK: - Game Flow
     func startGame() { activePhase = .gameScene }
     
     func endGame() {
@@ -35,7 +36,6 @@ final class GameViewModel: ObservableObject {
     func backToMenu() { activePhase = nil }
     
     // MARK: - Review Request
-    
     private func incrementGamesPlayed() {
         gamesPlayed += 1
         if gamesPlayed == 10 { requestAppReview() }

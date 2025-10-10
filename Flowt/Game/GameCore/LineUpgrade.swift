@@ -5,10 +5,12 @@
 //  Created by Wiktor Drab on 18/09/2025.
 //
 
+// MARK: - Protocol
 protocol LineUpgrade {
     func apply(line: RouteLine)
 }
 
+// MARK: - Upgrade Implementations
 class AddShipUpgrade: LineUpgrade {
     func apply(line: RouteLine) {
         guard line.permanentPoints.count >= 2 else { return }
@@ -32,6 +34,7 @@ class CapacityUpgrade: LineUpgrade {
     }
 }
 
+// MARK: - Upgrade Options Enum
 enum UpgradeOption: CaseIterable {
     case addShip, speedBoost, capacityBoost
     

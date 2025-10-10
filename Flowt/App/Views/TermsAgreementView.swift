@@ -19,6 +19,7 @@ struct TermsAgreementView: View {
     @State private var showPrivacy = false
     private var canAccept: Bool { agreedTerms && agreedPrivacy && confirmedAge }
     
+    // MARK: - Body
     var body: some View {
         VStack(spacing: 20) {
             headerPanel
@@ -33,7 +34,6 @@ struct TermsAgreementView: View {
     }
     
     // MARK: - Panels
-    
     private var headerPanel: some View {
         VStack(spacing: 6) {
             Text("Welcome to Flowt")

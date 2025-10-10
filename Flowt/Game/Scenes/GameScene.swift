@@ -36,7 +36,6 @@ class GameScene: SKScene {
         didSet { resetCargoSpawnTimer() }
     }
     
-    // Timery:
     enum TimerKeys {
         static let spawnPort = "SpawnPortAction"
         static let spawnCargo = "SpawnCargoAction"

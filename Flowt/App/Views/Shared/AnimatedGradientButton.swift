@@ -17,6 +17,7 @@ struct AnimatedGradientButton: View {
     @State private var glowPulse = false
     @State private var pressed = false
     
+    // MARK: - Body
     var body: some View {
         Button(action: {
             Task {

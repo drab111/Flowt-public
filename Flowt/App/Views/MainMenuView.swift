@@ -8,26 +8,26 @@
 import SwiftUI
 
 struct MainMenuView: View {
-    @ObservedObject var mainMenuVM: MainMenuViewModel
+    @ObservedObject var container: MainMenuContainer
     let selectedTab: MainMenuTab
     let onTabChange: (MainMenuTab) -> Void
-    
     @Namespace private var animation
     
+    // MARK: - Body
     var body: some View {
         ZStack {
             BackgroundView()
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Główna treść
+                // Main content
                 ZStack {
                     switch selectedTab {
-                    case .profile: ProfileView(authVM: mainMenuVM.authVM, userProfileVM: mainMenuVM.profileVM, accountScoreVM: mainMenuVM.accountScoreVM)
-                    case .tutorial: TutorialView(tutorialVM: mainMenuVM.tutorialVM, onTabChange: onTabChange)
-                    case .game: GameView(gameVM: mainMenuVM.gameVM, scoreVM: mainMenuVM.scoreVM, accountScoreVM: mainMenuVM.accountScoreVM)
-                    case .leaderboard: LeaderboardView(scoreVM: mainMenuVM.scoreVM)
-                    case .info: InfoView(infoVM: mainMenuVM.infoVM)
+                    case .profile: ProfileView(authVM: container.authVM, userProfileVM: container.profileVM, accountScoreVM: container.accountScoreVM)
+                    case .tutorial: TutorialView(tutorialVM: container.tutorialVM, onTabChange: onTabChange)
+                    case .game: GameView(gameVM: container.gameVM, scoreVM: container.scoreVM, accountScoreVM: container.accountScoreVM)
+                    case .leaderboard: LeaderboardView(scoreVM: container.scoreVM)
+                    case .info: InfoView(infoVM: container.infoVM)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -39,6 +39,7 @@ struct MainMenuView: View {
     }
 }
 
+// MARK: - Subviews
 struct CustomTabBar: View {
     let selectedTab: MainMenuTab
     var animation: Namespace.ID
@@ -48,7 +49,7 @@ struct CustomTabBar: View {
     
     var body: some View {
         ZStack {
-            // Tło paska
+            // Background of the progress bar
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(
                     LinearGradient(
@@ -65,7 +66,7 @@ struct CustomTabBar: View {
                 )
                 .shadow(color: .black.opacity(0.35), radius: 12, x: 0, y: -4)
             
-            // Ikony i highlight
+            // Icons and highlights
             HStack {
                 ForEach(MainMenuTab.allCases, id: \.self) { tab in
                     VStack(spacing: 6) {
@@ -133,10 +134,10 @@ struct CustomTabBar: View {
 #if DEBUG
 #Preview {
     let appState = AppState()
-    let mainMenuVM = MainMenuViewModel(appState: appState)
+    let container = MainMenuContainer(appState: appState)
     
     MainMenuView(
-        mainMenuVM: mainMenuVM,
+        container: container,
         selectedTab: .tutorial,
         onTabChange: { newTab in
             appState.currentScreen = .mainMenu(newTab)

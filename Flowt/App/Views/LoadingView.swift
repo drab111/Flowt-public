@@ -12,13 +12,14 @@ struct LoadingView: View {
     @State private var pulse = false
     @State private var sheen = false
 
+    // MARK: - Body
     var body: some View {
         ZStack {
             BackgroundView(withLogo: false)
 
             VStack(spacing: 20) {
                 ZStack {
-                    // glow za logiem
+                    // Glow behind the logo
                     Circle()
                         .fill(RadialGradient(colors: [Color(red: 0.12, green: 0.22, blue: 0.35).opacity(0.92), .clear], center: .center, startRadius: 4, endRadius: 140))
                         .frame(width: 170, height: 170)
@@ -26,7 +27,7 @@ struct LoadingView: View {
                         .opacity(appear ? 1 : 0)
                         .accessibilityHidden(true)
 
-                    // logo
+                    // Logo
                     Image("FlowtLogo")
                         .resizable()
                         .scaledToFit()

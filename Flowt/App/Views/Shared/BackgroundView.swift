@@ -16,6 +16,7 @@ struct BackgroundView: View {
     @State private var parallaxX: CGFloat = 0
     @State private var parallaxY: CGFloat = 0
     
+    // MARK: - Body
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
@@ -77,6 +78,7 @@ struct BackgroundView: View {
     }
 }
 
+// MARK: - Subviews
 private struct WavesLayer: View {
     var hasBottomBar: Bool
     var reduceMotion: Bool
@@ -247,7 +249,6 @@ private struct ParallaxGesture: ViewModifier {
 }
 
 // MARK: - App style
-
 var animatedGradientButtonColors: [Color] = [
     Color(red: 0.0, green: 0.65, blue: 0.8).opacity(0.5),
     Color(red: 0.0, green: 0.55, blue: 0.55).opacity(0.4),

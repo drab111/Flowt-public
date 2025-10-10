@@ -15,7 +15,7 @@ final class ScoreViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var leaderboard: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = [] {
-        didSet { if leaderboard.contains(where: { $0.isLatest }) { playSuccessSound() } }
+        didSet { if leaderboard.contains(where: { $0.isLatest }) { AudioService.shared.playSystemSFX(id: 1022) } }
     }
     
     private let appState: AppState
@@ -30,6 +30,9 @@ final class ScoreViewModel: ObservableObject {
         self.profileService = profileService
     }
     
+    // MARK: - Score Lifecycle
+    func setScore(_ score: Int) { self.score = score }
+    
     func reset() {
         leaderboard = []
         score = nil
@@ -40,8 +43,7 @@ final class ScoreViewModel: ObservableObject {
         profileCache = [:]
     }
     
-    func setScore(_ score: Int) { self.score = score }
-    
+    // MARK: - Leaderboard Loading
     func saveAndLoadLeaderboard(limit: Int) async {
         isLoading = true
         defer { isLoading = false }
@@ -55,7 +57,7 @@ final class ScoreViewModel: ObservableObject {
             latestScoreId = documentId
             
             guard let saved = try await scoreService.fetchScore(id: documentId), let createdAt = saved.createdAt else {
-                 // jeśli brak stempla to próbujemy jeszcze raz po chwili
+                // Retry if timestamp is missing after a short delay
                  try? await Task.sleep(nanoseconds: 200_000_000)
                  if let retry = try await scoreService.fetchScore(id: documentId), let createdAtRetry = retry.createdAt {
                      userRank = try await scoreService.fetchRank(score: retry.score, createdAt: createdAtRetry)
@@ -81,7 +83,7 @@ final class ScoreViewModel: ObservableObject {
         guard let userId = appState.currentUser?.uid else { return }
         let rawScores = try await scoreService.fetchTopScores(limit: limit)
 
-        // Równoległe pobieranie profili + prosty cache, aby nie powielać odczytów
+        // Parallel profile fetching with a simple cache to avoid redundant reads
         let uniqueUserIds = Array(Set(rawScores.map { $0.userId }))
         try await withThrowingTaskGroup(of: (String, UserProfile?).self) { group in
             for uid in uniqueUserIds where profileCache[uid] == nil {
@@ -105,6 +107,7 @@ final class ScoreViewModel: ObservableObject {
         leaderboard = mapped
     }
     
+    // MARK: - Sharing
     func makeSharePayload() -> ScoreSharePayload? {
         let score = self.score ?? 0
         let rank = self.userRank
@@ -112,7 +115,7 @@ final class ScoreViewModel: ObservableObject {
         let card = ScoreShareCardView(score: score, rank: rank, nickname: appState.currentUserProfile?.nickname)
             .frame(width: 600, height: 320)
 
-        // renderujemy do PNG
+        // Render to PNG
         let renderer = ImageRenderer(content: card)
         renderer.scale = 2.0
 
@@ -120,6 +123,4 @@ final class ScoreViewModel: ObservableObject {
 
         return ScoreSharePayload(imageData: png)
     }
-    
-    private func playSuccessSound() { AudioService.shared.playSystemSFX(id: 1022) }
 }

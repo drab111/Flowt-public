@@ -8,21 +8,7 @@
 import SpriteKit
 
 extension GameScene {
-    func addPort(position: CGPoint, type: CargoType) {
-        let port = Port(position: position, portType: type, factory: cargoFactory, increaseScore: { [weak self] in
-                self?.increaseScore()
-            },
-            gameOver: { [weak self] in
-                self?.gameOver()
-            },
-            focusOnPort: { [weak self] port in
-                self?.focusOnPort(port: port)
-            })
-        
-        addChild(port)
-        ports.append(port)
-    }
-    
+    // MARK: - Port Spawning
     func setupInitialPorts() {
         for type in CargoType.allCases { spawnRandomPort(portType: type) }
     }
@@ -42,14 +28,31 @@ extension GameScene {
         }
     }
     
+    func addPort(position: CGPoint, type: CargoType) {
+        let port = Port(position: position, portType: type, factory: cargoFactory, increaseScore: { [weak self] in
+                self?.increaseScore()
+            },
+            gameOver: { [weak self] in
+                self?.gameOver()
+            },
+            focusOnPort: { [weak self] port in
+                self?.focusOnPort(port: port)
+            })
+        
+        addChild(port)
+        ports.append(port)
+    }
+    
+    // MARK: - Cargo Spawning
     func spawnRandomCargo() { ports.randomElement()?.produceRandomCargo() }
     
+    // MARK: - Storm Spawning
     func spawnStorm() {
-        // Usuwamy starą burzę
+        // Remove old storm
         storm?.removeFromParent()
         storm = nil
         
-        // Losujemy obszar dla nowej
+        // Randomize area for new storm
         let randomX = CGFloat.random(in: GameConfig.stormMargin...(size.width - GameConfig.stormMargin))
         let randomY = CGFloat.random(in: GameConfig.stormMargin...(size.height - GameConfig.stormMargin))
         let position = CGPoint(x: randomX, y: randomY)
@@ -95,7 +98,7 @@ extension GameScene {
     }
     
     private func isTooCloseToAnyButton(_ pos: CGPoint, minDistance: CGFloat) -> Bool {
-        // Wszystkie możliwe przyciski linii które są i mogą się pojawić
+        // All possible line buttons (current and potential)
         let buttonPosition = [
             CGPoint(x: size.width - 40, y: size.height - CGFloat(40)),
             CGPoint(x: size.width - 40, y: size.height - CGFloat(90)),
@@ -109,7 +112,7 @@ extension GameScene {
             if dist < minDistance { return true }
         }
         
-        // Dla backToMenuButton, pauseButton i ScoreLabel
+        // For backToMenuButton, pauseButton, and ScoreLabel
         if let button = backToMenuButton {
             let distToButton = hypot(button.position.x - pos.x, button.position.y - pos.y)
             if distToButton < minDistance { return true }

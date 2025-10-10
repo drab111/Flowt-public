@@ -17,6 +17,7 @@ struct GlassField<Value: Hashable>: View {
     var field: Value
     var onSubmit: (() -> Void)? = nil
 
+    // MARK: - Body
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: systemIcon)

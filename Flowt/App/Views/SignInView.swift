@@ -17,6 +17,7 @@ struct SignInView: View {
     @FocusState private var focusedField: Field?
     @AppStorage("hasAcceptedTerms") private var hasAccepted: Bool = false
     
+    // MARK: - Body
     var body: some View {
         ZStack {
             BackgroundView(withLogo: false, hasBottomBar: false)
@@ -55,7 +56,6 @@ struct SignInView: View {
     }
     
     // MARK: - Panels
-    
     private var headerPanel: some View {
         EdgeLitContainer {
             HStack(spacing: 14) {
@@ -163,6 +163,7 @@ struct SignInView: View {
         .padding(.top, 4)
     }
     
+    // MARK: Subviews
     private var forgotPasswordSheet: some View {
         VStack(spacing: 20) {
             Text("Reset Password")

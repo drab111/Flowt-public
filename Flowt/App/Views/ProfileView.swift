@@ -23,12 +23,13 @@ struct ProfileView: View {
     @ObservedObject var authVM: AuthViewModel
     @ObservedObject var userProfileVM: ProfileViewModel
     @ObservedObject var accountScoreVM: AccountScoreViewModel
-    @State private var pickerItem: PhotosPickerItem? = nil // wybrany element w selektorze zdjęć
+    @State private var pickerItem: PhotosPickerItem? = nil // Selected item in the photo picker
     @State private var activeAlert: ActiveAlert? = nil
     @State private var signOutButtonPressed = false
     @State private var deleteButtonPressed = false
     @FocusState private var focusedField: Int?
     
+    // MARK: - Body
     var body: some View {
         ZStack {
             if userProfileVM.isLoading || accountScoreVM.isLoading {
@@ -81,7 +82,6 @@ struct ProfileView: View {
     }
     
     // MARK: - Panels
-    
     private var profilePanel: some View {
         EdgeLitContainer {
             VStack(spacing: 20) {

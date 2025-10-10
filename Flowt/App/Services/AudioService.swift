@@ -18,7 +18,7 @@ protocol AudioServiceProtocol {
 }
 
 final class AudioService: AudioServiceProtocol {
-    static let shared = AudioService()
+    static let shared = AudioService() // Singleton
     
     private var endObserver: Any?
     private var preferencesObserver: Any?
@@ -44,8 +44,7 @@ final class AudioService: AudioServiceProtocol {
         if let preferencesObserver { NotificationCenter.default.removeObserver(preferencesObserver) }
     }
     
-    // MARK: - Settings Observation
-    
+    // MARK: - Preference Handling
     private func applyPreferences(profile: UserProfile) {
         sfxEnabled = profile.sfxEnabled
         musicEnabled = profile.musicEnabled
@@ -57,12 +56,11 @@ final class AudioService: AudioServiceProtocol {
         }
     }
     
-    // MARK: - Music
-    
+    // MARK: - Music Playback
     func start() {
         guard musicEnabled, player == nil else { return }
         
-        // Losujemy playlistę
+        // Shuffle the playlist
         trackNames.shuffle()
         currentIndex = 0
         playTrack(index: currentIndex)
@@ -71,7 +69,7 @@ final class AudioService: AudioServiceProtocol {
     private func playTrack(index: Int) {
         guard musicEnabled else { return }
         guard index < trackNames.count else {
-            currentIndex = 0 // Jeśli dojdziemy do końca to zaczynamy od nowa
+            currentIndex = 0 // Restart from the beginning when reaching the end
             playTrack(index: currentIndex)
             return
         }
@@ -88,7 +86,7 @@ final class AudioService: AudioServiceProtocol {
         player?.volume = 0.5
         player?.play()
         
-        // Obserwujemy koniec utworu
+        // Observe when the audio track finishes playing in order to play the next track
         endObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { [weak self] _ in
             guard let self = self else { return }
             self.currentIndex += 1
@@ -103,8 +101,7 @@ final class AudioService: AudioServiceProtocol {
         player = nil
     }
     
-    // MARK: - SFX
-    
+    // MARK: - Sound Effects
     func playSFX(node: SKNode, fileName: String) {
         guard sfxEnabled else { return }
         node.run(SKAction.playSoundFileNamed(fileName, waitForCompletion: false))
@@ -126,9 +123,9 @@ final class AudioService: AudioServiceProtocol {
         soundPlayer.volume = 0.8
         soundPlayer.play()
         
-        // czekamy na powiadomienie o zakończeniu dźwięku
+        // Observe when the audio track finishes playing
         for await _ in NotificationCenter.default.notifications(named: .AVPlayerItemDidPlayToEndTime, object: item) {
-            break // pierwszy event wystarczy
+            break // First event is enough
         }
         player = nil
         

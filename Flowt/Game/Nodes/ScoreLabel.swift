@@ -15,14 +15,6 @@ class ScoreLabel: SKLabelNode {
         }
     }
     
-    private func animateScoreChange() {
-        let scaleUp = SKAction.scale(to: 1.3, duration: 0.12)
-        let scaleDown = SKAction.scale(to: 0.95, duration: 0.1)
-        let scaleNormal = SKAction.scale(to: 1.0, duration: 0.1)
-        let seq = SKAction.sequence([scaleUp, scaleDown, scaleNormal])
-        run(seq)
-    }
-    
     init(position: CGPoint) {
         super.init()
         fontColor = .white
@@ -33,6 +25,15 @@ class ScoreLabel: SKLabelNode {
         horizontalAlignmentMode = .left
         verticalAlignmentMode = .top
         text = "Score: 0"
+    }
+    
+    // MARK: - Animation
+    private func animateScoreChange() {
+        let scaleUp = SKAction.scale(to: 1.3, duration: 0.12)
+        let scaleDown = SKAction.scale(to: 0.95, duration: 0.1)
+        let scaleNormal = SKAction.scale(to: 1.0, duration: 0.1)
+        let seq = SKAction.sequence([scaleUp, scaleDown, scaleNormal])
+        run(seq)
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }

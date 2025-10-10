@@ -10,6 +10,8 @@ import SwiftUI
 @MainActor
 final class TutorialViewModel: ObservableObject {
     @Published var currentIndex = 0
+    
+    // MARK: - Tutorial Pages
     let pages: [TutorialPage] = [
         TutorialPage(imageName: "FlowtLogo", title: "Welcome to Flowt", description: "Guide your ships between offshore platforms to deliver vital resources. Plan routes wisely, balance supply and demand, and keep the system running."),
         
@@ -36,6 +38,7 @@ final class TutorialViewModel: ObservableObject {
         TutorialPage(imageName: "FlowtLogo", title: "Aim for the Top", description: "Deliver as much cargo as possible and survive as long as you can. Strive for the highest score and climb the global ranking.")
     ]
     
+    // MARK: - Navigation
     func nextPage() {
         if currentIndex < pages.count - 1 { currentIndex += 1 }
     }

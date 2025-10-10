@@ -1,5 +1,5 @@
 //
-//  MainMenuViewModel.swift
+//  MainMenuContainer.swift
 //  Flowt
 //
 //  Created by Wiktor Drab on 22/08/2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @MainActor
-final class MainMenuViewModel: ObservableObject {
+final class MainMenuContainer: ObservableObject {
     let authVM: AuthViewModel
     let profileVM: ProfileViewModel
     let gameVM: GameViewModel

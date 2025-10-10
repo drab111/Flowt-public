@@ -18,13 +18,12 @@ class Ocean: SKNode {
         
         makeGradientTexture(size: size)
         brightnessPulseEffect()
-        addWaveLayer(size: size) // migające fale
+        addWaveLayer(size: size) // Blinking waves
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not implemented") }
     
     // MARK: - Setup
-    
     private func makeGradientTexture(size: CGSize) {
         let renderer = UIGraphicsImageRenderer(size: size)
         let image = renderer.image { ctx in
@@ -51,7 +50,7 @@ class Ocean: SKNode {
             )
         }
         
-        // dwie kopie gradientu (jedna nad drugą)
+        // Two gradient layers (stacked)
         for i in 0..<2 {
             let node = SKSpriteNode(texture: SKTexture(image: image))
             node.size = size
@@ -76,12 +75,11 @@ class Ocean: SKNode {
     }
     
     // MARK: - Update
-    
     func update(_ dt: CGFloat) {
         for node in layers {
             node.position.y -= scrollSpeed * dt
             
-            // teleport gdy cały gradient zniknie
+            // Teleport once the entire gradient disappears
             if node.position.y <= -oceanSize.height { node.position.y += oceanSize.height * 2 }
         }
     }

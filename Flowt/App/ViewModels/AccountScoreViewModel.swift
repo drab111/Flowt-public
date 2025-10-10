@@ -22,6 +22,7 @@ final class AccountScoreViewModel: ObservableObject {
         self.scoreService = scoreService
     }
     
+    // MARK: - Public Methods
     func loadUserStats() async {
         guard let userId = appState.currentUser?.uid else { return }
         isLoading = true

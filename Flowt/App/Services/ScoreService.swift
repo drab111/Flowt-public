@@ -19,6 +19,7 @@ protocol ScoreServiceProtocol {
 final class ScoreService: ScoreServiceProtocol {
     private let db = Firestore.firestore()
     
+    // MARK: - Create & Save
     func saveScore(_ entry: ScoreEntry) async throws -> String {
         let data: [String: Any] = [
             "userId": entry.userId,
@@ -30,6 +31,7 @@ final class ScoreService: ScoreServiceProtocol {
         return ref.documentID
     }
     
+    // MARK: - Fetching
     func fetchTopScores(limit: Int) async throws -> [ScoreEntry] {
         let snapshot = try await db.collection("scores")
             .order(by: "score", descending: true)
@@ -48,16 +50,16 @@ final class ScoreService: ScoreServiceProtocol {
     }
     
     func fetchRank(score: Int, createdAt: Date) async throws -> Int {
-        // konwersja Date -> Timestamp dla zapytania
+        // Convert Date -> Timestamp for Firestore query
         let ts = Timestamp(date: createdAt)
 
-        // ile osób ma wyższy wynik
+        // Count how many users have a higher score
         let greaterQ = db.collection("scores")
             .whereField("score", isGreaterThan: score)
         let greaterAgg = try await greaterQ.count.getAggregation(source: .server)
         let greater = greaterAgg.count.intValue
 
-        // ile osób ma ten sam wynik ale wcześniejszy czas
+        // Count users with the same score but earlier submission time
         let tieQ = db.collection("scores")
             .whereField("score", isEqualTo: score)
             .whereField("createdAt", isLessThan: ts)
@@ -95,6 +97,7 @@ final class ScoreService: ScoreServiceProtocol {
         )
     }
     
+    // MARK: - Deletion
     func deleteScores(userId: String) async throws {
         let snapshot = try await db.collection("scores")
             .whereField("userId", isEqualTo: userId)

@@ -24,6 +24,7 @@ class LineSelectionPopup: SKNode, Popup {
     
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
     
+    // MARK: - Setup UI
     private func setupBackground() {
         let bg = SKSpriteNode(color: .black, size: UIScreen.main.bounds.size)
         bg.alpha = 0.5
@@ -42,7 +43,7 @@ class LineSelectionPopup: SKNode, Popup {
     }
     
     private func setupButtons(amount: Int) {
-        // Wyliczamy pozycje startowe dla różnych ilości linii
+        // Calculate starting positions for different line counts
         let initPos: CGFloat
         switch amount {
         case 2: initPos = -25
@@ -58,6 +59,7 @@ class LineSelectionPopup: SKNode, Popup {
         }
     }
     
+    // MARK: - Touch Handling
     func handleTouch(_ location: CGPoint) {
         guard let parent = parent else { return }
         let localPos = convert(location, from: parent)
@@ -70,8 +72,8 @@ class LineSelectionPopup: SKNode, Popup {
     }
 }
 
-// Pojedynczy przycisk wyboru linii
-fileprivate class LineButton: SKShapeNode {
+// MARK: - Helpers
+fileprivate class LineButton: SKShapeNode { // Single line-selection button
     let index: Int
     
     init(index: Int, color: UIColor, position: CGPoint) {

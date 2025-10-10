@@ -22,6 +22,7 @@ protocol AuthServiceProtocol {
 }
 
 final class AuthService: AuthServiceProtocol {
+    private var currentNonce: String?
     
     // MARK: - Email & Password
     func signUp(email: String, password: String) async throws -> AuthUser {
@@ -35,12 +36,10 @@ final class AuthService: AuthServiceProtocol {
     }
     
     
-    // MARK: - Apple
-    private var currentNonce: String?
-    
+    // MARK: - Apple Sign-In
     func prepareAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         let nonce = randomNonceString()
-        currentNonce = nonce // Zapisujemy nonce w zmiennej globalnej, by później porównać go z odpowiedzią
+        currentNonce = nonce // Store nonce globally to compare it later with the server response
         request.requestedScopes = [.fullName, .email]
         request.nonce = sha256(nonce)
     }
@@ -54,7 +53,7 @@ final class AuthService: AuthServiceProtocol {
         return AuthUser(uid: result.user.uid, displayName: result.user.displayName ?? credential.fullName?.givenName, email: result.user.email)
     }
     
-    // MARK: - Other Methods
+    // MARK: - Account Management
     func deleteAccount() async throws {
         guard let user = Auth.auth().currentUser else { return }
         try await user.delete()

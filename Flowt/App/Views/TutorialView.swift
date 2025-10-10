@@ -9,10 +9,11 @@ import SwiftUI
 
 struct TutorialView: View {
     @ObservedObject var tutorialVM: TutorialViewModel
-    @GestureState private var dragOffset: CGFloat = 0 // długość przesunięcia przez usera w trakcie gestu (sam wróci na 0 po zakończeniu)
-    @State private var settledOffset: CGFloat = 0 // umożliwia płynny powrót gdy nie przekroczymy threshold
+    @GestureState private var dragOffset: CGFloat = 0 // The distance of user's drag gesture (auto resets to 0 when released)
+    @State private var settledOffset: CGFloat = 0 // Enables smooth return if drag distance doesn't exceed threshold
     let onTabChange: (MainMenuTab) -> Void
     
+    // MARK: - Body
     var body: some View {
         VStack {
             headerPanel
@@ -26,7 +27,6 @@ struct TutorialView: View {
     }
     
     // MARK: - Panels
-    
     private var headerPanel: some View {
         EdgeLitContainer {
             HStack(alignment: .top, spacing: 12) {
@@ -63,18 +63,18 @@ struct TutorialView: View {
             .animation(.spring(response: 0.45, dampingFraction: 0.85), value: tutorialVM.currentIndex)
             .gesture(
                 DragGesture()
-                    .updating($dragOffset) { value, state, _ in // podczas przeciągania aktualizujemy @GestureState
-                        state = value.translation.width // ile pikseli przesunięte w osi X od początku gestu (state to tymczasowa kopia dragOffset)
+                    .updating($dragOffset) { value, state, _ in // Update @GestureState during the drag gesture
+                        state = value.translation.width // Horizontal drag distance in pixels from the gesture’s starting point (state is a temporary copy of dragOffset)
                     }
                     .onEnded { value in
-                        let threshold = geo.size.width / 5 // trzeba przeciągnąć min. 1/5 szerokości żeby przeskoczyć na inną stronę
+                        let threshold = geo.size.width / 5 // Must drag at least 1/5 of the view’s width to switch to another page
                         if value.translation.width < -threshold && tutorialVM.currentIndex < tutorialVM.pages.count - 1 {
                             tutorialVM.currentIndex += 1
                             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                         } else if value.translation.width > threshold && tutorialVM.currentIndex > 0 {
                             tutorialVM.currentIndex -= 1
                             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                        } else { // cofamy z animacją gdy nie przekroczyliśmy progu
+                        } else { // Revert with animation if the threshold was not exceeded
                             settledOffset = value.translation.width
                             withAnimation(.spring()) { settledOffset = 0 }
                         }
@@ -105,7 +105,6 @@ struct TutorialView: View {
     }
     
     // MARK: - Helpers
-    
     private func progressWidth(total: CGFloat) -> CGFloat {
         guard tutorialVM.pages.count > 1 else { return total }
         let step = total / CGFloat(tutorialVM.pages.count - 1)
@@ -113,6 +112,7 @@ struct TutorialView: View {
     }
 }
 
+// MARK: Subviews
 struct TutorialCard: View {
     let page: TutorialPage
     

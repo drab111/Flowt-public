@@ -12,6 +12,7 @@ struct ScoreShareCardView: View {
     let rank: Int?
     let nickname: String?
 
+    // MARK: - Body
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -45,7 +46,7 @@ struct ScoreShareCardView: View {
                     .frame(height: 72)
                     .shadow(radius: 6)
 
-                // Nick + ranga (jeśli jest)
+                // Nickname + rank (if available)
                 HStack(spacing: 8) {
                     Spacer()
                     if let nickname, !nickname.isEmpty {
@@ -75,7 +76,7 @@ struct ScoreShareCardView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                // Wynik
+                // Score
                 VStack(spacing: 2) {
                     Text("\(score)")
                         .font(.system(size: 60, weight: .black, design: .rounded))
@@ -90,7 +91,7 @@ struct ScoreShareCardView: View {
                 }
                 .padding(.top, 2)
 
-                // Delikatny divider
+                // Subtle divider
                 RoundedRectangle(cornerRadius: 2)
                     .fill(.white.opacity(0.10))
                     .frame(height: 2)
@@ -115,6 +116,7 @@ struct ScoreShareCardView: View {
     }
 }
 
+// MARK: - Subviews
 private struct WaveMask: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
@@ -129,8 +131,9 @@ private struct WaveMask: Shape {
     }
 }
 
+// MARK: - Helpers
 struct ScoreSharePayload: Transferable {
-    let imageData: Data // PNG karty wyniku
+    let imageData: Data // PNG scorecard
 
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(exportedContentType: .png) { payload in

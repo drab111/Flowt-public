@@ -7,10 +7,12 @@
 
 import SpriteKit
 
+// MARK: - Protocol
 protocol MovementStrategy {
     func moveShip(_ context: ShipMovementContext)
 }
 
+// MARK: - Context
 class ShipMovementContext {
     private var strategy: MovementStrategy
     unowned let ship: Ship
@@ -25,6 +27,7 @@ class ShipMovementContext {
     func move() { strategy.moveShip(self) }
 }
 
+// MARK: - Concrete Strategies
 class LoopMovementStrategy: MovementStrategy {
     func moveShip(_ context: ShipMovementContext) {
         let ship = context.ship

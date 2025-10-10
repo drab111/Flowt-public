@@ -7,11 +7,13 @@
 
 import SwiftUI
 
-// Liniowy pasek wyników z delikatnym pulsem
+// Linear score bar with subtle pulse animation
 struct ScoreBar: View {
     let progress: CGFloat
     let label: String
     @State private var pulse = false
+    
+    // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             ZStack(alignment: .leading) {

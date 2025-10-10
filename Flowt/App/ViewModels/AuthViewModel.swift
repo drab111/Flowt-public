@@ -25,7 +25,7 @@ final class AuthViewModel: ObservableObject {
         self.authService = authService
     }
     
-    // MARK: - Sign in with Email & Password
+    // MARK: - Email & Password Authentication
     func submit() async {
         isLoading = true
         defer { isLoading = false }
@@ -57,7 +57,7 @@ final class AuthViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
     
-    // MARK: - Sign in with Apple
+    // MARK: - Apple Sign-In
     func handleAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         authService.prepareAppleRequest(request)
     }
@@ -65,7 +65,7 @@ final class AuthViewModel: ObservableObject {
     func handleAppleCompletion(_ result: Result<ASAuthorization, Error>) {
         switch result {
         case .success(let authResults):
-            // credential - to obiekt zwracany przez system po zakończeniu procesu autoryzacji Apple (tożsamość usera)
+            // 'credential' is the object returned by the system after completing Apple authentication (user identity)
             if let credential = authResults.credential as? ASAuthorizationAppleIDCredential {
                 Task {
                     do {
@@ -80,7 +80,16 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
-    // MARK: Deleting Account
+    // MARK: - Account Management
+    func signOut() {
+        do {
+            try authService.signOut()
+            appState.currentUser = nil
+            appState.currentUserProfile = nil
+            appState.currentScreen = .signIn
+        } catch { errorMessage = error.localizedDescription }
+    }
+    
     func deleteUserAccount() async {
         guard (appState.currentUser?.uid) != nil else { return }
         do {
@@ -90,7 +99,7 @@ final class AuthViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
     
-    // MARK: Reset password
+    // MARK: - Password Reset
     func resetPasswordWithEmail(_ email: String) async {
         guard !email.isEmpty else { return }
         do {
@@ -100,7 +109,6 @@ final class AuthViewModel: ObservableObject {
     }
     
     // MARK: - Helpers
-    
     var isEmailValid: Bool {
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
@@ -109,15 +117,6 @@ final class AuthViewModel: ObservableObject {
     var isPasswordValid: Bool { return password.count >= 8 }
 
     var canSubmit: Bool { return isEmailValid && isPasswordValid }
-    
-    func signOut() {
-        do {
-            try authService.signOut()
-            appState.currentUser = nil
-            appState.currentUserProfile = nil
-            appState.currentScreen = .signIn
-        } catch { errorMessage = error.localizedDescription }
-    }
     
     func toggleMode() {
         withAnimation(.spring()) {

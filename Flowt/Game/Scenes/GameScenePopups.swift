@@ -22,10 +22,10 @@ extension GameScene {
             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             self.pendingUpgrade = upgradeFactory.createUpgrade(option: option)
             
-            // Zamykamy popup 1
+            // Close popup 1
             self.activePopup = nil
             
-            // Teraz otwieramy popup 2 - wybór linii
+            // Open popup 2 — line selection
             self.showLineSelectionPopup()
         }
         
@@ -39,7 +39,7 @@ extension GameScene {
             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             
             if let upgrade = self.pendingUpgrade {
-                // Aplikujemy do odpowiedniej linii
+                // Apply to the selected line
                 let line = self.routeLines[index]
                 upgrade.apply(line: line)
                 self.pendingUpgrade = nil
