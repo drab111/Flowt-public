@@ -376,7 +376,9 @@ private struct LeaderboardRowCard: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     LeaderboardView(scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: ProfileService()))
 }
+#endif

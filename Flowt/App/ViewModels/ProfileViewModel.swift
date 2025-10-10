@@ -29,6 +29,7 @@ final class ProfileViewModel: ObservableObject {
     func loadUserProfile() async {
         isLoading = true
         defer { isLoading = false }
+        
         guard let uid = appState.currentUser?.uid else { return }
         do {
             if let profile = try await profileService.fetchProfile(uid: uid) {

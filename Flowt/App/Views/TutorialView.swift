@@ -142,6 +142,7 @@ struct TutorialCard: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     return TutorialView(
@@ -152,3 +153,4 @@ struct TutorialCard: View {
     )
     .environmentObject(appState)
 }
+#endif

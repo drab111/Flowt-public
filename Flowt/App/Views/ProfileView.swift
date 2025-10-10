@@ -394,6 +394,7 @@ struct ProfileView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     let userProfileVM = ProfileViewModel(appState: appState, profileService: ProfileService())
@@ -403,3 +404,4 @@ struct ProfileView: View {
     ProfileView(authVM: authVM, userProfileVM: userProfileVM, accountScoreVM: accountScoreVM)
         .environmentObject(appState)
 }
+#endif

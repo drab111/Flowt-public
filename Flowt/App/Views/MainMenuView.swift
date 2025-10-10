@@ -130,6 +130,7 @@ struct CustomTabBar: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     let mainMenuVM = MainMenuViewModel(appState: appState)
@@ -143,3 +144,4 @@ struct CustomTabBar: View {
     )
     .environmentObject(appState)
 }
+#endif

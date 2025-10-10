@@ -323,6 +323,7 @@ private struct ToOneBar: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     let scoreService = ScoreService()
@@ -333,3 +334,4 @@ private struct ToOneBar: View {
     )
     .environmentObject(appState)
 }
+#endif

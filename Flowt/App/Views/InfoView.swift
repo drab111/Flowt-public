@@ -481,6 +481,8 @@ private struct Tooltip: View {
     }
 }
 
+#if DEBUG
 #Preview {
     InfoView(infoVM: InfoViewModel())
 }
+#endif

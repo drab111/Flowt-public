@@ -269,8 +269,10 @@ private struct ResultRowCard: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     EndGameView(gameVM: GameViewModel(), scoreVM: ScoreViewModel(appState: appState, scoreService: ScoreService(), profileService: ProfileService()))
         .environmentObject(appState)
 }
+#endif

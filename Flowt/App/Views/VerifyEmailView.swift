@@ -190,9 +190,11 @@ private struct BulletRow: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     let viewModel = VerifyEmailViewModel(appState: appState, authService: AuthService())
     VerifyEmailView(verifyVM: viewModel)
         .environmentObject(appState)
 }
+#endif

@@ -126,7 +126,9 @@ struct TermsAgreementView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     @Previewable @State var accepted = false
     TermsAgreementView(infoVM: InfoViewModel(), hasAccepted: $accepted)
 }
+#endif

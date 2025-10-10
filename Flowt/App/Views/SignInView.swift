@@ -222,9 +222,11 @@ struct SignInView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let appState = AppState()
     let viewModel = AuthViewModel(appState: appState, authService: AuthService())
     SignInView(authVM: viewModel)
         .environmentObject(appState)
 }
+#endif
