@@ -51,8 +51,10 @@ extension GameScene {
         if let tappedButton = nodes(at: location).compactMap({ $0 as? SKShapeNode }).first, let index = colorButtons.firstIndex(of: tappedButton) {
             AudioService.shared.playSFX(node: self, fileName: "clickSound.wav")
             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-            currentLineIndex = index
-            createColorButtons()
+            if currentLineIndex != index {
+                currentLineIndex = index
+                createColorButtons()
+            }
             isDrawing = false
             return
         }

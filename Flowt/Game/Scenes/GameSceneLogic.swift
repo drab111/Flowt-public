@@ -199,7 +199,8 @@ extension GameScene {
         case ..<500:   return 0.55
         case ..<1000:  return 0.38
         case ..<1500:  return 0.28
-        default:       return 0.18
+        case ..<2000:  return 0.18
+        default:       return 0.05
         }
     }
     
