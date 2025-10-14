@@ -15,7 +15,12 @@ final class ScoreViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var leaderboard: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = [] {
-        didSet { if leaderboard.contains(where: { $0.isLatest }) { AudioService.shared.playSystemSFX(id: 1022) } }
+        didSet {
+            if leaderboard.contains(where: { $0.isLatest }) {
+                AudioService.shared.playSystemSFX(id: 1022)
+                GameCenterService.shared.unlockAchievement(id: "flowt.ach.leaderboard.top3")
+            }
+        }
     }
     
     private let appState: AppState

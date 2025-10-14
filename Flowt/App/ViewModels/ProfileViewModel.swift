@@ -39,7 +39,7 @@ final class ProfileViewModel: ObservableObject {
                 avatarData = profile.avatarBase64.flatMap { Data(base64Encoded: $0) }
             } else {
                 errorMessage = "New profile"
-                currentNickname = "Player \(String(uid.prefix(5)))"
+                currentNickname = GameCenterService.shared.displayName ?? "Player \(String(uid.prefix(5)))"
                 avatarData = nil
                 let profile = UserProfile(
                     id: uid,

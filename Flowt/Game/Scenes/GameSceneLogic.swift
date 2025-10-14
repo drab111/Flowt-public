@@ -47,6 +47,25 @@ extension GameScene {
         cargoSpawnInterval = cargoInterval(score: score)
         
         if score == GameConfig.PointsToSpawnAdditionalStorm && additionalStorm == nil { unlockAdditionalStorm() }
+        
+        checkScoreAchievements(score: score) // Game Center
+    }
+    
+    private func checkScoreAchievements(score: Int) {
+        switch score {
+        case 100:
+            GameCenterService.shared.unlockAchievement(id: "flowt.ach.score.100")
+        case 300:
+            GameCenterService.shared.unlockAchievement(id: "flowt.ach.score.300.secondstorm")
+        case 500:
+            GameCenterService.shared.unlockAchievement(id: "flowt.ach.score.500.fulllines")
+        case 1000:
+            GameCenterService.shared.unlockAchievement(id: "flowt.ach.score.1000")
+        case 2000:
+            GameCenterService.shared.unlockAchievement(id: "flowt.ach.score.2000")
+        default:
+            break
+        }
     }
     
     // MARK: Storm Handling
@@ -176,11 +195,11 @@ extension GameScene {
         case ..<60:    return 1.8
         case ..<100:   return 1.4
         case ..<150:   return 1.0
-        case ..<300:   return 0.7
-        case ..<500:   return 0.5
-        case ..<1000:  return 0.28
-        case ..<1500:  return 0.2
-        default:       return 0.12
+        case ..<300:   return 0.72
+        case ..<500:   return 0.55
+        case ..<1000:  return 0.38
+        case ..<1500:  return 0.28
+        default:       return 0.18
         }
     }
     

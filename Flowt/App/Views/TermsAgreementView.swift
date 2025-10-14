@@ -107,7 +107,7 @@ struct TermsAgreementView: View {
                 Toggle(isOn: $agreedPrivacy)  { Text("I have read and agree to the Privacy Policy.") }
                     .tint(.cyan)
                 
-                Toggle(isOn: $confirmedAge)  { Text("I confirm I am at least 17 years old.") }
+                Toggle(isOn: $confirmedAge)  { Text("I confirm I am at least 13 years old.") }
                     .tint(.cyan)
             }
         }
