@@ -21,16 +21,19 @@ struct TermsAgreementView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack(spacing: 20) {
-            headerPanel
-            agreementsPanel
-            togglesPanel
-            Spacer()
-            buttonPanel
-            Spacer(minLength: 30)
+        ScrollView {
+            VStack(spacing: 20) {
+                headerPanel
+                agreementsPanel
+                togglesPanel
+                Spacer()
+                buttonPanel
+                Spacer(minLength: 30)
+            }
+            .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL) }
+            .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL) }
         }
-        .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL) }
-        .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL) }
+        .scrollBounceBehavior(.basedOnSize)
     }
     
     // MARK: - Panels
@@ -101,14 +104,9 @@ struct TermsAgreementView: View {
             VStack(alignment: .leading, spacing: 12) {
                 SectionHeader(title: "Consent", subtitle: "Please confirm")
                 
-                Toggle(isOn: $agreedTerms)  { Text("I have read and agree to the Terms of Service.") }
-                    .tint(.cyan)
-                
-                Toggle(isOn: $agreedPrivacy)  { Text("I have read and agree to the Privacy Policy.") }
-                    .tint(.cyan)
-                
-                Toggle(isOn: $confirmedAge)  { Text("I confirm I am at least 13 years old.") }
-                    .tint(.cyan)
+                AgreementToggle(text: "I have read and agree to the Terms of Service.", isOn: $agreedTerms)
+                AgreementToggle(text: "I have read and agree to the Privacy Policy.", isOn: $agreedPrivacy)
+                AgreementToggle(text: "I confirm I am at least 13 years old.", isOn: $confirmedAge)
             }
         }
         .padding(.horizontal, 20)
@@ -123,6 +121,24 @@ struct TermsAgreementView: View {
         .opacity(canAccept ? 1 : 0.5)
         .disabled(!canAccept)
         .padding(.horizontal, 24)
+    }
+}
+
+// MARK: - Subviews
+private struct AgreementToggle: View {
+    let text: String
+    @Binding var isOn: Bool
+    
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            Text(text)
+                .font(.body)
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .tint(.cyan)
     }
 }
 

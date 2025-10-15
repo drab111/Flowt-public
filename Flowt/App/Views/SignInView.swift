@@ -24,32 +24,40 @@ struct SignInView: View {
                 .onTapGesture { focusedField = nil }
                 .ignoresSafeArea()
             
-            if !hasAccepted {
-                TermsAgreementView(infoVM: InfoViewModel(), hasAccepted: $hasAccepted)
+            ZStack {
+                if !hasAccepted {
+                    TermsAgreementView(infoVM: InfoViewModel(), hasAccepted: $hasAccepted)
+                        .transition(.opacity)
+                } else {
+                    ScrollView {
+                        VStack(spacing: 15) {
+                            headerPanel
+                            logoPanel
+                            formPanel
+                            actionsPanel
+                            forgotPasswordRow
+                            modeSwitcher
+                            if let error = authVM.errorMessage { banner(message: error, colors: [.yellow, .orange], symbol: "exclamationmark.triangle.fill") }
+                            else if let info = authVM.infoMessage { banner(message: info, colors: [.cyan, .teal], symbol: "checkmark.seal.fill") }
+                            Spacer(minLength: 20)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 30)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .scrollDismissesKeyboard(.immediately)
                     .transition(.opacity)
-            } else {
-                VStack(spacing: 15) {
-                    headerPanel
-                    logoPanel
-                    formPanel
-                    actionsPanel
-                    forgotPasswordRow
-                    modeSwitcher
-                    if let error = authVM.errorMessage { banner(message: error, colors: [.yellow, .orange], symbol: "exclamationmark.triangle.fill") }
-                    else if let info = authVM.infoMessage { banner(message: info, colors: [.cyan, .teal], symbol: "checkmark.seal.fill") }
-                    Spacer(minLength: 20)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 30)
-                
-                if authVM.isLoading {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                    ProgressView("Signing in...")
-                        .padding(.horizontal, 18).padding(.vertical, 12)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 6)
-                }
+            }
+            .animation(.easeInOut, value: hasAccepted)
+            
+            if authVM.isLoading {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                ProgressView("Signing in...")
+                    .padding(.horizontal, 18).padding(.vertical, 12)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 6)
             }
         }
         .sheet(isPresented: $showForgotPasswordSheet) { forgotPasswordSheet }

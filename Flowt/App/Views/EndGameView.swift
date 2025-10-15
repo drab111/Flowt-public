@@ -19,16 +19,19 @@ struct EndGameView: View {
             BackgroundView()
                 .ignoresSafeArea()
             
-            VStack(spacing: 22) {
-                Spacer(minLength: 30)
-                scorePanel
-                topFivePanel
-                Spacer()
-                actionsPanel
+            ScrollView {
+                VStack(spacing: 22) {
+                    Spacer(minLength: 30)
+                    scorePanel
+                    topFivePanel
+                    Spacer()
+                    actionsPanel
+                }
+                .padding(.horizontal)
+                .padding(.top, 30)
+                .padding(.bottom, 30)
             }
-            .padding(.horizontal)
-            .padding(.top, 30)
-            .padding(.bottom, 30)
+            .scrollBounceBehavior(.basedOnSize)
         }
         .task { await scoreVM.saveAndLoadLeaderboard(limit: 3) }
         .onAppear {

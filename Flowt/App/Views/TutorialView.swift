@@ -15,15 +15,18 @@ struct TutorialView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack {
-            headerPanel
-            Spacer()
-            cardsPanel
-            progressPanel
-            Spacer()
-            if tutorialVM.currentIndex == tutorialVM.pages.count - 1 { playPanel }
-            Spacer(minLength: 40)
+        ScrollView {
+            VStack {
+                headerPanel
+                Spacer()
+                cardsPanel
+                progressPanel
+                Spacer()
+                if tutorialVM.currentIndex == tutorialVM.pages.count - 1 { playPanel }
+                Spacer(minLength: 40)
+            }
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
     
     // MARK: - Panels

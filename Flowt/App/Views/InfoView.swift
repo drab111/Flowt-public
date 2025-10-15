@@ -70,13 +70,13 @@ struct InfoView: View {
                 let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
                 
                 LazyVGrid(columns: columns, spacing: 12) {
-                    ActionCard(title: "Privacy Policy", icon: "lock.fill", gradient: [.cyan, .teal]) {
+                    ActionCard(title: "Privacy", icon: "lock.fill", gradient: [.cyan, .teal]) {
                         showPrivacy = true
                     }
-                    ActionCard(title: "Terms of Service", icon: "doc.text.fill", gradient: [.cyan, .teal]) {
+                    ActionCard(title: "Terms", icon: "doc.text.fill", gradient: [.cyan, .teal]) {
                         showTerms = true
                     }
-                    ActionCard(title: "Contact Support", icon: "envelope.fill", gradient: [.cyan, .teal]) {
+                    ActionCard(title: "Support", icon: "envelope.fill", gradient: [.cyan, .teal]) {
                         if let url = URL(string: "mailto:flowt.apps@gmail.com") { openURL(url) }
                     }
                     ShareLink(
@@ -86,7 +86,7 @@ struct InfoView: View {
                         preview: { (_: URL) in
                             SharePreview("Flowt", image: Image("FlowtLogo"))
                         }
-                    ) { ActionCardChrome(title: "Share Flowt", icon: "square.and.arrow.up.fill", gradient: [.cyan, .teal]) }
+                    ) { ActionCardChrome(title: "Share", icon: "square.and.arrow.up.fill", gradient: [.cyan, .teal]) }
                     .buttonStyle(.plain)
                 }
             }
@@ -197,7 +197,7 @@ private struct ActionCard: View {
         }) {
             ZStack {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color.white.opacity(0.06))
+                    .fill(Color.white.opacity(0.16))
                     .overlay(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .stroke(LinearGradient(colors: gradient, startPoint: .leading, endPoint: .trailing), lineWidth: 1)
@@ -229,9 +229,17 @@ private struct ActionCard: View {
                             .foregroundColor(.white)
                             .font(.system(size: 18, weight: .bold))
                     }
+                    
                     Text(title)
-                        .font(.headline.weight(.semibold))
+                        .font(.headline)
+                        .fontWeight(.semibold)
                         .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .truncationMode(.tail)
+                        .accessibilityLabel("Share Flowt")
+                        .accessibilityHint("Opens \(title.lowercased()).")
+                    
                     Spacer()
                 }
                 .padding(.horizontal, 14)
@@ -255,7 +263,7 @@ private struct ActionCardChrome: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.white.opacity(0.06))
+                .fill(Color.white.opacity(0.16))
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .stroke(LinearGradient(colors: gradient, startPoint: .leading, endPoint: .trailing), lineWidth: 1)
@@ -287,9 +295,24 @@ private struct ActionCardChrome: View {
                         .foregroundColor(.white)
                         .font(.system(size: 18, weight: .bold))
                 }
+                
                 Text(title)
-                    .font(.headline.weight(.semibold))
+                    .font(.headline)
+                    .fontWeight(.semibold)
                     .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .truncationMode(.tail)
+                    .accessibilityLabel({
+                        switch title {
+                        case "Privacy": "Privacy Policy"
+                        case "Terms": "Terms of Service"
+                        case "Support": "Contact Support"
+                        default: title
+                        }
+                    }())
+                    .accessibilityHint("Opens \(title.lowercased()).")
+                
                 Spacer()
             }
             .padding(.horizontal, 14)
@@ -448,7 +471,8 @@ private struct Tooltip: View {
     let text: String
     var body: some View {
         Text(text)
-            .font(.caption2.weight(.semibold))
+            .font(.footnote)
+            .fontWeight(.semibold)
             .padding(.horizontal, 8).padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
