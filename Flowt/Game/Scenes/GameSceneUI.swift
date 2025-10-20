@@ -227,7 +227,8 @@ extension GameScene {
     // MARK: - End Game Focus
     func focusOnPort(port: Port, scale: CGFloat = 0.14, duration: TimeInterval = 2.0) {
         guard let camera = camera else { return }
-
+        
+        isGameOverAnimation = true
         if let popup = activePopup {
             popup.removeFromParent()
             activePopup = nil

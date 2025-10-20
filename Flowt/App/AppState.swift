@@ -6,7 +6,44 @@
 //
 
 import SwiftUI
-import FirebaseAuth
+
+@MainActor
+class AppState: ObservableObject {
+    private let authSession: AuthSession
+    @Published var currentScreen: Screen = .loading
+    @Published var currentUser: AuthUser? = nil
+    @Published var currentUserProfile: UserProfile? = nil {
+        didSet {
+            if let profile = currentUserProfile {
+                NotificationCenter.default.post(name: .userPreferencesChanged, object: profile)
+            }
+        }
+    }
+    
+    init(authSession: AuthSession = FirebaseAuthSession()) {
+        self.authSession = authSession
+        checkUserSession()
+    }
+    
+    func checkUserSession() {
+        if let user = authSession.currentUser {
+            Task {
+                do {
+                    try await authSession.reload(user)
+                    let newUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
+                    if currentUser != newUser { currentUser = newUser }
+                    
+                    let newScreen: Screen = user.isEmailVerified ? .mainMenu(.profile) : .verifyEmail
+                    if currentScreen != newScreen { currentScreen = newScreen }
+                } catch {
+                    if currentScreen != .signIn { currentScreen = .signIn }
+                }
+            }
+        } else {
+            if currentScreen != .signIn { currentScreen = .signIn }
+        }
+    }
+}
 
 enum Screen: Equatable {
     case loading, signIn, verifyEmail, mainMenu(MainMenuTab)
@@ -32,40 +69,6 @@ enum MainMenuTab: CaseIterable, Equatable {
         case .game: return "gamecontroller"
         case .leaderboard: return "list.star"
         case .info: return "info"
-        }
-    }
-}
-
-@MainActor
-class AppState: ObservableObject {
-    @Published var currentScreen: Screen = .loading
-    @Published var currentUser: AuthUser? = nil
-    @Published var currentUserProfile: UserProfile? = nil {
-        didSet {
-            if let profile = currentUserProfile {
-                NotificationCenter.default.post(name: .userPreferencesChanged, object: profile)
-            }
-        }
-    }
-    
-    init() { checkUserSession() }
-    
-    func checkUserSession() {
-        if let user = Auth.auth().currentUser {
-            Task {
-                do {
-                    try await user.reload()
-                    let newUser = AuthUser(uid: user.uid, displayName: user.displayName, email: user.email)
-                    if currentUser != newUser { currentUser = newUser }
-                    
-                    let newScreen: Screen = user.isEmailVerified ? .mainMenu(.profile) : .verifyEmail
-                    if currentScreen != newScreen { currentScreen = newScreen }
-                } catch {
-                    if currentScreen != .signIn { currentScreen = .signIn }
-                }
-            }
-        } else {
-            if currentScreen != .signIn { currentScreen = .signIn }
         }
     }
 }

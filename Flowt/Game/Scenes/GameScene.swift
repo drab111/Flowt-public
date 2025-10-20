@@ -20,6 +20,7 @@ class GameScene: SKScene {
     var currentLineIndex: Int = 0
     var currentLine: RouteLine { routeLines[currentLineIndex] }
     var isDrawing: Bool = false
+    var isGameOverAnimation: Bool = false
     var colorButtons: [SKShapeNode] = []
     var score: Int = 0 { didSet { scoreLabel.score = score } }
     var storm: Storm?

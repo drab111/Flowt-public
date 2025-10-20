@@ -41,6 +41,7 @@ extension GameScene {
         
         // Check if “Pause” was tapped
         if nodes(at: location).contains(where: { $0.name == "PauseButton" }) {
+            guard !isGameOverAnimation else { return }
             AudioService.shared.playSystemSFX(id: 1110)
             scene?.isPaused.toggle()
             let text = (scene?.isPaused == true) ? "\u{25B6}\u{FE0E}" : "\u{23F8}\u{FE0E}"
