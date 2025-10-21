@@ -11,11 +11,9 @@ import FirebaseAuth
 
 final class MockAuthSession: AuthSession {
     var currentUser: User?
-    var shouldThrowOnReload = false
+    var shouldThrowOnReload: Bool = false
     
     func reload(_ user: User) async throws {
-        // Error:
         if shouldThrowOnReload { throw NSError(domain: "MockAuthSession", code: 1, userInfo: [NSLocalizedDescriptionKey: "Reload failed"]) }
-        // Success: -
     }
 }
