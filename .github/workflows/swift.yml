@@ -1,4 +1,4 @@
-name: Xcode Build & Test
+name: Xcode Build & Test (fixed)
 
 on:
   push:
@@ -9,18 +9,13 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install xcpretty
-        run: |
-          gem install xcpretty --no-document || true
-
-      - name: Show repository (debug)
+      - name: Show repo (debug)
         run: |
           pwd
           ls -la
@@ -28,12 +23,11 @@ jobs:
           find . -maxdepth 3 -type f -name '*.xcworkspace' -print || true
           find . -maxdepth 3 -type d -name '*.xcodeproj' -print || true
 
-      - name: Detect workspace/project and scheme
+      - name: Determine build target and scheme
         id: detect
         run: |
           set -euo pipefail
 
-          # find workspace first, then project
           WORKSPACE=$(find . -maxdepth 3 -name '*.xcworkspace' | head -n 1 || true)
           PROJECT=$(find . -maxdepth 3 -name '*.xcodeproj' | head -n 1 || true)
 
@@ -41,31 +35,32 @@ jobs:
             echo "Detected workspace: $WORKSPACE"
             TARGET_TYPE="workspace"
             TARGET_PATH="$WORKSPACE"
-            LIST_OUT=$(xcodebuild -workspace "$WORKSPACE" -list 2>/dev/null || true)
+            SCHEMES=$(xcodebuild -workspace "$WORKSPACE" -list 2>/dev/null || true)
           elif [ -n "$PROJECT" ]; then
             echo "Detected project: $PROJECT"
             TARGET_TYPE="project"
             TARGET_PATH="$PROJECT"
-            LIST_OUT=$(xcodebuild -project "$PROJECT" -list 2>/dev/null || true)
+            SCHEMES=$(xcodebuild -project "$PROJECT" -list 2>/dev/null || true)
           else
             echo "::error::No .xcworkspace or .xcodeproj found. Exiting."
             exit 1
           fi
 
-          # Try to parse the first scheme from xcodebuild output
-          SCHEME=$(echo "$LIST_OUT" | awk '/Schemes:/{p=1; next} p && NF{print $1; exit}' || true)
+          # Try to parse first scheme name from xcodebuild -list output
+          # We look for the "Schemes:" section and grab the first non-empty line after it.
+          SCHEME=$(echo "$SCHEMES" | awk '/Schemes:/{p=1; next} p && NF{print $1; exit}')
 
           if [ -z "$SCHEME" ]; then
-            echo "::error::Could not auto-detect a scheme. Make sure the scheme is shared (Xcode → Manage Schemes → Shared)."
+            echo "::error::Could not auto-detect a scheme. Ensure the scheme is Shared (Xcode -> Manage Schemes -> Shared)."
             exit 1
           fi
 
-          # Export outputs using GITHUB_OUTPUT (replacement for deprecated set-output)
-          echo "target_type=$TARGET_TYPE" >> "$GITHUB_OUTPUT"
-          echo "target_path=$TARGET_PATH" >> "$GITHUB_OUTPUT"
-          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+          # Use the GITHUB_OUTPUT env file to set action outputs (preferred to deprecated set-output)
+          echo "target_type=$TARGET_TYPE" >> $GITHUB_OUTPUT
+          echo "target_path=$TARGET_PATH" >> $GITHUB_OUTPUT
+          echo "scheme=$SCHEME" >> $GITHUB_OUTPUT
 
-      - name: Build & Test (xcodebuild) with stable simulator selection
+      - name: Build & Test (xcodebuild)
         run: |
           set -euo pipefail
 
@@ -77,45 +72,22 @@ jobs:
           echo "Using target path: $TARGET_PATH"
           echo "Using scheme: $SCHEME"
 
-          # Ensure xcpretty is available (just in case)
-          gem install xcpretty --no-document || true
+          DESTINATION='platform=iOS Simulator,name=iPhone 14'
+          DESTINATION='platform=iOS Simulator,name=iPhone 17'
 
-          # Try to pick first available iPhone simulator UDID via simctl
-          # Example simctl line: "iPhone 16 (18.4) (0660E938-...)" -> UDID is last parentheses part
-          UDID=$(xcrun simctl list devices available | grep -m1 -E "iPhone" | awk -F'[()]' '{print $NF}' | tr -d ' ' || true)
-
-          # Validate UDID format (basic UUID check). If invalid, fall back to name selection
-          if echo "$UDID" | grep -qE '^[0-9A-Fa-f-]{36}$'; then
-            DEST="id=$UDID"
-            echo "Using simulator UDID destination: $DEST"
-          else
-            echo "Could not parse UDID; trying to pick simulator by name..."
-            SIM_NAME=$(xcrun simctl list devices available | grep -m1 -E "iPhone" | sed -E 's/^[[:space:]]*([^ (].*?)[[:space:]]*\(.*/\1/' | xargs || true)
-            if [ -n "$SIM_NAME" ]; then
-              DEST="platform=iOS Simulator,name=${SIM_NAME}"
-              echo "Using simulator by name: $DEST"
-            else
-              # Final fallback: common device name that tends to exist on runners
-              DEST="platform=iOS Simulator,name=iPhone 16"
-              echo "No simulator detected via simctl; falling back to: $DEST"
-            fi
-          fi
-
-          # Run xcodebuild with stable destination and pipe through xcpretty
           if [ "$TARGET_TYPE" = "workspace" ]; then
-            xcodebuild -workspace "$TARGET_PATH" -scheme "$SCHEME" -destination "$DEST" clean test | xcpretty || true
+            xcodebuild -workspace "$TARGET_PATH" -scheme "$SCHEME" -destination "$DESTINATION" clean test | xcpretty || true
           else
-            xcodebuild -project "$TARGET_PATH" -scheme "$SCHEME" -destination "$DEST" clean test | xcpretty || true
+            xcodebuild -project "$TARGET_PATH" -scheme "$SCHEME" -destination "$DESTINATION" clean test | xcpretty || true
           fi
         env:
           CI: true
 
-      - name: Upload DerivedData and xcresult (for debugging)
+      - name: Upload test results (if any)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: xcode-build-artifacts
+          name: xcode-tests-results
           path: |
             ~/Library/Logs/DiagnosticReports
             DerivedData
-            **/*.xcresult
