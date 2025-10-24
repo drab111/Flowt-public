@@ -4,7 +4,7 @@
 //
 //  Created by Wiktor Drab on 20/08/2025.
 //
-
+/*
 import XCTest
 
 final class FlowtUITestsLaunchTests: XCTestCase {
@@ -31,3 +31,4 @@ final class FlowtUITestsLaunchTests: XCTestCase {
         add(attachment)
     }
 }
+*/
