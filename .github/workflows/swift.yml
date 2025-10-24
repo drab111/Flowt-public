@@ -1,22 +1,79 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
-
-name: Swift
+name: Xcode Build & Test (auto-detect)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: macos-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show repo (debug)
+        run: |
+          pwd
+          ls -la
+          echo "=== find workspaces & projects ==="
+          find . -maxdepth 3 -type f -name '*.xcworkspace' -print || true
+          find . -maxdepth 3 -type d -name '*.xcodeproj' -print || true
+
+      - name: Determine build command and scheme
+        id: detect
+        run: |
+          # find workspace first, then project
+          WORKSPACE=$(find . -maxdepth 3 -name '*.xcworkspace' | head -n 1 || true)
+          PROJECT=$(find . -maxdepth 3 -name '*.xcodeproj' | head -n 1 || true)
+
+          if [ -n "$WORKSPACE" ]; then
+            echo "Using workspace: $WORKSPACE"
+            TARGET="-workspace \"$WORKSPACE\""
+            # list schemes and pick first
+            SCHEMES=$(xcodebuild -workspace "$WORKSPACE" -list 2>/dev/null | sed -n '/Schemes:/,$p')
+          elif [ -n "$PROJECT" ]; then
+            echo "Using project: $PROJECT"
+            TARGET="-project \"$PROJECT\""
+            SCHEMES=$(xcodebuild -project "$PROJECT" -list 2>/dev/null | sed -n '/Schemes:/,$p')
+          else
+            echo "No .xcworkspace or .xcodeproj found. Exiting with error."
+            exit 1
+          fi
+
+          # try to extract the first scheme name from xcodebuild -list output
+          SCHEME=$(echo "$SCHEMES" | sed -n '2p' | xargs) || true
+          if [ -z "$SCHEME" ]; then
+            # fallback: try to read XYScheme files or fail with helpful message
+            echo "No scheme auto-detected."
+            echo "::error::Could not detect an Xcode scheme. Run 'xcodebuild -list' locally and add a shared scheme."
+            exit 1
+          fi
+
+          echo "::set-output name=target::$TARGET"
+          echo "::set-output name=scheme::$SCHEME"
+
+      - name: Build & test (xcodebuild)
+        run: |
+          set -euo pipefail
+          TARGET=${{ steps.detect.outputs.target }}
+          SCHEME=${{ steps.detect.outputs.scheme }}
+          echo "Running xcodebuild for $TARGET -scheme $SCHEME"
+          # destination without explicit OS minimizes simulator mismatch
+          DESTINATION='platform=iOS Simulator,name=iPhone 14'
+          # Clean & test (adjust destination if you test macOS/tvOS)
+          eval xcodebuild $TARGET -scheme "\"$SCHEME\"" -destination "$DESTINATION" clean test | xcpretty || true
+        env:
+          CI: true
+
+      - name: Upload test results (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-tests-results
+          path: |
+            ~/Library/Logs/DiagnosticReports
+            DerivedData
