@@ -1,4 +1,4 @@
-name: Xcode Build & Test (auto-detect)
+name: Xcode Build & Test (fixed)
 
 on:
   push:
@@ -23,49 +23,62 @@ jobs:
           find . -maxdepth 3 -type f -name '*.xcworkspace' -print || true
           find . -maxdepth 3 -type d -name '*.xcodeproj' -print || true
 
-      - name: Determine build command and scheme
+      - name: Determine build target and scheme
         id: detect
         run: |
-          # find workspace first, then project
+          set -euo pipefail
+
           WORKSPACE=$(find . -maxdepth 3 -name '*.xcworkspace' | head -n 1 || true)
           PROJECT=$(find . -maxdepth 3 -name '*.xcodeproj' | head -n 1 || true)
 
           if [ -n "$WORKSPACE" ]; then
-            echo "Using workspace: $WORKSPACE"
-            TARGET="-workspace \"$WORKSPACE\""
-            # list schemes and pick first
-            SCHEMES=$(xcodebuild -workspace "$WORKSPACE" -list 2>/dev/null | sed -n '/Schemes:/,$p')
+            echo "Detected workspace: $WORKSPACE"
+            TARGET_TYPE="workspace"
+            TARGET_PATH="$WORKSPACE"
+            SCHEMES=$(xcodebuild -workspace "$WORKSPACE" -list 2>/dev/null || true)
           elif [ -n "$PROJECT" ]; then
-            echo "Using project: $PROJECT"
-            TARGET="-project \"$PROJECT\""
-            SCHEMES=$(xcodebuild -project "$PROJECT" -list 2>/dev/null | sed -n '/Schemes:/,$p')
+            echo "Detected project: $PROJECT"
+            TARGET_TYPE="project"
+            TARGET_PATH="$PROJECT"
+            SCHEMES=$(xcodebuild -project "$PROJECT" -list 2>/dev/null || true)
           else
-            echo "No .xcworkspace or .xcodeproj found. Exiting with error."
+            echo "::error::No .xcworkspace or .xcodeproj found. Exiting."
             exit 1
           fi
 
-          # try to extract the first scheme name from xcodebuild -list output
-          SCHEME=$(echo "$SCHEMES" | sed -n '2p' | xargs) || true
+          # Try to parse first scheme name from xcodebuild -list output
+          # We look for the "Schemes:" section and grab the first non-empty line after it.
+          SCHEME=$(echo "$SCHEMES" | awk '/Schemes:/{p=1; next} p && NF{print $1; exit}')
+
           if [ -z "$SCHEME" ]; then
-            # fallback: try to read XYScheme files or fail with helpful message
-            echo "No scheme auto-detected."
-            echo "::error::Could not detect an Xcode scheme. Run 'xcodebuild -list' locally and add a shared scheme."
+            echo "::error::Could not auto-detect a scheme. Ensure the scheme is Shared (Xcode -> Manage Schemes -> Shared)."
             exit 1
           fi
 
-          echo "::set-output name=target::$TARGET"
-          echo "::set-output name=scheme::$SCHEME"
+          # Use the GITHUB_OUTPUT env file to set action outputs (preferred to deprecated set-output)
+          echo "target_type=$TARGET_TYPE" >> $GITHUB_OUTPUT
+          echo "target_path=$TARGET_PATH" >> $GITHUB_OUTPUT
+          echo "scheme=$SCHEME" >> $GITHUB_OUTPUT
 
-      - name: Build & test (xcodebuild)
+      - name: Build & Test (xcodebuild)
         run: |
           set -euo pipefail
-          TARGET=${{ steps.detect.outputs.target }}
-          SCHEME=${{ steps.detect.outputs.scheme }}
-          echo "Running xcodebuild for $TARGET -scheme $SCHEME"
-          # destination without explicit OS minimizes simulator mismatch
+
+          TARGET_TYPE="${{ steps.detect.outputs.target_type }}"
+          TARGET_PATH="${{ steps.detect.outputs.target_path }}"
+          SCHEME="${{ steps.detect.outputs.scheme }}"
+
+          echo "Using target type: $TARGET_TYPE"
+          echo "Using target path: $TARGET_PATH"
+          echo "Using scheme: $SCHEME"
+
           DESTINATION='platform=iOS Simulator,name=iPhone 14'
-          # Clean & test (adjust destination if you test macOS/tvOS)
-          eval xcodebuild $TARGET -scheme "\"$SCHEME\"" -destination "$DESTINATION" clean test | xcpretty || true
+
+          if [ "$TARGET_TYPE" = "workspace" ]; then
+            xcodebuild -workspace "$TARGET_PATH" -scheme "$SCHEME" -destination "$DESTINATION" clean test | xcpretty || true
+          else
+            xcodebuild -project "$TARGET_PATH" -scheme "$SCHEME" -destination "$DESTINATION" clean test | xcpretty || true
+          fi
         env:
           CI: true
 
