@@ -72,7 +72,7 @@ jobs:
           echo "Using target path: $TARGET_PATH"
           echo "Using scheme: $SCHEME"
 
-          DESTINATION='platform=iOS Simulator,name=iPhone 14'
+          DESTINATION='platform=iOS Simulator,name=iPhone 17'
 
           if [ "$TARGET_TYPE" = "workspace" ]; then
             xcodebuild -workspace "$TARGET_PATH" -scheme "$SCHEME" -destination "$DESTINATION" clean test | xcpretty || true
