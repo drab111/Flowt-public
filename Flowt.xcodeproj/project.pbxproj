@@ -30,7 +30,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1C35275D2EA6957900CE252C /* FlowtMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowtMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C370B2C2E565C2600A13271 /* Flowt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flowt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C370B392E565C2800A13271 /* FlowtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C370B432E565C2800A13271 /* FlowtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,13 +67,6 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		1C35275A2EA6957900CE252C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1C370B292E565C2600A13271 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -119,7 +111,6 @@
 				1C370B2C2E565C2600A13271 /* Flowt.app */,
 				1C370B392E565C2800A13271 /* FlowtTests.xctest */,
 				1C370B432E565C2800A13271 /* FlowtUITests.xctest */,
-				1C35275D2EA6957900CE252C /* FlowtMacTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,25 +125,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1C35275C2EA6957900CE252C /* FlowtMacTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 1C3527612EA6957900CE252C /* Build configuration list for PBXNativeTarget "FlowtMacTests" */;
-			buildPhases = (
-				1C3527592EA6957900CE252C /* Sources */,
-				1C35275A2EA6957900CE252C /* Frameworks */,
-				1C35275B2EA6957900CE252C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = FlowtMacTests;
-			packageProductDependencies = (
-			);
-			productName = FlowtMacTests;
-			productReference = 1C35275D2EA6957900CE252C /* FlowtMacTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		1C370B2B2E565C2600A13271 /* Flowt */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1C370B4D2E565C2800A13271 /* Build configuration list for PBXNativeTarget "Flowt" */;
@@ -234,9 +206,6 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					1C35275C2EA6957900CE252C = {
-						CreatedOnToolsVersion = 26.0.1;
-					};
 					1C370B2B2E565C2600A13271 = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -271,19 +240,11 @@
 				1C370B2B2E565C2600A13271 /* Flowt */,
 				1C370B382E565C2800A13271 /* FlowtTests */,
 				1C370B422E565C2800A13271 /* FlowtUITests */,
-				1C35275C2EA6957900CE252C /* FlowtMacTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1C35275B2EA6957900CE252C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1C370B2A2E565C2600A13271 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -308,13 +269,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1C3527592EA6957900CE252C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1C370B282E565C2600A13271 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -352,46 +306,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		1C3527622EA6957900CE252C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = KV29DSPCB2;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drab.FlowtMacTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		1C3527632EA6957900CE252C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = KV29DSPCB2;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drab.FlowtMacTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 		1C370B4B2E565C2800A13271 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -522,7 +436,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Flowt/Flowt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = KV29DSPCB2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -559,7 +473,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Flowt/Flowt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = KV29DSPCB2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -664,15 +578,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1C3527612EA6957900CE252C /* Build configuration list for PBXNativeTarget "FlowtMacTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1C3527622EA6957900CE252C /* Debug */,
-				1C3527632EA6957900CE252C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		1C370B272E565C2600A13271 /* Build configuration list for PBXProject "Flowt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
