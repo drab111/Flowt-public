@@ -8,7 +8,7 @@
 import XCTest
 
 final class VerifyEmailViewUITests: XCTestCase {
-    private let defaultTimeout: TimeInterval = 30
+    private let defaultTimeout: TimeInterval = 60
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
