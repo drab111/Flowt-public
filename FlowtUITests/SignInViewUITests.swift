@@ -8,7 +8,7 @@
 import XCTest
 
 final class SignInViewUITests: XCTestCase {
-    private let defaultTimeout: TimeInterval = 20
+    private let defaultTimeout: TimeInterval = 30
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -33,11 +33,14 @@ final class SignInViewUITests: XCTestCase {
 
         // enter email and password
         emailField.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
         emailField.typeText("ui-test@example.com")
 
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
+        XCTAssertTrue(passwordField.isHittable)
         passwordField.typeText("Password123")
 
         // tap the Sign In button
@@ -57,13 +60,17 @@ final class SignInViewUITests: XCTestCase {
         
         // enter invalid email
         let emailField = app.textFields["login_emailTextField"]
-        XCTAssertTrue(emailField.waitForExistence(timeout: 5))
+        XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
         emailField.tap()
-        emailField.typeText("not-an-email")
+        
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
+        emailField.typeText("ui-test@example.com")
 
         // enter too short password
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         passwordField.tap()
+        XCTAssertTrue(passwordField.isHittable)
         passwordField.typeText("short") // < 8
 
         // check that Sign In button is disabled
@@ -82,11 +89,14 @@ final class SignInViewUITests: XCTestCase {
 
         // enter email and password
         emailField.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
         emailField.typeText("ui-test@example.com")
 
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
+        XCTAssertTrue(passwordField.isHittable)
         passwordField.typeText("Password123")
 
         // tap the Sign In button

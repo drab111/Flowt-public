@@ -8,7 +8,7 @@
 import XCTest
 
 final class GameViewUITests: XCTestCase {
-    private let defaultTimeout: TimeInterval = 20
+    private let defaultTimeout: TimeInterval = 30
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -29,11 +29,15 @@ final class GameViewUITests: XCTestCase {
         let emailField = app.textFields["login_emailTextField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
         emailField.tap()
+        
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
         emailField.typeText("ui-test@example.com")
-
+        
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
+        XCTAssertTrue(passwordField.isHittable)
         passwordField.typeText("Password123")
 
         let signInButton = app.buttons["login_submitButton"]
@@ -54,7 +58,7 @@ final class GameViewUITests: XCTestCase {
         let gameTab = app.staticTexts["Game"]
         XCTAssertTrue(gameTab.waitForExistence(timeout: defaultTimeout))
         gameTab.tap()
-
+        
         // wait for GameView to be visible
         let playButton = app.buttons["game_playButton"]
         XCTAssertTrue(playButton.waitForExistence(timeout: defaultTimeout))

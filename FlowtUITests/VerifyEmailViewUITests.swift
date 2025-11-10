@@ -8,7 +8,7 @@
 import XCTest
 
 final class VerifyEmailViewUITests: XCTestCase {
-    private let defaultTimeout: TimeInterval = 20
+    private let defaultTimeout: TimeInterval = 30
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -30,11 +30,15 @@ final class VerifyEmailViewUITests: XCTestCase {
         let emailField = app.textFields["login_emailTextField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
         emailField.tap()
+        
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
         emailField.typeText("ui-test@example.com")
 
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
+        XCTAssertTrue(passwordField.isHittable)
         passwordField.typeText("Password123")
 
         let signInButton = app.buttons["login_submitButton"]

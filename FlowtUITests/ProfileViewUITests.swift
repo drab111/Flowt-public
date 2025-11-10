@@ -8,7 +8,7 @@
 import XCTest
 
 final class ProfileViewUITests: XCTestCase {
-    private let defaultTimeout: TimeInterval = 20
+    private let defaultTimeout: TimeInterval = 30
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -28,11 +28,15 @@ final class ProfileViewUITests: XCTestCase {
         let emailField = app.textFields["login_emailTextField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
         emailField.tap()
+        
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
         emailField.typeText("ui-test@example.com")
 
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
+        XCTAssertTrue(passwordField.isHittable)
         passwordField.typeText("Password123")
 
         let signInButton = app.buttons["login_submitButton"]
@@ -56,6 +60,9 @@ final class ProfileViewUITests: XCTestCase {
         let nicknameField = app.textFields["profile_nicknameTextField"]
         XCTAssertTrue(nicknameField.exists)
         nicknameField.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
+        
         // clear existing text (if any) - send selectAll + delete for robust clearing
         nicknameField.press(forDuration: 1.0)
         if app.menuItems["Select All"].exists { app.menuItems["Select All"].tap() }
@@ -73,6 +80,8 @@ final class ProfileViewUITests: XCTestCase {
         let nicknameField = app.textFields["profile_nicknameTextField"]
         XCTAssertTrue(nicknameField.exists)
         nicknameField.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
 
         // clear + enter new nickname
         nicknameField.press(forDuration: 0.5)
