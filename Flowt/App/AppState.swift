@@ -20,8 +20,19 @@ class AppState: ObservableObject {
         }
     }
     
-    init(authSession: AuthSession = FirebaseAuthSession()) {
-        self.authSession = authSession
+    init(authSession: AuthSession? = nil) {
+        if let provided = authSession {
+            self.authSession = provided
+        } else {
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] == "1" {
+                self.authSession = MockAuthSession()
+            } else { self.authSession = FirebaseAuthSession() }
+            #else
+            self.authSession = FirebaseAuthSession()
+            #endif
+        }
+        
         checkUserSession()
     }
     

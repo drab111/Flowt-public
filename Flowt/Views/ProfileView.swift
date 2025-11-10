@@ -167,6 +167,7 @@ struct ProfileView: View {
                 .onChange(of: userProfileVM.newNickname) { _, newValue in
                     if newValue.count > 15 { userProfileVM.newNickname = String(newValue.prefix(15)) }
                 }
+                .accessibilityIdentifier("profile_nicknameTextField")
                 
                 // Save Buttons
                 Group {
@@ -176,6 +177,7 @@ struct ProfileView: View {
                             Task { await userProfileVM.updateProfile(nickname: userProfileVM.newNickname, imageData: userProfileVM.avatarData) }
                             focusedField = nil
                         }
+                        .accessibilityIdentifier("profile_saveButton")
                         
                     case .saving:
                         ProgressView()
@@ -198,6 +200,7 @@ struct ProfileView: View {
                             .cornerRadius(20)
                             .shadow(color: Color.cyan.opacity(0.5), radius: 10)
                             .transition(.opacity)
+                            .accessibilityIdentifier("profile_savedLabel")
                         
                     case .rejected:
                         Label("Inappropriate avatar!", systemImage: "xmark.octagon.fill")
@@ -211,6 +214,7 @@ struct ProfileView: View {
                             .cornerRadius(20)
                             .shadow(color: Color.red.opacity(0.5), radius: 10)
                             .transition(.opacity)
+                            .accessibilityIdentifier("profile_rejectedLabel")
                     }
                 }
             }
@@ -225,6 +229,7 @@ struct ProfileView: View {
                 if let error = accountScoreVM.errorMessage {
                     Text(error)
                         .foregroundColor(.orange)
+                        .accessibilityIdentifier("profile_errorMessage")
                 } else {
                     HStack(alignment: .center, spacing: 16) {
                         VStack(alignment: .leading, spacing: 6) {
@@ -320,6 +325,8 @@ struct ProfileView: View {
                         }
                     )) { Label("Music", systemImage: "music.note") }
                         .tint(.cyan)
+                        .accessibilityLabel("Music toggle")
+                        .accessibilityIdentifier("profile_toggle_music")
                     
                     
                     Toggle(isOn: Binding(
@@ -339,6 +346,8 @@ struct ProfileView: View {
                         }
                     )) { Label("Sound Effects", systemImage: "speaker.wave.2.fill") }
                         .tint(.cyan)
+                        .accessibilityLabel("Sound Effects toggle")
+                        .accessibilityIdentifier("profile_toggle_sfx")
                 }
             }
         }
@@ -363,6 +372,7 @@ struct ProfileView: View {
             }
             .scaleEffect(signOutButtonPressed ? 0.94 : 1.0)
             .padding(.horizontal, 35)
+            .accessibilityIdentifier("profile_signOutButton")
             
             Button(action: {
                 Task {
@@ -390,6 +400,7 @@ struct ProfileView: View {
                     .scaleEffect(deleteButtonPressed ? 0.94 : 1.0)
             }
             .padding(.horizontal, 65)
+            .accessibilityIdentifier("profile_deleteButton")
         }
     }
 }

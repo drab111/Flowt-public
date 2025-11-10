@@ -84,12 +84,15 @@ struct VerifyEmailView: View {
                     }
                     .accessibilityLabel("Resend verification email")
                     .accessibilityHint("Sends a new verification link to your email address.")
+                    .accessibilityIdentifier("verify_resendButton")
                 }
-
+                
                 if let error = verifyVM.errorMessage {
                     messageRow(system: "exclamationmark.triangle.fill", color: [.yellow, .orange], text: error)
+                        .accessibilityIdentifier("verify_errorMessage")
                 } else if let info = verifyVM.infoMessage {
                     messageRow(system: "checkmark.seal.fill", color: [.cyan, .teal], text: info)
+                        .accessibilityIdentifier("verify_infoMessage")
                 }
             }
         }
@@ -103,6 +106,7 @@ struct VerifyEmailView: View {
                     BulletRow("Search inbox for “Flowt” or “verify”.")
                 }
                 .padding(.top, 6)
+                .accessibilityIdentifier("verify_tips_answer")
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "questionmark.circle.fill")
@@ -111,6 +115,8 @@ struct VerifyEmailView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityIdentifier("verify_tips_question")
             }
             .tint(.white)
         }
@@ -128,6 +134,7 @@ struct VerifyEmailView: View {
         }
         .buttonStyle(.plain)
         .padding(.top, 6)
+        .accessibilityIdentifier("verify_signOutButton")
     }
 
     // MARK: - Helpers

@@ -27,6 +27,7 @@ struct TutorialView: View {
             }
         }
         .scrollBounceBehavior(.basedOnSize)
+        .accessibilityIdentifier("tutorial_scrollView")
     }
     
     // MARK: - Panels
@@ -105,6 +106,7 @@ struct TutorialView: View {
         }
         .padding(.horizontal, 40)
         .transition(.opacity)
+        .accessibilityIdentifier("tutorial_startPlayingButton")
     }
     
     // MARK: - Helpers

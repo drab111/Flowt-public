@@ -136,6 +136,10 @@ extension GameScene {
         createBackToMenuButton()
         createPauseButton()
         createColorButtons()
+        
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] == "1" { createDebugButton() }
+        #endif
     }
     
     // MARK: - Islands
@@ -274,4 +278,29 @@ extension GameScene {
         let dt = CGFloat(1.0 / 60.0)
         ocean?.update(dt)
     }
+    
+    // MARK: - Debug
+    #if DEBUG
+    func createDebugButton() {
+        let debugRect = SKShapeNode(rectOf: CGSize(width: 100, height: 40), cornerRadius: 10)
+        debugRect.fillColor = .clear
+        debugRect.strokeColor = .clear
+        debugRect.lineWidth = 0
+        debugRect.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        debugRect.zPosition = 1000
+        debugRect.name = "DebugGameOver"
+
+        let label = SKLabelNode(text: "DEBUG END")
+        label.fontName = "HelveticaNeue-Bold"
+        label.fontSize = 20
+        label.fontColor = .white
+        label.verticalAlignmentMode = .center
+        label.horizontalAlignmentMode = .center
+        label.zPosition = 1001
+        label.name = "DebugGameOver"
+
+        debugRect.addChild(label)
+        addChild(debugRect)
+    }
+    #endif
 }

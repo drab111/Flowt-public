@@ -1,12 +1,13 @@
+#if DEBUG
+
 //
 //  MockScoreService.swift
 //  Flowt
 //
-//  Created by Wiktor Drab on 21/10/2025.
+//  Created by Wiktor Drab on 07/11/2025.
 //
 
 import Foundation
-@testable import Flowt
 
 final class MockScoreService: ScoreServiceProtocol {
     var scores: [String: ScoreEntry] = [:]
@@ -20,6 +21,16 @@ final class MockScoreService: ScoreServiceProtocol {
     var shouldThrowOnDelete: Bool = false
     
     var thrownError: Error = NSError(domain: "MockScoreService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Mock error"])
+    
+    init() {
+        let env = ProcessInfo.processInfo.environment
+        if env["MOCK_SCORE_SHOULD_THROW_SAVE"] == "1" { shouldThrowOnSave = true }
+        if env["MOCK_SCORE_SHOULD_THROW_FETCH_TOP_SCORES"] == "1" { shouldThrowOnFetchTopScores = true }
+        if env["MOCK_SCORE_SHOULD_THROW_FETCH_RANK"] == "1" { shouldThrowOnFetchRank = true }
+        if env["MOCK_SCORE_SHOULD_THROW_FETCH_BEST_SCORE"] == "1" { shouldThrowOnFetchBestScore = true }
+        if env["MOCK_SCORE_SHOULD_THROW_FETCH_SCORE"] == "1" { shouldThrowOnFetchScore = true }
+        if env["MOCK_SCORE_SHOULD_THROW_DELETE"] == "1" { shouldThrowOnDelete = true }
+    }
     
     // MARK: - Create & Save
     func saveScore(_ entry: ScoreEntry) async throws -> String {
@@ -81,3 +92,5 @@ final class MockScoreService: ScoreServiceProtocol {
         lastDeletedUserId = userId
     }
 }
+
+#endif

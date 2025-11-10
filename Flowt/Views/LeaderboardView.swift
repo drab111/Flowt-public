@@ -31,6 +31,7 @@ struct LeaderboardView: View {
                 await scoreVM.loadLeaderboard(limit: 30)
                 scoreVM.errorMessage = nil
             }
+            .accessibilityIdentifier("leaderboard_scrollView")
             
             // Loading
             if scoreVM.isLoading == true {
@@ -94,6 +95,7 @@ struct LeaderboardView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("Refresh leaderboard")
                 .accessibilityHint("Reloads the top 30 scores.")
+                .accessibilityIdentifier("leaderboard_refreshButton")
             }
         }
     }

@@ -37,8 +37,16 @@ struct SignInView: View {
                             actionsPanel
                             forgotPasswordRow
                             modeSwitcher
-                            if let error = authVM.errorMessage { banner(message: error, colors: [.yellow, .orange], symbol: "exclamationmark.triangle.fill") }
-                            else if let info = authVM.infoMessage { banner(message: info, colors: [.cyan, .teal], symbol: "checkmark.seal.fill") }
+                            if let error = authVM.errorMessage {
+                                banner(message: error, colors: [.yellow, .orange], symbol: "exclamationmark.triangle.fill")
+                                    .accessibilityElement(children: .ignore)
+                                    .accessibilityIdentifier("login_errorBanner")
+                            }
+                            else if let info = authVM.infoMessage {
+                                banner(message: info, colors: [.cyan, .teal], symbol: "checkmark.seal.fill")
+                                    .accessibilityElement(children: .ignore)
+                                    .accessibilityIdentifier("login_infoBanner")
+                            }
                             Spacer(minLength: 20)
                         }
                         .padding(.horizontal, 24)
@@ -58,6 +66,7 @@ struct SignInView: View {
                     .padding(.horizontal, 18).padding(.vertical, 12)
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 6)
+                    .accessibilityIdentifier("signIn_progress")
             }
         }
         .sheet(isPresented: $showForgotPasswordSheet) { forgotPasswordSheet }
@@ -101,11 +110,13 @@ struct SignInView: View {
                 .autocorrectionDisabled()
                 .keyboardType(.emailAddress)
                 .accessibilityLabel("Email address")
+                .accessibilityIdentifier("login_emailTextField")
 
                 GlassField(systemIcon: "lock", placeholder: "Password", text: $authVM.password, isSecure: true, submitLabel: .go, focused: $focusedField, field: .password, onSubmit: { Task { await authVM.submit() } })
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .accessibilityLabel("Password")
+                .accessibilityIdentifier("login_passwordSecureTextField")
             }
         }
     }
@@ -120,6 +131,7 @@ struct SignInView: View {
             .frame(height: 52)
             .disabled(!authVM.canSubmit)
             .opacity(authVM.canSubmit ? 1 : 0.5)
+            .accessibilityIdentifier("login_submitButton")
             
             SignInWithAppleButton(onRequest: authVM.handleAppleRequest, onCompletion: authVM.handleAppleCompletion)
             .signInWithAppleButtonStyle(.black)
@@ -153,6 +165,7 @@ struct SignInView: View {
         }
         .buttonStyle(.plain)
         .padding(.top, 6)
+        .accessibilityIdentifier("forgot_password_button")
     }
 
     
@@ -167,6 +180,7 @@ struct SignInView: View {
             }
             .font(.footnote)
             .fontWeight(.semibold)
+            .accessibilityIdentifier("auth_mode_switch_button")
         }
         .padding(.top, 4)
     }
@@ -187,6 +201,7 @@ struct SignInView: View {
             .autocorrectionDisabled()
             .keyboardType(.emailAddress)
             .accessibilityLabel("Email address")
+            .accessibilityIdentifier("forgot_sheet_email")
 
             HStack {
                 Button("Cancel") {
@@ -194,6 +209,7 @@ struct SignInView: View {
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
                 .foregroundColor(.red)
+                .accessibilityIdentifier("forgot_sheet_cancel_button")
 
                 Spacer()
 
@@ -203,6 +219,7 @@ struct SignInView: View {
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
                 .disabled(resetEmail.isEmpty)
+                .accessibilityIdentifier("forgot_send_link_button")
             }
             .padding(.horizontal)
 

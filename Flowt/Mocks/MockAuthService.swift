@@ -1,14 +1,15 @@
+#if DEBUG
+
 //
 //  MockAuthService.swift
 //  Flowt
 //
-//  Created by Wiktor Drab on 20/10/2025.
+//  Created by Wiktor Drab on 07/11/2025.
 //
 
 import AuthenticationServices
 import CryptoKit
 import FirebaseAuth
-@testable import Flowt
 
 final class MockAuthService: AuthServiceProtocol {
     var shouldThrowOnSignUp: Bool = false
@@ -21,6 +22,16 @@ final class MockAuthService: AuthServiceProtocol {
 
     var currentAuthUser: AuthUser? = nil
     private(set) var lastGeneratedNonce: String?
+    
+    init() {
+        let env = ProcessInfo.processInfo.environment
+        if env["MOCK_AUTH_SHOULD_THROW_SIGNIN"] == "1" { shouldThrowOnSignIn = true }
+        if env["MOCK_AUTH_SHOULD_THROW_SIGNUP"] == "1" { shouldThrowOnSignUp = true }
+        if env["MOCK_AUTH_SHOULD_THROW_SIGNOUT"] == "1" { shouldThrowOnSignOut = true }
+        if env["MOCK_AUTH_SHOULD_THROW_DELETE"] == "1" { shouldThrowOnDelete = true }
+        if env["MOCK_AUTH_SHOULD_THROW_SEND"] == "1" { shouldThrowOnSendVerification = true }
+        if env["MOCK_AUTH_SHOULD_THROW_PASSWORD_RESET"] == "1" { shouldThrowOnPasswordReset = true }
+    }
 
     // MARK: - Email & Password
     func signUp(email: String, password: String) async throws -> AuthUser {
@@ -32,13 +43,10 @@ final class MockAuthService: AuthServiceProtocol {
 
     func signIn(email: String, password: String) async throws -> AuthUser {
         if shouldThrowOnSignIn { throw thrownError }
-        if let user = currentAuthUser, user.email == email {
-            return user
-        } else {
-            let user = AuthUser(uid: UUID().uuidString, displayName: nil, email: email)
-            currentAuthUser = user
-            return user
-        }
+        if let user = currentAuthUser, user.email == email { return user }
+        let user = AuthUser(uid: UUID().uuidString, displayName: nil, email: email)
+        currentAuthUser = user
+        return user
     }
 
     // MARK: - Apple Sign-In
@@ -50,11 +58,10 @@ final class MockAuthService: AuthServiceProtocol {
     }
 
     func handleAppleAuth(credential: ASAuthorizationAppleIDCredential) async throws -> AuthUser {
-        // W mocku ignorujemy tokeny i tworzymy użytkownika bazując na credential.fullName / email (jeśli są)
-        // Możemy też wymusić błąd
+        // in the mock we ignore tokens and create a user based on credential.fullName / email (if present)
         if shouldThrowOnSignIn { throw thrownError }
         let displayName = credential.fullName?.givenName
-        // w testach często credential.email będzie nil — użyjemy placeholdera
+        // in tests, credential.email is often nil — use a placeholder
         let emailCandidate = credential.email ?? "apple-\(UUID().uuidString.prefix(6))@mock"
         let user = AuthUser(uid: UUID().uuidString, displayName: displayName, email: emailCandidate)
         currentAuthUser = user
@@ -89,3 +96,5 @@ private func sha256(_ input: String) -> String { // the same as in the original
     let hashed = SHA256.hash(data: inputData)
     return hashed.map { String(format: "%02x", $0) }.joined()
 }
+
+#endif

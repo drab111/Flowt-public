@@ -18,6 +18,11 @@ extension GameScene {
             return
         }
         
+        #if DEBUG
+        // Check if debug button was tapped
+        if nodes(at: location).contains(where: { $0.name == "DebugGameOver" }) { gameOver(); return }
+        #endif
+        
         // Check if “Menu” was tapped
         if nodes(at: location).contains(where: { $0.name == "BackToMenuButton" }) {
             AudioService.shared.playSystemSFX(id: 1110)

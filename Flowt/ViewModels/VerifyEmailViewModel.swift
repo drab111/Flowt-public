@@ -19,7 +19,7 @@ final class VerifyEmailViewModel: ObservableObject {
     init(appState: AppState, authService: AuthServiceProtocol) {
         self.appState = appState
         self.authService = authService
-        startAutoCheck()
+        if ProcessInfo.processInfo.environment["SET_VERIFY_EMAIL"] != "1" { startAutoCheck() }
     }
     
     deinit { sessionTimer?.invalidate() }
@@ -30,6 +30,8 @@ final class VerifyEmailViewModel: ObservableObject {
             try await authService.sendVerificationEmail()
             infoMessage = "A verification email has been sent."
         } catch { errorMessage = error.localizedDescription }
+        
+        if ProcessInfo.processInfo.environment["SET_VERIFY_EMAIL"] == "1" { return }
         
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(5))

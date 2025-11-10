@@ -30,8 +30,8 @@ struct TermsAgreementView: View {
                 buttonPanel
                 Spacer(minLength: 30)
             }
-            .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL) }
-            .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL) }
+            .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL).accessibilityIdentifier("terms_modal") }
+            .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL).accessibilityIdentifier("privacy_modal") }
         }
         .scrollBounceBehavior(.basedOnSize)
     }
@@ -66,6 +66,7 @@ struct TermsAgreementView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("terms_button")
                 
                 Divider()
                     .overlay(LinearGradient(colors: [.white.opacity(0.0), .white.opacity(0.25), .white.opacity(0.0)], startPoint: .leading, endPoint: .trailing))
@@ -82,6 +83,7 @@ struct TermsAgreementView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("privacy_button")
                 
                 Text("Last updated: October 2025")
                     .font(.caption)
@@ -104,9 +106,9 @@ struct TermsAgreementView: View {
             VStack(alignment: .leading, spacing: 12) {
                 SectionHeader(title: "Consent", subtitle: "Please confirm")
                 
-                AgreementToggle(text: "I have read and agree to the Terms of Service.", isOn: $agreedTerms)
-                AgreementToggle(text: "I have read and agree to the Privacy Policy.", isOn: $agreedPrivacy)
-                AgreementToggle(text: "I confirm I am at least 13 years old.", isOn: $confirmedAge)
+                AgreementToggle(text: "I have read and agree to the Terms of Service.", isOn: $agreedTerms, accessibilityID: "toggle_terms")
+                AgreementToggle(text: "I have read and agree to the Privacy Policy.", isOn: $agreedPrivacy, accessibilityID: "toggle_privacy")
+                AgreementToggle(text: "I confirm I am at least 13 years old.", isOn: $confirmedAge, accessibilityID: "toggle_age")
             }
         }
         .padding(.horizontal, 20)
@@ -121,6 +123,7 @@ struct TermsAgreementView: View {
         .opacity(canAccept ? 1 : 0.5)
         .disabled(!canAccept)
         .padding(.horizontal, 24)
+        .accessibilityIdentifier("terms_acceptButton")
     }
 }
 
@@ -128,6 +131,7 @@ struct TermsAgreementView: View {
 private struct AgreementToggle: View {
     let text: String
     @Binding var isOn: Bool
+    var accessibilityID: String
     
     var body: some View {
         Toggle(isOn: $isOn) {
@@ -139,6 +143,7 @@ private struct AgreementToggle: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .tint(.cyan)
+        .accessibilityIdentifier(accessibilityID)
     }
 }
 

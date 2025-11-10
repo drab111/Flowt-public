@@ -128,6 +128,8 @@ struct CustomTabBar: View {
         .frame(height: 80)
         .padding(.horizontal, 20)
         .padding(.bottom, 20)
+        .accessibilityElement(children: .ignore)
+        .accessibilityIdentifier("mainMenu_tabBar")
     }
 }
 

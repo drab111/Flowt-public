@@ -32,6 +32,7 @@ struct EndGameView: View {
                 .padding(.bottom, 30)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .accessibilityIdentifier("endGame_scrollView")
         }
         .task { await scoreVM.saveAndLoadLeaderboard(limit: 3) }
         .onAppear {
@@ -163,6 +164,7 @@ struct EndGameView: View {
                 gradientColors: animatedGradientButtonColors
             ) { gameVM.backToMenu() }
             .padding(.horizontal, 65)
+            .accessibilityIdentifier("endGame_backToMenuButton")
         }
     }
 }

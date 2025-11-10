@@ -49,6 +49,11 @@ final class AuthViewModel: ObservableObject {
         do {
             let user = try await authService.signIn(email: email, password: password)
             appState.currentUser = user
+            
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["SET_VERIFY_EMAIL"] == "1" { appState.currentScreen = .verifyEmail; return }
+            #endif
+            
             if let user = authService.getCurrentUser(), !user.isEmailVerified {
                 appState.currentScreen = .verifyEmail
                 return

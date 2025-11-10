@@ -121,6 +121,7 @@ struct GameView: View {
         .accessibilityLabel("Play")
         .padding(.horizontal, 35)
         .padding(.bottom, 30)
+        .accessibilityIdentifier("game_playButton")
     }
     
     // MARK: - Helpers

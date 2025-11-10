@@ -16,14 +16,24 @@ struct RootView: View {
         _container = StateObject(wrappedValue: MainMenuContainer(appState: appState))
     }
     
+    private var injectedAuthService: AuthServiceProtocol {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] == "1" {
+            return MockAuthService()
+        } else { return AuthService() }
+        #else
+        return AuthService()
+        #endif
+    }
+    
     var body: some View {
         switch appState.currentScreen {
         case .loading:
             LoadingView()
         case .signIn:
-            SignInView(authVM: AuthViewModel(appState: appState, authService: AuthService())) // appState is a class, so we pass the original instance
+            SignInView(authVM: AuthViewModel(appState: appState, authService: injectedAuthService)) // appState is a class, so we pass the original instance
         case .verifyEmail:
-            VerifyEmailView(verifyVM: VerifyEmailViewModel(appState: appState, authService: AuthService()))
+            VerifyEmailView(verifyVM: VerifyEmailViewModel(appState: appState, authService: injectedAuthService))
         case .mainMenu(let selectedTab):
             MainMenuView(
                 container: container,

@@ -32,6 +32,7 @@ struct InfoView: View {
         .onAppear {
             withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: false)) { sheen.toggle() }
         }
+        .accessibilityIdentifier("info_scrollView")
     }
     
     // MARK: - Panels
@@ -73,12 +74,18 @@ struct InfoView: View {
                     ActionCard(title: "Privacy", icon: "lock.fill", gradient: [.cyan, .teal]) {
                         showPrivacy = true
                     }
+                    .accessibilityIdentifier("info_privacyButton")
+                    
                     ActionCard(title: "Terms", icon: "doc.text.fill", gradient: [.cyan, .teal]) {
                         showTerms = true
                     }
+                    .accessibilityIdentifier("info_termsButton")
+                    
                     ActionCard(title: "Support", icon: "envelope.fill", gradient: [.cyan, .teal]) {
                         if let url = URL(string: "mailto:flowt.apps@gmail.com") { openURL(url) }
                     }
+                    .accessibilityIdentifier("info_supportButton")
+                    
                     ShareLink(
                         items: [URL(string: "https://apps.apple.com/app/flowt/id6753603068?utm_source=share")!],
                         subject: Text("Flowt"),
@@ -88,6 +95,7 @@ struct InfoView: View {
                         }
                     ) { ActionCardChrome(title: "Share", icon: "square.and.arrow.up.fill", gradient: [.cyan, .teal]) }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("info_shareButton")
                 }
             }
             .overlay(alignment: .topTrailing) {
@@ -98,8 +106,8 @@ struct InfoView: View {
                     .accessibilityHidden(true)
             }
         }
-        .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL) }
-        .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL) }
+        .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL).accessibilityIdentifier("info_termsModal") }
+        .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL).accessibilityIdentifier("info_privacyModal") }
     }
     
     private var guidelinesPanel: some View {
@@ -351,6 +359,7 @@ private struct FAQItem<Content: View>: View {
                 answer
                     .font(.footnote)
                     .foregroundStyle(.white.opacity(0.8))
+                    .accessibilityIdentifier("faq_answer_\(question.replacingOccurrences(of: " ", with: "_"))")
             }
             .padding(.top, 6)
         } label: {
@@ -362,6 +371,8 @@ private struct FAQItem<Content: View>: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityIdentifier("faq_question_\(question.replacingOccurrences(of: " ", with: "_"))")
         }
         .tint(.white)
         .padding(.vertical, 6)
@@ -412,7 +423,11 @@ private struct TechMap: View {
                                 selected = (selected == stop.id) ? nil : stop.id
                             }
                         }
-
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityIdentifier("techstop_\(stop.name)")
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel(stop.name)
+                    
                     VStack(spacing: 6) {
                         Text(stop.name)
                             .font(.caption2)
@@ -484,6 +499,7 @@ private struct Tooltip: View {
             )
             .foregroundColor(.white)
             .transition(.move(edge: .top).combined(with: .opacity))
+            .accessibilityIdentifier("tech_tooltip_\(text.replacingOccurrences(of: " ", with: "_"))")
     }
 }
 
