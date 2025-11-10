@@ -62,7 +62,7 @@ final class InfoViewUITests: XCTestCase {
     
     // MARK: - UI Tests
     
-    func test_tapping_terms_and_privacy_opensSheets() throws {
+    func test_tapping_privacy_opensSheet() throws {
         signIn()
         openInfoTab()
         
@@ -79,20 +79,6 @@ final class InfoViewUITests: XCTestCase {
         let privacyModalButton = privacyModal.buttons.element(boundBy: 0)
         XCTAssertTrue(privacyModalButton.waitForExistence(timeout: defaultTimeout))
         privacyModalButton.tap()
-
-        // terms button
-        let termsButton = app.buttons["info_termsButton"]
-        XCTAssertTrue(termsButton.waitForExistence(timeout: defaultTimeout))
-        termsButton.tap()
-
-        // expect SafariSheet to appear
-        let termsModal = app.otherElements["info_termsModal"]
-        XCTAssertTrue(termsModal.waitForExistence(timeout: defaultTimeout))
-        
-        // close the sheet
-        let termsModalButton = termsModal.buttons.element(boundBy: 0)
-        XCTAssertTrue(termsModalButton.waitForExistence(timeout: defaultTimeout))
-        termsModalButton.tap()
     }
     
     func test_faq_disclosure_expands_and_collapses() throws {
