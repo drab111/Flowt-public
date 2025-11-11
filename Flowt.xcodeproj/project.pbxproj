@@ -10,6 +10,7 @@
 		1C3BAAC02E57205B004D83AC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAABF2E57205B004D83AC /* FirebaseAuth */; };
 		1C3BAAC22E57205B004D83AC /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1C3BAAC12E57205B004D83AC /* FirebaseFirestore */; };
 		1CB515D02E7AF56D0050FFA6 /* NSFWDetector in Frameworks */ = {isa = PBXBuildFile; productRef = 1CB515CF2E7AF56D0050FFA6 /* NSFWDetector */; };
+		1CD5FCF82EC2C6D200924829 /* CITestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 1CD5FCF72EC2C6D200924829 /* CITestPlan.xctestplan */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +34,7 @@
 		1C370B2C2E565C2600A13271 /* Flowt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flowt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C370B392E565C2800A13271 /* FlowtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C370B432E565C2800A13271 /* FlowtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CD5FCF72EC2C6D200924829 /* CITestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = CITestPlan.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -97,6 +99,7 @@
 		1C370B232E565C2600A13271 = {
 			isa = PBXGroup;
 			children = (
+				1CD5FCF72EC2C6D200924829 /* CITestPlan.xctestplan */,
 				1C370B2E2E565C2600A13271 /* Flowt */,
 				1C370B3C2E565C2800A13271 /* FlowtTests */,
 				1C370B462E565C2800A13271 /* FlowtUITests */,
@@ -249,6 +252,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CD5FCF82EC2C6D200924829 /* CITestPlan.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
