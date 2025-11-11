@@ -37,7 +37,9 @@ final class InfoViewUITests: XCTestCase {
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
-        XCTAssertTrue(passwordField.isHittable)
+        sleep(3)
+        let passwordKeyboard = app.keyboards.firstMatch
+        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
         passwordField.typeText("Password123")
 
         let signInButton = app.buttons["login_submitButton"]

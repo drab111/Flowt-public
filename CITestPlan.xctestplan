@@ -4,7 +4,7 @@
       "id" : "A5F43DD7-F9E6-487C-B7D6-78C4D224DDC1",
       "name" : "Configuration 1",
       "options" : {
-
+        "testRepetitionMode" : "retryOnFailure"
       }
     }
   ],
@@ -29,7 +29,6 @@
       }
     },
     {
-      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:Flowt.xcodeproj",
         "identifier" : "1C370B422E565C2800A13271",

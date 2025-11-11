@@ -40,7 +40,9 @@ final class SignInViewUITests: XCTestCase {
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
-        XCTAssertTrue(passwordField.isHittable)
+        sleep(3)
+        let passwordKeyboard = app.keyboards.firstMatch
+        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
         passwordField.typeText("Password123")
 
         // tap the Sign In button
@@ -70,7 +72,9 @@ final class SignInViewUITests: XCTestCase {
         // enter too short password
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         passwordField.tap()
-        XCTAssertTrue(passwordField.isHittable)
+        sleep(3)
+        let passwordKeyboard = app.keyboards.firstMatch
+        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
         passwordField.typeText("short") // < 8
 
         // check that Sign In button is disabled
@@ -96,7 +100,9 @@ final class SignInViewUITests: XCTestCase {
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
         XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
         passwordField.tap()
-        XCTAssertTrue(passwordField.isHittable)
+        sleep(3)
+        let passwordKeyboard = app.keyboards.firstMatch
+        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
         passwordField.typeText("Password123")
 
         // tap the Sign In button
@@ -119,8 +125,10 @@ final class SignInViewUITests: XCTestCase {
         let sheetEmail = app.textFields["forgot_sheet_email"]
         XCTAssertTrue(sheetEmail.waitForExistence(timeout: defaultTimeout))
         sheetEmail.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
         sheetEmail.typeText("ui-test@example.com")
-
+        
         let sendButton = app.buttons["forgot_send_link_button"]
         XCTAssertTrue(sendButton.waitForExistence(timeout: defaultTimeout))
         sendButton.tap()
