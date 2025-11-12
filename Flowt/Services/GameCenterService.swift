@@ -15,6 +15,7 @@ final class GameCenterService {
 
     // MARK: - Authentication
     func authenticate() {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         let player = GKLocalPlayer.local
         player.authenticateHandler = { [weak self] vc, error in
             if let vc = vc {
@@ -26,6 +27,7 @@ final class GameCenterService {
     
     // MARK: - Report Achievements
     func unlockAchievement(id: String) {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         guard GKLocalPlayer.local.isAuthenticated else { return }
 
         let achievement = GKAchievement(identifier: id)

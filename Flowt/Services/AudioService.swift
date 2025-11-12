@@ -31,6 +31,7 @@ final class AudioService: AudioServiceProtocol {
     var sfxEnabled: Bool = true
     
     private init() {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         preferencesObserver = NotificationCenter.default.addObserver(forName: .userPreferencesChanged, object: nil, queue: .main) { [weak self] notification in
             guard let profile = notification.object as? UserProfile else { return }
             Task { @MainActor in
@@ -58,6 +59,7 @@ final class AudioService: AudioServiceProtocol {
     
     // MARK: - Music Playback
     func start() {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         guard musicEnabled, player == nil else { return }
         
         // Shuffle the playlist
@@ -103,16 +105,19 @@ final class AudioService: AudioServiceProtocol {
     
     // MARK: - Sound Effects
     func playSFX(node: SKNode, fileName: String) {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         guard sfxEnabled else { return }
         node.run(SKAction.playSoundFileNamed(fileName, waitForCompletion: false))
     }
     
     func playSystemSFX(id: SystemSoundID) {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         guard sfxEnabled else { return }
         AudioServicesPlaySystemSound(id)
     }
     
     func playEndGameSound() async {
+        guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
         guard sfxEnabled, let url = Bundle.main.url(forResource: "explodeSound", withExtension: "wav") else { return }
         stop()
         try? await Task.sleep(nanoseconds: 500_000_000)

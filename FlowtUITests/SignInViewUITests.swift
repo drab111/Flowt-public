@@ -38,11 +38,7 @@ final class SignInViewUITests: XCTestCase {
         emailField.typeText("ui-test@example.com")
 
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
-        XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
-        passwordField.tap()
-        sleep(3)
-        let passwordKeyboard = app.keyboards.firstMatch
-        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
+        tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
         passwordField.typeText("Password123")
 
         // tap the Sign In button
@@ -71,10 +67,7 @@ final class SignInViewUITests: XCTestCase {
 
         // enter too short password
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
-        passwordField.tap()
-        sleep(3)
-        let passwordKeyboard = app.keyboards.firstMatch
-        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
+        tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
         passwordField.typeText("short") // < 8
 
         // check that Sign In button is disabled
@@ -98,11 +91,7 @@ final class SignInViewUITests: XCTestCase {
         emailField.typeText("ui-test@example.com")
 
         let passwordField = app.secureTextFields["login_passwordSecureTextField"]
-        XCTAssertTrue(passwordField.waitForExistence(timeout: defaultTimeout))
-        passwordField.tap()
-        sleep(3)
-        let passwordKeyboard = app.keyboards.firstMatch
-        XCTAssertTrue(passwordKeyboard.waitForExistence(timeout: defaultTimeout))
+        tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
         passwordField.typeText("Password123")
 
         // tap the Sign In button
