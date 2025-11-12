@@ -55,6 +55,15 @@ final class MockProfileService: ProfileServiceProtocol {
         return mockProfiles[uid]
     }
     
+    func fetchProfiles(uids: [String]) async throws -> [UserProfile] {
+        if shouldThrowOnFetch { throw thrownError }
+        
+        let foundProfiles = uids.compactMap { uid in
+            mockProfiles[uid]
+        }
+        return foundProfiles
+    }
+    
     func saveProfile(_ profile: UserProfile) async throws {
         if shouldThrowOnSave { throw thrownError }
         mockProfiles[profile.id] = profile

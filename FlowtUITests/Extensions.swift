@@ -10,7 +10,7 @@ import XCTest
 extension XCTestCase {
     // tap the element and wait for the software keyboard to appear
     // uses the provided 'app' instance, retries taps a few times and uses XCT expectations with timeout.
-    func tapElementAndWaitForKeyboardToAppear(_ element: XCUIElement, app: XCUIApplication, timeout: TimeInterval = 5.0, maxAttempts: Int = 3) {
+    func tapElementAndWaitForKeyboardToAppear(_ element: XCUIElement, app: XCUIApplication, timeout: TimeInterval = 5.0, maxAttempts: Int = 5) {
         // element must exist first
         XCTAssertTrue(element.waitForExistence(timeout: timeout))
         

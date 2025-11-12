@@ -55,7 +55,7 @@ final class GameSceneIntegrationTests: XCTestCase {
         scene.invalidateTimers()
         
         // Act
-        scene.setupInitialPorts()
+        scene.setupInitialPorts(immediate: true)
         
         // Assert
         XCTAssertEqual(scene.ports.count, CargoType.allCases.count)

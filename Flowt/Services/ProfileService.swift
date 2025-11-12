@@ -10,6 +10,7 @@ import NSFWDetector
 
 protocol ProfileServiceProtocol {
     func fetchProfile(uid: String) async throws -> UserProfile?
+    func fetchProfiles(uids: [String]) async throws -> [UserProfile]
     func saveProfile(_ profile: UserProfile) async throws
     func deleteProfile(uid: String) async throws
     func validateAvatar(image: UIImage, threshold: Float) async throws -> Bool
@@ -31,6 +32,25 @@ final class ProfileService: ProfileServiceProtocol {
             musicEnabled: data["musicEnabled"] as? Bool ?? true,
             sfxEnabled: data["sfxEnabled"] as? Bool ?? true
         )
+    }
+
+    func fetchProfiles(uids: [String]) async throws -> [UserProfile] {
+        guard !uids.isEmpty else { return [] }
+        
+        let snapshot = try await db.collection("users")
+            .whereField(FieldPath.documentID(), in: uids)
+            .getDocuments()
+        
+        return snapshot.documents.map { doc in
+            let data = doc.data()
+            return UserProfile(
+                id: doc.documentID,
+                nickname: data["nickname"] as? String ?? "",
+                avatarBase64: data["avatarBase64"] as? String,
+                musicEnabled: data["musicEnabled"] as? Bool ?? true,
+                sfxEnabled: data["sfxEnabled"] as? Bool ?? true
+            )
+        }
     }
     
     func saveProfile(_ profile: UserProfile) async throws {

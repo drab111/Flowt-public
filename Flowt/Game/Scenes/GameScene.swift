@@ -38,6 +38,7 @@ class GameScene: SKScene {
     }
     
     enum TimerKeys {
+        static let spawnInitialPorts = "SpawnInitialPortsAction"
         static let spawnPort = "SpawnPortAction"
         static let spawnCargo = "SpawnCargoAction"
         static let spawnStorm = "SpawnStormAction"

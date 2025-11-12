@@ -9,8 +9,29 @@ import SpriteKit
 
 extension GameScene {
     // MARK: - Port Spawning
-    func setupInitialPorts() {
-        for type in CargoType.allCases { spawnRandomPort(portType: type) }
+    func setupInitialPorts(immediate: Bool = false) {
+        if immediate {
+            for type in CargoType.allCases { spawnRandomPort(portType: type) }
+            return
+        }
+        
+        let delay = 0.8
+        let types = CargoType.allCases
+        var actions: [SKAction] = []
+        
+        for (index, type) in types.enumerated() {
+            let spawn = SKAction.run { [weak self] in
+                self?.spawnRandomPort(portType: type)
+            }
+            actions.append(spawn)
+            
+            if index < types.count - 1 {
+                actions.append(SKAction.wait(forDuration: delay))
+            }
+        }
+        
+        let sequence = SKAction.sequence(actions)
+        self.run(sequence, withKey: TimerKeys.spawnInitialPorts)
     }
     
     func spawnRandomPort(portType: CargoType) {

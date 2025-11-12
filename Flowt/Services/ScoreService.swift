@@ -52,20 +52,25 @@ final class ScoreService: ScoreServiceProtocol {
     func fetchRank(score: Int, createdAt: Date) async throws -> Int {
         // Convert Date -> Timestamp for Firestore query
         let ts = Timestamp(date: createdAt)
-
+        
         // Count how many users have a higher score
-        let greaterQ = db.collection("scores")
+        async let greaterAggTask = db.collection("scores")
             .whereField("score", isGreaterThan: score)
-        let greaterAgg = try await greaterQ.count.getAggregation(source: .server)
-        let greater = greaterAgg.count.intValue
-
+            .count
+            .getAggregation(source: .server)
+        
         // Count users with the same score but earlier submission time
-        let tieQ = db.collection("scores")
+        async let tieAggTask = db.collection("scores")
             .whereField("score", isEqualTo: score)
             .whereField("createdAt", isLessThan: ts)
-        let tieAgg = try await tieQ.count.getAggregation(source: .server)
+            .count
+            .getAggregation(source: .server)
+        
+        // await the results of both operations in parallel
+        let (greaterAgg, tieAgg) = try await (greaterAggTask, tieAggTask)
+        let greater = greaterAgg.count.intValue
         let ties = tieAgg.count.intValue
-
+        
         return greater + ties + 1
     }
     

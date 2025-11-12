@@ -38,12 +38,12 @@ extension GameScene {
     
     func increaseScore() {
         score += 1
-
+        
         // Rewards for milestones
         if let color = GameConfig.milestoneRewards[score] {
             addExtraLine(lineColor: color, buttonColor: color)
         }
-
+        
         cargoSpawnInterval = cargoInterval(score: score)
         
         if score == GameConfig.PointsToSpawnAdditionalStorm && additionalStorm == nil { unlockAdditionalStorm() }
@@ -222,6 +222,7 @@ extension GameScene {
     }
     
     func invalidateTimers() {
+        removeAction(forKey: TimerKeys.spawnInitialPorts)
         removeAction(forKey: TimerKeys.spawnPort)
         removeAction(forKey: TimerKeys.spawnCargo)
         removeAction(forKey: TimerKeys.spawnStorm)

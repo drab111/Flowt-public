@@ -88,27 +88,27 @@ final class ScoreViewModel: ObservableObject {
         guard let userId = appState.currentUser?.uid else { return }
         let rawScores = try await scoreService.fetchTopScores(limit: limit)
 
-        // Parallel profile fetching with a simple cache to avoid redundant reads
-        let uniqueUserIds = Array(Set(rawScores.map { $0.userId }))
-        try await withThrowingTaskGroup(of: (String, UserProfile?).self) { group in
-            for uid in uniqueUserIds where profileCache[uid] == nil {
-                group.addTask { [profileService] in
-                    let profile = try? await profileService.fetchProfile(uid: uid)
-                    return (uid, profile)
-                }
-            }
-            for try await (uid, profile) in group {
-                if let profile { profileCache[uid] = profile }
+        // collect users who are not yet in the cache
+        let allUserIds = Set(rawScores.map { $0.userId })
+        let idsToFetch = Array(allUserIds.filter { profileCache[$0] == nil })
+        
+        // fetch all missing profiles with a single query
+        if !idsToFetch.isEmpty {
+            let fetchedProfiles = try await profileService.fetchProfiles(uids: idsToFetch)
+            
+            // update the local cache
+            for profile in fetchedProfiles {
+                profileCache[profile.id] = profile
             }
         }
-
+        
         let mapped = rawScores.map { scoreEntry in
             let profile = profileCache[scoreEntry.userId] ?? nil
             let isCurrent = (scoreEntry.userId == userId)
             let isLatest  = (scoreEntry.id == highlightLatestId)
             return (entry: scoreEntry, profile: profile, isCurrentUser: isCurrent, isLatest: isLatest)
         }
-
+        
         leaderboard = mapped
     }
     
