@@ -82,7 +82,7 @@ The game logic includes dedicated deterministic helpers to ensure predictable si
 A custom deterministic cargo factory allows integration tests to generate stable game scenarios, making gameplay assertions reliable and repeatable.
 Both unit tests and UI tests rely on mock service implementations, which replace Firebase, networking and game data during test execution.
 This keeps the tests fully isolated, fast and deterministic.
-Integration and UI tests run as part of the Xcode Cloud pipeline, providing full regression coverage for gameplay, authentication and user flows across the entire application.
+Unit, integration and UI tests run as part of the Xcode Cloud pipeline, providing full regression coverage for gameplay, authentication and user flows across the entire application.
 
 ---
 
@@ -94,7 +94,7 @@ Integration and UI tests run as part of the Xcode Cloud pipeline, providing full
 - Game Center: Achievements & integration
 - Dependency management: Swift Package Manager
 - CI/CD: Xcode Cloud (build, test, archive, distribute)
-- Unit & UI tests: XCTest, XCUITest
+- Unit, Integration & UI tests: XCTest, XCUITest
 
 ---
 
@@ -154,32 +154,10 @@ The project contains three test groups: Unit, Integration, and UI tests. There i
 
 ### From Xcode
 
-- Select the `Flowt` scheme and run Product → Test (⌘U).
-- For UI tests, make sure the scheme’s UI Testing target has `USE_MOCK_SERVICES=1` and `SKIP_TERMS_AGREEMENT=1` in the Run arguments so tests run deterministically.
+Simply select the `Flowt` scheme and run **Product → Test** (⌘U).  
+Unit, Integration and UI tests run without additional configuration.
 
-### From terminal (example)
-
-**Unit & Integration tests using the Test Plan**:
-
-```bash
-xcodebuild test \
-  -project Flowt.xcodeproj \
-  -scheme Flowt \
-  -testPlan CITestPlan.xctestplan \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
-```
-
-**UI tests (XCUITest)**
-
-```bash
-xcodebuild test \
-  -project Flowt.xcodeproj \
-  -scheme FlowtUITests \
-  -testPlan CITestPlan.xctestplan \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
-```
-
-> The project’s UI tests use environment variables in `setUp()` (for example `app.launchEnvironment["USE_MOCK_SERVICES"] = "1"`) to ensure reliable, fast runs. Some integration tests rely on deterministic helpers such as `DeterministicCargoFactory` (see IntegrationTests). See the test files for exact usage and sample fixtures.
+> UI tests automatically set the required environment variables (e.g. `USE_MOCK_SERVICES=1`), ensuring deterministic and fast runs. Integration tests use deterministic helpers such as `DeterministicCargoFactory` to keep game behaviour stable.
 
 ---
 
@@ -215,8 +193,6 @@ The code in the repository is released under the **Creative Commons Attribution-
 ---
 
 ## Screenshots
-
-> Placeholder images — I will add high-quality screenshots from the App Store build here.
 
 <p align="center">
   <img src="Screenshots/gameplay1.png" width="260">

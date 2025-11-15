@@ -332,6 +332,30 @@ final class GameSceneIntegrationTests: XCTestCase {
         XCTAssertEqual(ship.shipSpeed, GameConfig.shipSpeed * GameConfig.stormSlowdown)
     }
     
+    func test_storm_containsPoint_and_sceneDetectsStormZone() {
+        // Arrange
+        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
+        scene.size = windowSize
+        scene.invalidateTimers()
+        
+        // create a storm
+        let center = CGPoint(x: 400, y: 300)
+        let radius: CGFloat = 100
+        let storm = Storm(position: center, radius: radius)
+        scene.addChild(storm)
+        scene.storm = storm
+        
+        let insidePoint = CGPoint(x: 450, y: 300) // 50 pts away → inside
+        let outsidePoint = CGPoint(x: 600, y: 300) // 200 pts away → outside
+        
+        // Act & Assert
+        XCTAssertTrue(storm.contains(point: insidePoint))
+        XCTAssertFalse(storm.contains(point: outsidePoint))
+        
+        XCTAssertTrue(scene.isInStormZone(insidePoint))
+        XCTAssertFalse(scene.isInStormZone(outsidePoint))
+    }
+    
     func test_upgrades_applyEffects_addShip_speed_capacity() {
         // Arange
         let line = makeLineWithPoints(3)
