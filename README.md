@@ -9,6 +9,15 @@ It’s a paid App Store title that demonstrates real production engineering: cle
 
 ---
 
+## About this repository (important)
+This repository is the **public demonstration** of the Flowt codebase. It contains the same architecture, features and tests as the production app, but is intentionally decoupled from production infrastructure:
+- The public repo is connected to a **dedicated demo Firebase project** and uses a **separate bundle identifier** (so it is safe to run and share)
+- The production app (App Store build), production Firebase project and the production CI/CD configuration remain in a **private repository**
+- This public copy is intended for review and local testing; it does **not** include any production secrets or credentials
+- Access to the full production repository is available **on request for recruiters / hiring managers**
+
+---
+
 ## Table of contents
 
 - [Short description](#short-description)
@@ -123,7 +132,9 @@ Flowt/
 
 ## Running locally (quick start)
 
-> NOTE: This repository does **not** include `GoogleService-Info.plist` (production Firebase credentials). Add your own `GoogleService-Info.plist` to the app target if you want to use a Firebase project. If you don't have Firebase, use the built-in mock services (recommended for local development and CI).
+> NOTE: This repository uses a **separate Firebase project** created only for the public/demo environment.  
+> The production `GoogleService-Info.plist` is not included (and lives in the private repository).  
+> If you prefer not to use Firebase at all, the app supports full mock mode.
 
 1. **Clone & Open**
 
@@ -142,9 +153,10 @@ When USE_MOCK_SERVICES=1 the app uses MockAuthService, MockProfileService and Mo
 
 3. **Run with Firebase**
 
-- Add your `GoogleService-Info.plist` to the app target.
-- Make sure Authentication and Firestore are configured in the Firebase console.
-- Unset USE_MOCK_SERVICES to use real backend services.
+- The repo contains a demo `GoogleService-Info.plist` for the public Firebase project.
+- No production data is used.
+- Authentication and Firestore are fully functional, but isolated from the App Store build.
+- To switch to Firebase mode, simply remove USE_MOCK_SERVICES from the scheme.
 
 ---
 
@@ -163,7 +175,7 @@ Unit, Integration and UI tests run without additional configuration.
 
 ## CI / CD (Xcode Cloud)
 
-This project is configured with a full Xcode Cloud pipeline (see Xcode project settings / Xcode Cloud). The pipeline includes:
+This public repository has its own Xcode Cloud pipeline, configured almost identically to the production setup. The pipeline includes:
 
 - Triggers: runs on `main` branch updates.
 - Actions: build → test (uses `CITestPlan.xctestplan`) → bump build number → archive.
@@ -182,7 +194,7 @@ This project is configured with a full Xcode Cloud pipeline (see Xcode project s
 
 ## Contributing
 
-This repository is intended as a portfolio / demonstration. If you find issues or want to suggest improvements, open an issue or a pull request with clear motivation. If you want to run the app locally, please follow the instructions above — especially around `GoogleService-Info.plist`.
+This repository is intended as a portfolio / demonstration. If you find issues or want to suggest improvements, open an issue or a pull request with clear motivation. For local development, follow the steps in the “Running locally” section — especially regarding Firebase configuration and mock mode.
 
 ---
 
