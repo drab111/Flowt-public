@@ -11,10 +11,10 @@ It’s a paid App Store title that demonstrates real production engineering: cle
 
 ## About this repository (important)
 This repository is the **public demonstration** of the Flowt codebase. It contains the same architecture, features and tests as the production app, but is intentionally decoupled from production infrastructure:
-- The public repo is connected to a **dedicated demo Firebase project** and uses a **separate bundle identifier** (so it is safe to run and share)
-- The production app (App Store build), production Firebase project and the production CI/CD configuration remain in a **private repository**
-- This public copy is intended for review and local testing; it does **not** include any production secrets or credentials
-- Access to the full production repository is available **on request for recruiters / hiring managers**
+- The public repo is connected to a **dedicated demo Firebase project** and uses a **separate bundle identifier** (so it is safe to run and share).
+- The production app (App Store build), production Firebase project and the production CI/CD configuration remain in a **private repository**.
+- This public copy is intended for review and local testing; it does **not** include any production secrets or credentials.
+- Access to the full production repository is available **on request for recruiters / hiring managers**.
 
 ---
 
@@ -139,7 +139,7 @@ Flowt/
 1. **Clone & Open**
 
 ```bash
-git clone https://github.com/drab111/Flowt.git
+git clone https://github.com/drab111/Flowt-public.git
 cd Flowt
 open Flowt.xcodeproj
 ```
