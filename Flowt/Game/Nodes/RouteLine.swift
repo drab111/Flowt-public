@@ -9,6 +9,7 @@ import SpriteKit
 
 class RouteLine: SKShapeNode {
     private let checkIslandCollision: ((CGPoint) -> Bool)
+    private(set) var currentSegmentInvalid: Bool = false
     
     // For factory pattern and Scene-based management
     let isInStormZone: ((CGPoint) -> Bool)
@@ -39,16 +40,23 @@ class RouteLine: SKShapeNode {
     
     func startNewLine(from point: CGPoint) {
         currentPoints.removeAll()
+        currentSegmentInvalid = false
         currentPoints.append(point)
         updatePath()
     }
     
     func addPoint(_ point: CGPoint) {
+        guard !currentSegmentInvalid else { return }
+        
         // First, check if the point lies within any island area
         if checkIslandCollision(point) {
+            AudioService.shared.playSFX(node: self, fileName: "failureSound.wav")
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            currentSegmentInvalid = true
             resetCurrentPoints()
             return
         }
+        
         currentPoints.append(point)
         updatePath()
     }

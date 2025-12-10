@@ -101,6 +101,7 @@ extension GameScene {
         guard isDrawing, let touch = touches.first else { return }
         let location = touch.location(in: self)
         currentLine.addPoint(location)
+        if currentLine.currentSegmentInvalid { isDrawing = false }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
