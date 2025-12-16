@@ -5,7 +5,6 @@
 //  Created by Wiktor Drab on 16/09/2025.
 //
 
-import StoreKit
 import SwiftUI
 
 @MainActor
@@ -24,6 +23,11 @@ final class GameViewModel: ObservableObject {
     
     @Published var activePhase: GamePhase?
     @AppStorage("gamesPlayed") var gamesPlayed: Int = 0
+    private let appReviewService: AppReviewServiceProtocol
+
+    init(appReviewService: AppReviewServiceProtocol) {
+        self.appReviewService = appReviewService
+    }
     
     // MARK: - Game Flow
     func startGame() { activePhase = .gameScene }
@@ -38,13 +42,6 @@ final class GameViewModel: ObservableObject {
     // MARK: - Review Request
     private func incrementGamesPlayed() {
         gamesPlayed += 1
-        if gamesPlayed == 10 { requestAppReview() }
-    }
-    
-    private func requestAppReview() {
-        if let scene = UIApplication.shared.connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-            AppStore.requestReview(in: scene)
-        }
+        if gamesPlayed == 10 { appReviewService.requestAppReview() }
     }
 }

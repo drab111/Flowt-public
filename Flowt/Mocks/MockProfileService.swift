@@ -31,13 +31,13 @@ final class MockProfileService: ProfileServiceProtocol {
         
         if let base64 = env["PRELOAD_AVATAR_BASE64"] {
             let profile = UserProfile(
-                id: "user-with-avatar",
+                id: "ui-test-uid",
                 nickname: "UI Tester",
                 avatarBase64: base64,
                 musicEnabled: true,
                 sfxEnabled: true
             )
-            mockProfiles["user-with-avatar"] = profile
+            mockProfiles["ui-test-uid"] = profile
         }
     }
     
@@ -48,7 +48,7 @@ final class MockProfileService: ProfileServiceProtocol {
         // to simulate a user already having an avatar loaded
         let env = ProcessInfo.processInfo.environment
         if env["PRELOAD_AVATAR_BASE64"] != nil {
-            return mockProfiles["user-with-avatar"]
+            return mockProfiles["ui-test-uid"]
         }
         
         // normal path

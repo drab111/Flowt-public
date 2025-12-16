@@ -10,13 +10,16 @@ import XCTest
 
 @MainActor
 final class GameViewModelTests: XCTestCase {
+    // MARK: - fixtures
     var originalGamesPlayed: Int?
     let gamesPlayedKey = "gamesPlayed"
+    var mockAppReviewService: MockAppReviewService!
     
     // MARK: - lifecycle
     override func tearDown() {
-        // for the duration of testing, we reset UserDeaults and then restore them to their original state
+        mockAppReviewService = nil
         
+        // for the duration of testing, we reset UserDeaults and then restore them to their original state
         // restore UserDefaults
         if let orig = originalGamesPlayed {
             UserDefaults.standard.set(orig, forKey: gamesPlayedKey)
@@ -37,12 +40,14 @@ final class GameViewModelTests: XCTestCase {
         }
         // ensure deterministic start
         UserDefaults.standard.removeObject(forKey: gamesPlayedKey)
+        
+        mockAppReviewService = MockAppReviewService()
     }
     
     // MARK: - tests
     func test_startGame_setsGameScene_and_endGame_setsEndView_and_incrementsGamesPlayed() {
         // Arrange
-        let vm = GameViewModel()
+        let vm = GameViewModel(appReviewService: mockAppReviewService)
         // ensure starting point
         UserDefaults.standard.set(0, forKey: gamesPlayedKey)
         
@@ -57,6 +62,8 @@ final class GameViewModelTests: XCTestCase {
         // Assert - gamesPlayed incremented
         let gamesPlayed = UserDefaults.standard.integer(forKey: gamesPlayedKey)
         XCTAssertEqual(gamesPlayed, 1)
+        XCTAssertFalse(mockAppReviewService.didRequestReview)
+        XCTAssertEqual(mockAppReviewService.requestCount, 0)
         
         // back to menu
         vm.backToMenu()
@@ -66,7 +73,7 @@ final class GameViewModelTests: XCTestCase {
     func test_endGame_incrementsToTen_triggersReviewThreshold() {
         // Arrange
         UserDefaults.standard.set(9, forKey: gamesPlayedKey)
-        let vm = GameViewModel()
+        let vm = GameViewModel(appReviewService: mockAppReviewService)
         
         // Act
         vm.endGame()
@@ -75,6 +82,8 @@ final class GameViewModelTests: XCTestCase {
         let gamesPlayed = UserDefaults.standard.integer(forKey: gamesPlayedKey)
         XCTAssertEqual(gamesPlayed, 10)
         
-        // NOTE: it is not possible to check in unit tests whether App Review has been displayed
+        // Review requested exactly once at threshold
+        XCTAssertTrue(mockAppReviewService.didRequestReview)
+        XCTAssertEqual(mockAppReviewService.requestCount, 1)
     }
 }

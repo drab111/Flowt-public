@@ -21,11 +21,13 @@ class AppState: ObservableObject {
     }
     
     init(authSession: AuthSession? = nil) {
+        let env = ProcessInfo.processInfo.environment
+        
         if let provided = authSession {
             self.authSession = provided
         } else {
             #if DEBUG
-            if ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] == "1" {
+            if env["USE_MOCK_SERVICES"] == "1" {
                 self.authSession = MockAuthSession()
             } else { self.authSession = FirebaseAuthSession() }
             #else
@@ -33,7 +35,17 @@ class AppState: ObservableObject {
             #endif
         }
         
-        checkUserSession()
+        guard let mode = env["SKIP_LOGIN"], mode != "0" else {
+            // standard route
+            checkUserSession()
+            return
+        }
+        
+        // for UI tests
+        let mockUid = "ui-test-uid"
+        currentUser = AuthUser(uid: mockUid, displayName: "UI Tester", email: "ui-test@example.com")
+        currentUserProfile = UserProfile(id: mockUid, nickname: "UI Tester", avatarBase64: env["PRELOAD_AVATAR_BASE64"], musicEnabled: true, sfxEnabled: true)
+        currentScreen = (mode == "2") ? .verifyEmail : .mainMenu(.profile)
     }
     
     func checkUserSession() {

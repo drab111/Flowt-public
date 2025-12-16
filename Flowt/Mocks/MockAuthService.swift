@@ -31,6 +31,9 @@ final class MockAuthService: AuthServiceProtocol {
         if env["MOCK_AUTH_SHOULD_THROW_DELETE"] == "1" { shouldThrowOnDelete = true }
         if env["MOCK_AUTH_SHOULD_THROW_SEND"] == "1" { shouldThrowOnSendVerification = true }
         if env["MOCK_AUTH_SHOULD_THROW_PASSWORD_RESET"] == "1" { shouldThrowOnPasswordReset = true }
+        
+        guard env["SKIP_LOGIN"] != nil else { return }
+        currentAuthUser = AuthUser(uid: "ui-test-uid", displayName: "UI Tester", email: "ui-test@example.com")
     }
 
     // MARK: - Email & Password

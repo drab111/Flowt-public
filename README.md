@@ -74,7 +74,7 @@ A dedicated MainMenuContainer owns all view models and injects services (Firebas
 
 ### MVVM + Services
 The UI layer (SwiftUI) remains intentionally thin: each screen is driven by a dedicated ViewModel (AuthViewModel, ProfileViewModel, GameViewModel, etc.), which exposes state and handles user intent.
-All side effects and platform interactions live in dedicated service objects (AuthService, ProfileService, ScoreService, GameCenterService, AudioService).
+All side effects and platform interactions live in dedicated service objects (AuthService, ProfileService, ScoreService, GameCenterService, AudioService, AppReviewService).
 These services abstract Firebase, Firestore, Game Center and system APIs, making the ViewModels pure and fully testable.
 Every service has a production implementation and a matching Mock* variant, which is used in unit tests, previews and local development.
 
@@ -115,8 +115,8 @@ Flowt/
   ├─ Game/               # Game core: GameScene, nodes, factories, movement strategies
   ├─ Views/              # SwiftUI views & shared components
   ├─ ViewModels/         # ViewModels for each screen
-  ├─ Services/           # AuthService, ScoreService, ProfileService, AudioService, GameCenterService
-  ├─ Mocks/              # MockAuthService, MockProfileService, MockScoreService
+  ├─ Services/           # AuthService, ScoreService, ProfileService, AudioService, GameCenterService, AppReviewService
+  ├─ Mocks/              # MockAuthService, MockProfileService, MockScoreService, MockAppReviewService
   ├─ Models/             # AuthUser, UserProfile, ScoreEntry, TutorialPage
   ├─ Tests/
   │   ├─ UnitTests/

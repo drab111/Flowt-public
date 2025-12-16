@@ -17,6 +17,7 @@ final class VerifyEmailViewUITests: XCTestCase {
         app.launchEnvironment["USE_MOCK_SERVICES"] = "1"
         app.launchEnvironment["SKIP_TERMS_AGREEMENT"] = "1"
         app.launchEnvironment["SET_VERIFY_EMAIL"] = "1"
+        app.launchEnvironment["SKIP_LOGIN"] = "2"
     }
 
     override func tearDownWithError() throws {
@@ -27,22 +28,25 @@ final class VerifyEmailViewUITests: XCTestCase {
     
     private func signIn() {
         app.launch()
-        let emailField = app.textFields["login_emailTextField"]
-        XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
-        emailField.tap()
         
-        let keyboard = app.keyboards.firstMatch
-        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
-        emailField.typeText("ui-test@example.com")
-
-        let passwordField = app.secureTextFields["login_passwordSecureTextField"]
-        tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
-        passwordField.typeText("Password123")
-
-        let signInButton = app.buttons["login_submitButton"]
-        XCTAssertTrue(signInButton.waitForExistence(timeout: defaultTimeout))
-        XCTAssertTrue(signInButton.isEnabled)
-        signInButton.tap()
+        if app.launchEnvironment["SKIP_LOGIN"] != "2" {
+            let emailField = app.textFields["login_emailTextField"]
+            XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
+            emailField.tap()
+            
+            let keyboard = app.keyboards.firstMatch
+            XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
+            emailField.typeText("ui-test@example.com")
+            
+            let passwordField = app.secureTextFields["login_passwordSecureTextField"]
+            tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
+            passwordField.typeText("Password123")
+            
+            let signInButton = app.buttons["login_submitButton"]
+            XCTAssertTrue(signInButton.waitForExistence(timeout: defaultTimeout))
+            XCTAssertTrue(signInButton.isEnabled)
+            signInButton.tap()
+        }
     }
     
     private func ensureVerifyEmailVisible() {

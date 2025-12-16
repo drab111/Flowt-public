@@ -327,7 +327,7 @@ private struct ToOneBar: View {
     let appState = AppState()
     let scoreService = ScoreService()
     GameView(
-        gameVM: GameViewModel(),
+        gameVM: GameViewModel(appReviewService: AppReviewService()),
         scoreVM: ScoreViewModel(appState: appState, scoreService: scoreService, profileService: ProfileService()),
         accountScoreVM: AccountScoreViewModel(appState: appState, scoreService: scoreService)
     )

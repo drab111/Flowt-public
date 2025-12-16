@@ -13,6 +13,7 @@ final class MainMenuContainer: ObservableObject {
     private let authService: AuthServiceProtocol
     private let profileService: ProfileServiceProtocol
     private let scoreService: ScoreServiceProtocol
+    private let appReviewService: AppReviewServiceProtocol
     
     let authVM: AuthViewModel
     let profileVM: ProfileViewModel
@@ -30,21 +31,24 @@ final class MainMenuContainer: ObservableObject {
             self.authService = MockAuthService()
             self.profileService = MockProfileService()
             self.scoreService = MockScoreService()
+            self.appReviewService = MockAppReviewService()
         } else {
             self.authService = AuthService()
             self.profileService = ProfileService()
             self.scoreService = ScoreService()
+            self.appReviewService = AppReviewService()
         }
         #else
         // production
         self.authService = AuthService()
         self.profileService = ProfileService()
         self.scoreService = ScoreService()
+        self.appReviewService = AppReviewService()
         #endif
         
         self.authVM = AuthViewModel(appState: appState, authService: authService)
         self.profileVM = ProfileViewModel(appState: appState, profileService: profileService)
-        self.gameVM = GameViewModel()
+        self.gameVM = GameViewModel(appReviewService: appReviewService)
         self.scoreVM = ScoreViewModel(appState: appState, scoreService: scoreService, profileService: profileService)
         self.accountScoreVM = AccountScoreViewModel(appState: appState, scoreService: scoreService)
         self.tutorialVM = TutorialViewModel()

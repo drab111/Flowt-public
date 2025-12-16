@@ -48,7 +48,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     
     func test_setupInitialPorts_spawnsOnePortPerCargoType() {
         // Arange
-        let gameVM = GameViewModel()
+        let gameVM = GameViewModel(appReviewService: MockAppReviewService())
         let scoreVM = makeScoreVM()
         let scene = GameScene(gameVM: gameVM, scoreVM: scoreVM, cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
@@ -63,7 +63,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     
     func test_checkConnectionForSegment_detectsConnectionBetweenTwoPorts() {
         // Arange
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: DeterministicCargoFactory(forcedType: .food), upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: DeterministicCargoFactory(forcedType: .food), upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -85,7 +85,7 @@ final class GameSceneIntegrationTests: XCTestCase {
         let line = RouteLine(lineColor: .clear, checkIslandCollision: { _ in false }, isInStormZone: { _ in false }, getPorts: { [] })
         line.permanentPoints = [CGPoint(x: 0, y: 0), CGPoint(x: 100, y: 0), CGPoint(x: 10, y: 5)]
         XCTAssertFalse(line.isLoop)
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
         
         // Act
         scene.checkIfLoopClosed(line: line)
@@ -156,7 +156,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     func test_ship_loadsFromPort_and_respectsMaxCapacity() {
         // Arange
         let factory = DeterministicCargoFactory(forcedType: .gas)
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -187,7 +187,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     func test_ship_partialLoad_whenAlreadyHasCargo() {
         // Arange
         let factory = DeterministicCargoFactory(forcedType: .gas)
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -220,7 +220,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     func test_ship_doesNotLoad_whenPortOnlyHasItsOwnType() {
         // Arange: use factory that produces same type as port
         let factory = DeterministicCargoFactory(forcedType: .oil)
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -252,7 +252,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     func test_ship_constructor_autoLoads_respectsDefaultCapacity() {
         // Arange
         let factory = DeterministicCargoFactory(forcedType: .gas)
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -277,7 +277,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     func test_ship_loadsNothingWhenPortEmpty() {
         // Arange
         let factory = DeterministicCargoFactory(forcedType: .gas)
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: factory, upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -334,7 +334,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     
     func test_storm_containsPoint_and_sceneDetectsStormZone() {
         // Arrange
-        let scene = GameScene(gameVM: GameViewModel(), scoreVM: makeScoreVM(), cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
+        let scene = GameScene(gameVM: GameViewModel(appReviewService: MockAppReviewService()), scoreVM: makeScoreVM(), cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize
         scene.invalidateTimers()
         
@@ -402,7 +402,7 @@ final class GameSceneIntegrationTests: XCTestCase {
     
     func test_gameOver_clearsScene_and_setsVMs() {
         // Arange
-        let gameVM = GameViewModel()
+        let gameVM = GameViewModel(appReviewService: MockAppReviewService())
         let scoreVM = makeScoreVM()
         let scene = GameScene(gameVM: gameVM, scoreVM: scoreVM, cargoFactory: DarkCargoFactory(), upgradeFactory: SimpleUpgradeFactory())
         scene.size = windowSize

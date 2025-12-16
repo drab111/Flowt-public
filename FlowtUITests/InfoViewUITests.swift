@@ -16,6 +16,7 @@ final class InfoViewUITests: XCTestCase {
         app = XCUIApplication()
         app.launchEnvironment["USE_MOCK_SERVICES"] = "1"
         app.launchEnvironment["SKIP_TERMS_AGREEMENT"] = "1"
+        app.launchEnvironment["SKIP_LOGIN"] = "1"
     }
 
     override func tearDownWithError() throws {
@@ -26,22 +27,25 @@ final class InfoViewUITests: XCTestCase {
     
     private func signIn() {
         app.launch()
-        let emailField = app.textFields["login_emailTextField"]
-        XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
-        emailField.tap()
         
-        let keyboard = app.keyboards.firstMatch
-        XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
-        emailField.typeText("ui-test@example.com")
-
-        let passwordField = app.secureTextFields["login_passwordSecureTextField"]
-        tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
-        passwordField.typeText("Password123")
-
-        let signInButton = app.buttons["login_submitButton"]
-        XCTAssertTrue(signInButton.waitForExistence(timeout: defaultTimeout))
-        XCTAssertTrue(signInButton.isEnabled)
-        signInButton.tap()
+        if app.launchEnvironment["SKIP_LOGIN"] != "1" {
+            let emailField = app.textFields["login_emailTextField"]
+            XCTAssertTrue(emailField.waitForExistence(timeout: defaultTimeout))
+            emailField.tap()
+            
+            let keyboard = app.keyboards.firstMatch
+            XCTAssertTrue(keyboard.waitForExistence(timeout: defaultTimeout))
+            emailField.typeText("ui-test@example.com")
+            
+            let passwordField = app.secureTextFields["login_passwordSecureTextField"]
+            tapElementAndWaitForKeyboardToAppear(passwordField, app: app, timeout: defaultTimeout)
+            passwordField.typeText("Password123")
+            
+            let signInButton = app.buttons["login_submitButton"]
+            XCTAssertTrue(signInButton.waitForExistence(timeout: defaultTimeout))
+            XCTAssertTrue(signInButton.isEnabled)
+            signInButton.tap()
+        }
 
         // wait for tabBar
         let tabBar = app.otherElements["mainMenu_tabBar"]
