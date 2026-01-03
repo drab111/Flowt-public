@@ -9,7 +9,7 @@ import XCTest
 
 final class TermsAgreementViewUITests: XCTestCase {
     var app: XCUIApplication!
-    private let defaultTimeout: TimeInterval = 60
+    private let defaultTimeout: TimeInterval = 20
     
     override func setUpWithError() throws {
         continueAfterFailure = false

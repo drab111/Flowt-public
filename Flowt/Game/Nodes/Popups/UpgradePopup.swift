@@ -14,7 +14,7 @@ class UpgradePopup: SKNode, Popup {
     init(size: CGSize, onOptionSelected: ((UpgradeOption) -> Void)? = nil) {
         super.init()
         self.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        self.zPosition = 6
+        self.zPosition = 9
         self.name = "UpgradePopup"
         self.onOptionSelected = onOptionSelected
         

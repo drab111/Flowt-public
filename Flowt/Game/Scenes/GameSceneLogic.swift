@@ -190,16 +190,16 @@ extension GameScene {
     
     private func cargoInterval(score: Int) -> TimeInterval {
         switch score {
-        case ..<30:    return 2.5
-        case ..<45:    return 2.2
-        case ..<60:    return 1.8
-        case ..<100:   return 1.4
-        case ..<150:   return 1.0
-        case ..<300:   return 0.72
+        case ..<30:    return 3.0
+        case ..<45:    return 2.5
+        case ..<60:    return 2.0
+        case ..<100:   return 1.7
+        case ..<150:   return 1.2
+        case ..<300:   return 0.75
         case ..<500:   return 0.55
-        case ..<1000:  return 0.38
-        case ..<1500:  return 0.28
-        case ..<2000:  return 0.18
+        case ..<1000:  return 0.4
+        case ..<1500:  return 0.3
+        case ..<2000:  return 0.2
         default:       return 0.05
         }
     }

@@ -123,7 +123,7 @@ struct EndGameView: View {
     
     private var actionsPanel: some View {
         VStack(spacing: 12) {
-            if let payload = scoreVM.makeSharePayload() {
+            if let payload = scoreVM.sharePayload {
                 ShareLink(
                     items: [payload],
                     subject: Text("My Flowt score"),

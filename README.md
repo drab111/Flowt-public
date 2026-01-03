@@ -20,19 +20,19 @@ This repository is the **public demonstration** of the Flowt codebase. It contai
 
 ## Table of contents
 
-- [Short description](#short-description)
-- [Highlights & features](#highlights--features)
-- [Architecture & design decisions](#architecture--design-decisions)
-- [Tech stack](#tech-stack)
-- [Project structure (high level)](#project-structure-high-level)
-- [Running locally (quick start)](#running-locally-quick-start)
-- [Running tests (unit / integration / UI)](#running-tests-unit--integration--ui)
-- [CI / CD (Xcode Cloud)](#ci--cd-xcode-cloud)
-- [Design & UX polish notes](#design--ux-polish-notes)
-- [Contributing](#contributing)
-- [License](#license)
-- [Screenshots](#screenshots)
-- [Contact](#contact)
+1. [Short description](#short-description)
+2. [Highlights & features](#highlights--features)
+3. [Architecture & design decisions](#architecture--design-decisions)
+4. [Tech stack](#tech-stack)
+5. [Project structure (high level)](#project-structure-high-level)
+6. [Running locally (quick start)](#running-locally-quick-start)
+7. [Running tests (unit / integration / UI)](#running-tests-unit--integration--ui)
+8. [CI / CD (Xcode Cloud)](#ci--cd-xcode-cloud)
+9. [Design & UX polish notes](#design--ux-polish-notes)
+10. [Contributing](#contributing)
+11. [Screenshots](#screenshots)
+12. [License](#license)
+13. [Contact](#contact)
 
 ---
 
@@ -51,7 +51,7 @@ The repository contains the full application: SwiftUI wrapper, SpriteKit game sc
 - Firebase Auth (email/password) + Sign in with Apple.
 - Firestore global leaderboard with rank calculation and profile loading.
 - Game Center achievements and integration.
-- Mock services for offline development/testing.
+- Mock services for offline development/testing, serving as fakes, stubs, or spies depending on usage.
 - Dependency Injection and clear separation of concerns (services, view models, app state).
 - Design/architecture patterns used: MVVM (SwiftUI views + ViewModels), Service layer, AppState, Singleton utilities (AudioService, GameCenterService), Factory pattern, Strategy pattern (ship movement), and more.
 - Polished UI: subtle animations, parallax, vignette, haptics and sound design.
@@ -198,12 +198,6 @@ This repository is intended as a portfolio / demonstration. If you find issues o
 
 ---
 
-## License
-
-The code in the repository is released under the **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License** (see `LICENSE`).
-
----
-
 ## Screenshots
 
 <p align="center">
@@ -223,6 +217,16 @@ The code in the repository is released under the **Creative Commons Attribution-
   <img src="Screenshots/leaderboard.png" width="260">
   <img src="Screenshots/info.png" width="260">
 </p>
+
+---
+
+## License
+
+This project is licensed under:
+
+**Creative Commons Attribution‑NonCommercial‑NoDerivatives 4.0 International**
+
+See `LICENSE` for details.
 
 ---
 

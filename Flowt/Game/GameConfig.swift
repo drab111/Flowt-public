@@ -10,7 +10,7 @@ import SpriteKit
 enum GameConfig {
     // Time intervals
     static let spawnPortInterval: TimeInterval = 30.0
-    static let spawnCargoInterval: TimeInterval = 2.5 // Only on initial load
+    static let spawnCargoInterval: TimeInterval = 3.0 // Only on initial load
     static let spawnStormInterval: TimeInterval = 38.7
     static let spawnAdditionalStormInterval: TimeInterval = 42.9
     static let upgradePopupInterval: TimeInterval = 100.0
@@ -26,7 +26,7 @@ enum GameConfig {
     
     // Spawning
     static let minDistanceToPort: CGFloat = 50
-    static let minDistanceToIsland: CGFloat = 52
+    static let minDistanceToIsland: CGFloat = 75
     static let minDistanceToButton: CGFloat = 45
     static let PointsToSpawnAdditionalStorm: Int = 300
     
@@ -41,7 +41,7 @@ enum GameConfig {
     
     // Ship
     static let shipSpeed: CGFloat = 30
-    static let portSpeed: CGFloat = 20
+    static let portSpeed: CGFloat = 15
     static let stormSlowdown: CGFloat = 0.5
     static let portDetectionRadius: CGFloat = 15
     static let shipSize = CGSize(width: 25, height: 25)
@@ -57,7 +57,7 @@ enum GameConfig {
     
     // Rewards
     static let milestoneRewards: [Int: UIColor] = [
-        20: GameConfig.routeColors[2],
+        30: GameConfig.routeColors[2],
         150: GameConfig.routeColors[3],
         500: GameConfig.routeColors[4]
     ]

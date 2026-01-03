@@ -145,11 +145,11 @@ extension GameScene {
     // MARK: - Islands
     func setupIslands() {
         let islandConfigs: [(CGPoint, CGFloat, String)] = [
-            (CGPoint(x: size.width * 0.25, y: size.height * 0.35), 40, "IslandTexture1"),
-            (CGPoint(x: size.width * 0.47, y: size.height * 0.2), 50, "IslandTexture2"),
-            (CGPoint(x: size.width * 0.75, y: size.height * 0.75), 45, "IslandTexture3"),
-            (CGPoint(x: size.width * 0.4, y: size.height * 0.55), 55, "IslandTexture4"),
-            (CGPoint(x: size.width * 0.67, y: size.height * 0.41), 50, "IslandTexture5")
+            (CGPoint(x: size.width * 0.25, y: size.height * 0.35), 65, "IslandTexture1"),
+            (CGPoint(x: size.width * 0.47, y: size.height * 0.2), 75, "IslandTexture2"),
+            (CGPoint(x: size.width * 0.70, y: size.height * 0.77), 70, "IslandTexture3"),
+            (CGPoint(x: size.width * 0.4, y: size.height * 0.55), 80, "IslandTexture4"),
+            (CGPoint(x: size.width * 0.67, y: size.height * 0.41), 75, "IslandTexture5")
         ]
         
         for (pos, radius, pic) in islandConfigs { addIsland(position: pos, radius: radius, picture: pic) }
@@ -251,12 +251,32 @@ extension GameScene {
         showGameOverLabel(camera: camera)
         Task { await AudioService.shared.playEndGameSound() }
         
+        let shake = shakeCamera()
         let move = SKAction.move(to: port.position, duration: duration)
         let zoom = SKAction.scale(to: scale, duration: duration)
-        let group = SKAction.group([move, zoom])
-        group.timingMode = .easeInEaseOut
-
-        camera.run(group)
+        let focusGroup = SKAction.group([move, zoom])
+        focusGroup.timingMode = .easeInEaseOut
+        
+        let sequence = SKAction.sequence([shake, focusGroup])
+        
+        camera.run(sequence)
+    }
+    
+    private func shakeCamera(duration: TimeInterval = 0.2, shakeStep: TimeInterval = 0.04, amplitude: CGFloat = 4) -> SKAction {
+        let numberOfShakes = Int(duration / shakeStep)
+        var actions: [SKAction] = []
+        
+        for _ in 0..<numberOfShakes {
+            let dx = CGFloat.random(in: -amplitude...amplitude)
+            let dy = CGFloat.random(in: -amplitude...amplitude)
+            
+            let move = SKAction.moveBy(x: dx, y: dy, duration: shakeStep)
+            move.timingMode = .easeOut
+            actions.append(move)
+            actions.append(move.reversed())
+        }
+        
+        return SKAction.sequence(actions)
     }
     
     private func showGameOverLabel(camera: SKCameraNode) {

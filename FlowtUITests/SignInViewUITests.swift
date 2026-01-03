@@ -8,7 +8,7 @@
 import XCTest
 
 final class SignInViewUITests: XCTestCase {
-    private let defaultTimeout: TimeInterval = 60
+    private let defaultTimeout: TimeInterval = 20
     var app: XCUIApplication!
 
     override func setUpWithError() throws {

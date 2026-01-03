@@ -71,8 +71,10 @@ class Ship: SKNode {
     }
     
     func rotateShip(angle: CGFloat) {
-        let rotateAction = SKAction.rotate(toAngle: angle, duration: 0, shortestUnitArc: true)
-        shipSprite.run(rotateAction)
+        shipSprite.removeAction(forKey: "rotate")
+        let rotate = SKAction.rotate(toAngle: angle, duration: 0.15, shortestUnitArc: true)
+        rotate.timingMode = .easeOut
+        shipSprite.run(rotate, withKey: "rotate")
     }
     
     // MARK: - Movement and Unloading

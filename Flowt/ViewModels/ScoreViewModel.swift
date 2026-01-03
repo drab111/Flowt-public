@@ -14,6 +14,7 @@ final class ScoreViewModel: ObservableObject {
     @Published var userRank: Int?
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var sharePayload: ScoreSharePayload?
     @Published var leaderboard: [(entry: ScoreEntry, profile: UserProfile?, isCurrentUser: Bool, isLatest: Bool)] = [] {
         didSet {
             if leaderboard.contains(where: { $0.isLatest }) {
@@ -46,6 +47,7 @@ final class ScoreViewModel: ObservableObject {
         errorMessage = nil
         hasSaved = false
         profileCache = [:]
+        sharePayload = nil
     }
     
     // MARK: - Leaderboard Loading
@@ -110,6 +112,9 @@ final class ScoreViewModel: ObservableObject {
         }
         
         leaderboard = mapped
+        
+        // additional generate score pic
+        Task { sharePayload = makeSharePayload() }
     }
     
     // MARK: - Sharing

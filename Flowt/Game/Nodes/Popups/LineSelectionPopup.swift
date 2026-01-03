@@ -13,7 +13,7 @@ class LineSelectionPopup: SKNode, Popup {
     init(size: CGSize, amountOfLines: Int, onLineSelected: ((Int) -> Void)? = nil) {
         super.init()
         self.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        self.zPosition = 6
+        self.zPosition = 9
         self.name = "LineSelectionPopup"
         self.onLineSelected = onLineSelected
         
