@@ -12,13 +12,7 @@ class AppState: ObservableObject {
     private let authSession: AuthSession
     @Published var currentScreen: Screen = .loading
     @Published var currentUser: AuthUser? = nil
-    @Published var currentUserProfile: UserProfile? = nil {
-        didSet {
-            if let profile = currentUserProfile {
-                NotificationCenter.default.post(name: .userPreferencesChanged, object: profile)
-            }
-        }
-    }
+    @Published var currentUserProfile: UserProfile? = nil
     
     init(authSession: AuthSession? = nil) {
         let env = ProcessInfo.processInfo.environment

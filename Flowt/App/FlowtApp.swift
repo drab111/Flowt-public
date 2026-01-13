@@ -23,8 +23,11 @@ struct FlowtApp: App {
         let appState = AppState()
         // Assign object directly to the wrapper instead of the variable
         _appState = StateObject(wrappedValue: appState)
+        
         GameCenterService.shared.authenticate()
-        _ = AudioService.shared // Trigger initialization to set up the observer
+        
+        // Configure AudioService to react to user preference changes
+        AudioService.shared.bind(appState.$currentUserProfile.eraseToAnyPublisher())
     }
     
     var body: some Scene {

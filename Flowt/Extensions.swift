@@ -40,7 +40,3 @@ extension UIImage {
         return nil
     }
 }
-
-extension Notification.Name {
-    static let userPreferencesChanged = Notification.Name("userPreferencesChanged")
-}

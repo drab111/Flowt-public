@@ -1,11 +1,12 @@
 # Flowt: Offshore
 
-**Flowt** is a fully–polished iOS strategy game built with a modern, modular Swift codebase.
+> **Flowt** is a fully–polished iOS strategy game built with a modern, modular Swift codebase.
 It’s a paid App Store title that demonstrates real production engineering: clean architecture, async data pipelines, automated testing, CI/CD, and a well‑designed, animation–driven UI.
 
-> Live on the App Store: https://apps.apple.com/app/flowt-offshore/id6753603068
->
-> Demo trailer: https://streamable.com/ctp2us
+## App Store & Demo
+
+- 📱 **App Store:** https://apps.apple.com/app/flowt-offshore/id6753603068
+- 🎬 **Demo video:** https://dai.ly/km20pEqIjcBsfGEC4SW
 
 ---
 
@@ -22,17 +23,16 @@ This repository is the **public demonstration** of the Flowt codebase. It contai
 
 1. [Short description](#short-description)
 2. [Highlights & features](#highlights--features)
-3. [Architecture & design decisions](#architecture--design-decisions)
-4. [Tech stack](#tech-stack)
-5. [Project structure (high level)](#project-structure-high-level)
-6. [Running locally (quick start)](#running-locally-quick-start)
-7. [Running tests (unit / integration / UI)](#running-tests-unit--integration--ui)
-8. [CI / CD (Xcode Cloud)](#ci--cd-xcode-cloud)
+3. [Tech stack](#tech-stack)
+4. [Architecture & design decisions](#architecture--design-decisions)
+5. [Running locally (quick start)](#running-locally-quick-start)
+6. [Running tests (unit / integration / UI)](#running-tests-unit--integration--ui)
+7. [CI / CD (Xcode Cloud)](#ci--cd-xcode-cloud)
+8. [Project structure](#project-structure)
 9. [Design & UX polish notes](#design--ux-polish-notes)
-10. [Contributing](#contributing)
-11. [Screenshots](#screenshots)
-12. [License](#license)
-13. [Contact](#contact)
+10. [Screenshots](#screenshots)
+11. [License](#license)
+12. [Contact](#contact)
 
 ---
 
@@ -55,10 +55,24 @@ The repository contains the full application: SwiftUI wrapper, SpriteKit game sc
 - Dependency Injection and clear separation of concerns (services, view models, app state).
 - Design/architecture patterns used: MVVM (SwiftUI views + ViewModels), Service layer, AppState, Singleton utilities (AudioService, GameCenterService), Factory pattern, Strategy pattern (ship movement), and more.
 - Polished UI: subtle animations, parallax, vignette, haptics and sound design.
-- Swift Concurrency used across service APIs, views and view models.
+- Swift Concurrency and Combine used where appropriate: structured concurrency for sequential flows, Combine for reactive state and event streams.
 - NSFW detector: open source integration used to validate uploaded avatars in Profile flow.
 - Full automated test coverage: Unit, Integration and UI tests (using mocks where appropriate); overall **coverage above 85%**.
 - Xcode Cloud CI / CD configured: build, test (test plan), bump build number, archive and distribute to App Store Connect & TestFlight; internal + external tester notification.
+
+---
+
+## Tech stack
+
+- **Language:** Swift
+- **UI:** SwiftUI (app shell), SpriteKit (2D game scene)
+- **Architecture:** MVVM + Service layer + centralized AppState
+- **Concurrency & reactive state:** Swift Concurrency, Combine
+- **Authentication & Realtime DB:** Firebase Auth + Firestore
+- **Game Center:** Achievements & integration
+- **Dependency management:** Swift Package Manager
+- **CI/CD:** Xcode Cloud
+- **Testing:** XCTest, XCUITest (unit, integration, UI)
 
 ---
 
@@ -92,41 +106,6 @@ A custom deterministic cargo factory allows integration tests to generate stable
 Both unit tests and UI tests rely on mock service implementations, which replace Firebase, networking and game data during test execution.
 This keeps the tests fully isolated, fast and deterministic.
 Unit, integration and UI tests run as part of the Xcode Cloud pipeline, providing full regression coverage for gameplay, authentication and user flows across the entire application.
-
----
-
-## Tech stack
-
-- Language: Swift
-- UI: SwiftUI (app UI), SpriteKit (2D game scene)
-- Authentication & Realtime DB: Firebase Auth + Firestore
-- Game Center: Achievements & integration
-- Dependency management: Swift Package Manager
-- CI/CD: Xcode Cloud (build, test, archive, distribute)
-- Unit, Integration & UI tests: XCTest, XCUITest
-
----
-
-## Project structure (high level)
-
-```
-Flowt/
-  ├─ App/                # AppState, App entry, RootView
-  ├─ Game/               # Game core: GameScene, nodes, factories, movement strategies
-  ├─ Views/              # SwiftUI views & shared components
-  ├─ ViewModels/         # ViewModels for each screen
-  ├─ Services/           # AuthService, ScoreService, ProfileService, AudioService, GameCenterService, AppReviewService
-  ├─ Mocks/              # MockAuthService, MockProfileService, MockScoreService, MockAppReviewService
-  ├─ Models/             # AuthUser, UserProfile, ScoreEntry, TutorialPage
-  ├─ Tests/
-  │   ├─ UnitTests/
-  │   ├─ IntegrationTests/
-  │   └─ UITests/
-  ├─ Assets/
-  └─ GameConfig.swift
-```
-
-> The repository includes a `CITestPlan.xctestplan` that defines test parallelization and retry behavior.
 
 ---
 
@@ -183,18 +162,35 @@ This public repository has its own Xcode Cloud pipeline, configured almost ident
 
 ---
 
+## Project structure
+
+```
+Flowt/
+  ├─ App/                # AppState, App entry, RootView
+  ├─ Game/               # Game core: GameScene, nodes, factories, movement strategies
+  ├─ Views/              # SwiftUI views & shared components
+  ├─ ViewModels/         # ViewModels for each screen
+  ├─ Services/           # AuthService, ScoreService, ProfileService, AudioService, GameCenterService, AppReviewService
+  ├─ Mocks/              # MockAuthService, MockProfileService, MockScoreService, MockAppReviewService
+  ├─ Models/             # AuthUser, UserProfile, ScoreEntry, TutorialPage
+  ├─ Tests/
+  │   ├─ UnitTests/
+  │   ├─ IntegrationTests/
+  │   └─ UITests/
+  ├─ Assets/
+  └─ GameConfig.swift
+```
+
+> The repository includes a `CITestPlan.xctestplan` that defines test parallelization and retry behavior.
+
+---
+
 ## Design & UX polish notes (what I paid attention to)
 
 - Carefully designed motion: ocean background with layered gradients, animated waves and subtle brightness pulsing.
 - SpriteKit nodes are composed to produce soft shadows, blurred effects and dynamic outlines for islands, storms, ports and ships.
 - Haptics and short sound cues are used to communicate success / failure / attention.
 - UI accessibility: identifiers are present for UI tests and assistive interactions.
-
----
-
-## Contributing
-
-This repository is intended as a portfolio / demonstration. If you find issues or want to suggest improvements, open an issue or a pull request with clear motivation. For local development, follow the steps in the “Running locally” section — especially regarding Firebase configuration and mock mode.
 
 ---
 

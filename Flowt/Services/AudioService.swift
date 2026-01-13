@@ -7,43 +7,44 @@
 
 import AudioToolbox
 import AVFoundation
+import Combine
 import SpriteKit
 
 protocol AudioServiceProtocol {
     func start()
     func stop()
-    var hasPlayer: Bool { get }
     var musicEnabled: Bool { get set }
     var sfxEnabled: Bool { get set }
 }
 
 final class AudioService: AudioServiceProtocol {
-    static let shared = AudioService() // Singleton
+    static let shared = AudioService()
     
-    private var endObserver: Any?
-    private var preferencesObserver: Any?
+    private var preferenceCancellables = Set<AnyCancellable>()
+    private var playbackCancellables = Set<AnyCancellable>()
+    
     private var player: AVPlayer?
     private var trackNames = ["track1", "track2", "track3"]
     private var currentIndex = 0
     
-    var hasPlayer: Bool { return player != nil }
     var musicEnabled: Bool = true
     var sfxEnabled: Bool = true
     
-    private init() {
+    private init() {}
+    
+    func bind(_ userProfilePublisher: AnyPublisher<UserProfile?, Never>) {
         guard ProcessInfo.processInfo.environment["USE_MOCK_SERVICES"] != "1" else { return }
-        preferencesObserver = NotificationCenter.default.addObserver(forName: .userPreferencesChanged, object: nil, queue: .main) { [weak self] notification in
-            guard let profile = notification.object as? UserProfile else { return }
-            Task { @MainActor in
+        preferenceCancellables.removeAll()
+        
+        userProfilePublisher
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] profile in
                 self?.applyPreferences(profile: profile)
             }
-        }
+            .store(in: &preferenceCancellables)
     }
-    
-    deinit {
-        if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
-        if let preferencesObserver { NotificationCenter.default.removeObserver(preferencesObserver) }
-    }
+
     
     // MARK: - Preference Handling
     private func applyPreferences(profile: UserProfile) {
@@ -51,10 +52,8 @@ final class AudioService: AudioServiceProtocol {
         musicEnabled = profile.musicEnabled
         
         if profile.musicEnabled {
-            if !hasPlayer { start() }
-        } else {
-            if hasPlayer { stop() }
-        }
+            start()
+        } else { stop() }
     }
     
     // MARK: - Music Playback
@@ -76,11 +75,6 @@ final class AudioService: AudioServiceProtocol {
             return
         }
         
-        if let endObserver {
-            NotificationCenter.default.removeObserver(endObserver)
-            self.endObserver = nil
-        }
-        
         guard let url = Bundle.main.url(forResource: trackNames[index], withExtension: "mp3") else { return }
         
         let item = AVPlayerItem(url: url)
@@ -89,16 +83,20 @@ final class AudioService: AudioServiceProtocol {
         player?.play()
         
         // Observe when the audio track finishes playing in order to play the next track
-        endObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { [weak self] _ in
-            guard let self = self else { return }
-            self.currentIndex += 1
-            self.playTrack(index: self.currentIndex)
-        }
+        NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
+            .prefix(1) // automatically ends the subscription after the first event
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.playbackCancellables.removeAll()
+                self.currentIndex += 1
+                self.playTrack(index: self.currentIndex)
+            }
+            .store(in: &playbackCancellables)
     }
     
     func stop() {
-        if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
-        endObserver = nil
+        playbackCancellables.removeAll()
         player?.pause()
         player = nil
     }
@@ -130,7 +128,7 @@ final class AudioService: AudioServiceProtocol {
         
         // Observe when the audio track finishes playing
         for await _ in NotificationCenter.default.notifications(named: .AVPlayerItemDidPlayToEndTime, object: item) {
-            break // First event is enough
+            break // first event is enough
         }
         player = nil
         
