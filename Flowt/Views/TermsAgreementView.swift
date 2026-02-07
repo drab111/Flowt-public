@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SafariServices
 
 struct TermsAgreementView: View {
     @ObservedObject var infoVM: InfoViewModel
@@ -30,9 +29,9 @@ struct TermsAgreementView: View {
                 buttonPanel
                 Spacer(minLength: 30)
             }
-            .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL).accessibilityIdentifier("terms_modal") }
-            .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL).accessibilityIdentifier("privacy_modal") }
         }
+        .sheet(isPresented: $showTerms) { SafariSheet(url: infoVM.termsURL).accessibilityIdentifier("terms_modal") }
+        .sheet(isPresented: $showPrivacy) { SafariSheet(url: infoVM.privacyURL).accessibilityIdentifier("privacy_modal") }
         .scrollBounceBehavior(.basedOnSize)
     }
     

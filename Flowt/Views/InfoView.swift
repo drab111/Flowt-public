@@ -10,7 +10,6 @@ import SwiftUI
 struct InfoView: View {
     @ObservedObject var infoVM: InfoViewModel
     @Environment(\.openURL) private var openURL
-    @State private var sheen = false
     @State private var showTerms = false
     @State private var showPrivacy = false
     
@@ -28,9 +27,6 @@ struct InfoView: View {
             .padding(.horizontal)
             .padding(.top, 18)
             .padding(.bottom, 28)
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: false)) { sheen.toggle() }
         }
         .accessibilityIdentifier("info_scrollView")
     }

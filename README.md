@@ -1,7 +1,7 @@
 # Flowt: Offshore
 
-> **Flowt** is a fully–polished iOS strategy game built with a modern, modular Swift codebase.
-It’s a paid App Store title that demonstrates real production engineering: clean architecture, async data pipelines, automated testing, CI/CD, and a well‑designed, animation–driven UI.
+> **Flowt** is a fully–polished iOS strategy game built with a modern Swift codebase.
+It’s a paid App Store title that demonstrates real production engineering: an MVVM-based architecture with a service layer, async data pipelines, automated testing, CI/CD, and a polished, animation–driven UI.
 
 ## App Store & Demo
 
@@ -12,10 +12,10 @@ It’s a paid App Store title that demonstrates real production engineering: cle
 
 ## About this repository (important)
 This repository is the **public demonstration** of the Flowt codebase. It contains the same architecture, features and tests as the production app, but is intentionally decoupled from production infrastructure:
-- The public repo is connected to a **dedicated demo Firebase project** and uses a **separate bundle identifier** (so it is safe to run and share).
-- The production app (App Store build), production Firebase project and the production CI/CD configuration remain in a **private repository**.
-- This public copy is intended for review and local testing; it does **not** include any production secrets or credentials.
-- Access to the full production repository is available **on request for recruiters / hiring managers**.
+- The public repo is connected to a **dedicated demo Firebase project** and uses a **separate bundle identifier** (so it is safe to run and share)
+- The production app (App Store build), production Firebase project and the production CI/CD configuration remain in a **private repository**
+- This public copy is intended for review and local testing; it does **not** include any production secrets or credentials
+- Access to the full production repository is available **on request for recruiters / hiring managers**
 
 ---
 
@@ -46,19 +46,19 @@ The repository contains the full application: SwiftUI wrapper, SpriteKit game sc
 
 ## Highlights & features
 
-- End-to-end iOS app shipped to the App Store (paid app).
-- Two UI paradigms used intentionally: **SwiftUI** (app wrapper, menus, profile, leaderboard, settings) + **SpriteKit** (performance-sensitive 2D game scene).
-- Firebase Auth (email/password) + Sign in with Apple.
-- Firestore global leaderboard with rank calculation and profile loading.
-- Game Center achievements and integration.
-- Mock services for offline development/testing, serving as fakes, stubs, or spies depending on usage.
-- Dependency Injection and clear separation of concerns (services, view models, app state).
-- Design/architecture patterns used: MVVM (SwiftUI views + ViewModels), Service layer, AppState, Singleton utilities (AudioService, GameCenterService), Factory pattern, Strategy pattern (ship movement), and more.
-- Polished UI: subtle animations, parallax, vignette, haptics and sound design.
-- Swift Concurrency and Combine used where appropriate: structured concurrency for sequential flows, Combine for reactive state and event streams.
-- NSFW detector: open source integration used to validate uploaded avatars in Profile flow.
-- Full automated test coverage: Unit, Integration and UI tests (using mocks where appropriate); overall **coverage above 85%**.
-- Xcode Cloud CI / CD configured: build, test (test plan), bump build number, archive and distribute to App Store Connect & TestFlight; internal + external tester notification.
+- End-to-end iOS app shipped to the App Store (paid app)
+- Two UI paradigms used intentionally: **SwiftUI** (app wrapper, menus, profile, leaderboard, settings) + **SpriteKit** (performance-sensitive 2D game scene)
+- Firebase Auth (email/password) + Sign in with Apple
+- Firestore global leaderboard with rank calculation and profile loading
+- Game Center achievements and integration
+- Mock services for offline development/testing, serving as fakes, stubs, or spies depending on usage
+- Dependency Injection and clear separation of concerns (services, view models, app state)
+- Design/architecture patterns used: MVVM (SwiftUI views + ViewModels), Service layer, AppState, Singleton utilities (AudioService, GameCenterService), Factory pattern, Strategy pattern (ship movement), and more
+- Polished UI: subtle animations, parallax, vignette, haptics and sound design
+- Swift Concurrency and Combine used where appropriate: structured concurrency for sequential flows, Combine for reactive state and event streams
+- NSFW detector: open source integration used to validate uploaded avatars in Profile flow
+- Full automated test coverage: Unit, Integration and UI tests (using mocks where appropriate); overall **coverage above 85%**
+- Xcode Cloud CI / CD configured: build, test (test plan), bump build number, archive and distribute to App Store Connect & TestFlight; internal + external tester notification
 
 ---
 
@@ -125,17 +125,17 @@ open Flowt.xcodeproj
 
 2. **Run with mock services (fast, deterministic)**
 
-- Set environment variable USE_MOCK_SERVICES=1 in the scheme (Edit Scheme → Run → Arguments → Environment Variables) or export it in the shell before launching Xcode.
-- Optional for UI tests / demos: set SKIP_TERMS_AGREEMENT=1 to skip the terms flow.
+- Set environment variable USE_MOCK_SERVICES=1 in the scheme (Edit Scheme → Run → Arguments → Environment Variables) or export it in the shell before launching Xcode
+- Optional for UI tests / demos: set SKIP_TERMS_AGREEMENT=1 to skip the terms flow
 
 When USE_MOCK_SERVICES=1 the app uses MockAuthService, MockProfileService and MockScoreService (no Firebase needed).
 
 3. **Run with Firebase**
 
-- The repo contains a demo `GoogleService-Info.plist` for the public Firebase project.
-- No production data is used.
-- Authentication and Firestore are fully functional, but isolated from the App Store build.
-- To switch to Firebase mode, simply remove USE_MOCK_SERVICES from the scheme.
+- The repo contains a demo `GoogleService-Info.plist` for the public Firebase project
+- No production data is used
+- Authentication and Firestore are fully functional, but isolated from the App Store build
+- To switch to Firebase mode, simply remove USE_MOCK_SERVICES from the scheme
 
 ---
 
@@ -156,9 +156,9 @@ Unit, Integration and UI tests run without additional configuration.
 
 This public repository has its own Xcode Cloud pipeline, configured almost identically to the production setup. The pipeline includes:
 
-- Triggers: runs on `main` branch updates.
-- Actions: build → test (uses `CITestPlan.xctestplan`) → bump build number → archive.
-- Post-archive actions: upload to App Store Connect and TestFlight (internal + external testers), and run post-distribution notifications.
+- Triggers: runs on `main` branch updates
+- Actions: build → test (uses `CITestPlan.xctestplan`) → bump build number → archive
+- Post-archive actions: upload to App Store Connect and TestFlight (internal + external testers), and run post-distribution notifications
 
 ---
 
@@ -187,10 +187,10 @@ Flowt/
 
 ## Design & UX polish notes (what I paid attention to)
 
-- Carefully designed motion: ocean background with layered gradients, animated waves and subtle brightness pulsing.
-- SpriteKit nodes are composed to produce soft shadows, blurred effects and dynamic outlines for islands, storms, ports and ships.
-- Haptics and short sound cues are used to communicate success / failure / attention.
-- UI accessibility: identifiers are present for UI tests and assistive interactions.
+- Carefully designed motion: ocean background with layered gradients, animated waves and subtle brightness pulsing
+- SpriteKit nodes are composed to produce soft shadows, blurred effects and dynamic outlines for islands, storms, ports and ships
+- Haptics and short sound cues are used to communicate success / failure / attention
+- UI accessibility: identifiers are present for UI tests and assistive interactions
 
 ---
 
@@ -233,4 +233,4 @@ If you have any questions about the project, feel free to reach out at:
 
 ---
 
-*Thanks for taking a look — Flowt is my flagship iOS project demonstrating end-to-end app engineering, polished UI and clean architecture.*
+*Thanks for taking a look. Flowt is a complete, production-ready iOS project built to showcase real-world app architecture, testing and UI polish.*

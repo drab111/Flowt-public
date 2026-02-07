@@ -13,8 +13,6 @@ struct GameView: View {
     @ObservedObject var scoreVM: ScoreViewModel
     @ObservedObject var accountScoreVM: AccountScoreViewModel
     
-    @State private var sheen = false
-    
     // MARK: - Body
     var body: some View {
         VStack(spacing: 18) {
@@ -31,9 +29,6 @@ struct GameView: View {
         .task {
             await scoreVM.loadLeaderboard(limit: 1)
             await accountScoreVM.loadUserStats()
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: false)) { sheen.toggle() }
         }
         .fullScreenCover(item: $gameVM.activePhase) { phase in
             switch phase {

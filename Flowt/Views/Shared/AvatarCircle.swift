@@ -33,20 +33,12 @@ struct AvatarCircle: View {
     
     // MARK: - Helpers
     func decodeAndSetImage(base64: String?) async {
-        // Fallback when no data is available
-        guard let string = base64?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty else {
-            await MainActor.run { uiImage = nil }
+        guard let string = base64?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty, let data = Data(base64Encoded: string), let image = UIImage(data: data)
+        else {
+            uiImage = nil
             return
         }
 
-        // Decode in the background without blocking the UI
-        let decoded: UIImage? = await Task.detached(priority: .utility) {
-            guard let data = Data(base64Encoded: string) else { return nil }
-            return UIImage(data: data)
-        }.value // Wait asynchronously (await) until the task completes and return its result
-        // (since Task.detached doesn’t normally wait for a result)
-
-        // If decoding fails — keep the fallback
-        await MainActor.run { uiImage = decoded }
+        uiImage = image
     }
 }

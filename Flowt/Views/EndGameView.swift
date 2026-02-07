@@ -11,8 +11,6 @@ struct EndGameView: View {
     @ObservedObject var gameVM: GameViewModel
     @ObservedObject var scoreVM: ScoreViewModel
     
-    @State private var sheen = false
-    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -35,9 +33,6 @@ struct EndGameView: View {
             .accessibilityIdentifier("endGame_scrollView")
         }
         .task { await scoreVM.saveAndLoadLeaderboard(limit: 3) }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: false)) { sheen.toggle() }
-        }
     }
     
     // MARK: - Panels

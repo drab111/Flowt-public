@@ -45,8 +45,6 @@ struct CustomTabBar: View {
     var animation: Namespace.ID
     let onTabChange: (MainMenuTab) -> Void
     
-    @State private var bubbleOffset: CGFloat = 0
-    
     var body: some View {
         ZStack {
             // Background of the progress bar

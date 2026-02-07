@@ -8,7 +8,13 @@
 import GameKit
 
 @MainActor
-final class GameCenterService {
+protocol GameCenterServiceProtocol {
+    func authenticate()
+    func unlockAchievement(id: String)
+}
+
+@MainActor
+final class GameCenterService: GameCenterServiceProtocol {
     static let shared = GameCenterService()
     var displayName: String? { GKLocalPlayer.local.isAuthenticated ? GKLocalPlayer.local.displayName : nil }
     private init() {}

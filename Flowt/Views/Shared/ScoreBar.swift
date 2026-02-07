@@ -23,7 +23,6 @@ struct ScoreBar: View {
                         .fill(LinearGradient(colors: [.cyan, .teal], startPoint: .leading, endPoint: .trailing))
                         .frame(width: max(8, geo.size.width * min(progress, 1)), height: 8)
                         .shadow(color: .cyan.opacity(0.6), radius: pulse ? 8 : 2)
-                        .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: pulse)
                 }
                 .frame(height: 8)
             }
@@ -32,6 +31,10 @@ struct ScoreBar: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.8))
         }
-        .onAppear { pulse = true }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
+                pulse.toggle()
+            }
+        }
     }
 }
